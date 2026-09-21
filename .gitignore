@@ -1,0 +1,15 @@
+# Maven build output
+target/
+build/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Sensitive files
+application.properties
+application.yml
+.env
+*.key
+*.pem
