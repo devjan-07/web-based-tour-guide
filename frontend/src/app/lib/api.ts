@@ -1,5 +1,5 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080/api";
-const MANAGEMENT_AUTH_REQUIRED = import.meta.env.VITE_MANAGEMENT_AUTH_REQUIRED === "true";
+const MANAGEMENT_AUTH_REQUIRED = import.meta.env.VITE_MANAGEMENT_AUTH_REQUIRED !== "false";
 export { API_BASE_URL };
 
 export interface Destination {
