@@ -219,6 +219,23 @@ export default function TouristBookingCreate() {
     event.preventDefault();
     setError("");
 
+    if (!checkIn || !checkOut) {
+      setError("Please select both check-in and check-out dates.");
+      return;
+    }
+    if (new Date(checkOut) <= new Date(checkIn)) {
+      setError("Check-out must be after check-in.");
+      return;
+    }
+    if (guests < 1) {
+      setError("At least one guest is required.");
+      return;
+    }
+    if (selectedAccommodation && rooms < 1) {
+      setError("At least one room is required.");
+      return;
+    }
+
     setSubmitting(true);
     try {
       const booking = await touristBookingsApi.create({
