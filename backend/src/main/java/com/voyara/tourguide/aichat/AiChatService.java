@@ -176,37 +176,10 @@ public class AiChatService {
     }
 
     private String cancellationReply(String q) {
-        if (q.contains("hotel") || q.contains("room") || q.contains("check-in") || q.contains("check in")) {
-            return "Hotel room cancellations: you can cancel up to 24 hours before check-in for a full refund to the original payment method.\n\n"
-                    + "Some boutique properties may require 48 hours, so Voyara confirms the exact terms at booking.\n\n"
-                    + "To cancel, send a written request to cancellations@voyara.lk or use the booking portal. Approved refunds are processed within 5 to 7 business days.";
-        }
-        if (q.contains("tour") || q.contains("excursion") || q.contains("day")) {
-            return "Guided tours and day-excursions: cancel up to 48 hours before the tour start time for a full refund or re-booking credit.\n\n"
-                    + "Large group tours may require 72 hours' notice.\n\n"
-                    + "To cancel, send a written request to cancellations@voyara.lk or use the booking portal.";
-        }
-        if (q.contains("package") || q.contains("multi-day") || q.contains("multiday")) {
-            return "Multi-day packages: cancel up to 7 days before the first scheduled day for an 80% refund. A 20% admin fee applies.\n\n"
-                    + "If you cancel later, Voyara can offer travel credit valid for 12 months.\n\n"
-                    + "To cancel, send a written request to cancellations@voyara.lk or use the booking portal.";
-        }
-        if (q.contains("vehicle") || q.contains("car") || q.contains("van") || q.contains("bus") || q.contains("rental")) {
-            return "Vehicle rentals: cancel up to 24 hours before pick-up for a full refund.\n\n"
-                    + "Late cancellations may incur a 50% charge.\n\n"
-                    + "To cancel, send a written request to cancellations@voyara.lk or use the booking portal.";
-        }
-        if (q.contains("custom") || q.contains("itinerary")) {
-            return "Custom itinerary cancellations are handled according to the terms agreed in your proposal, usually with around 5 days' notice.\n\n"
-                    + "Refund terms are confirmed case-by-case. Send your request to cancellations@voyara.lk or through the booking portal.";
-        }
-        return "Voyara cancellation policy depends on the booking type:\n\n"
-                + "- Hotels: 24 hours before check-in for a full refund; some boutique stays may require 48 hours.\n"
-                + "- Guided tours/day excursions: 48 hours before start for a full refund or re-booking credit; large groups may require 72 hours.\n"
-                + "- Multi-day packages: 7 days before the first day for an 80% refund; later cancellations may receive 12-month travel credit.\n"
-                + "- Vehicle rentals: 24 hours before pick-up for a full refund; late cancellations may incur a 50% charge.\n"
-                + "- Custom itineraries: terms are agreed in the proposal.\n\n"
-                + "Please send cancellation requests to cancellations@voyara.lk or use the booking portal. Approved refunds are processed within 5 to 7 business days.\n\n"
-                + "What type of booking do you want to cancel?";
+        return "Voyara currently allows cancellation for bookings that are Pending or Confirmed. "
+                + "Paid bookings cannot be cancelled through the current system because a refund process is not implemented. "
+                + "Completed and already Cancelled bookings cannot be cancelled again.\\n\\n"
+                + "Open My Bookings, select the booking, and check its current status before requesting cancellation. "
+                + "If you need help with a specific booking, keep the booking ID ready for support.";
     }
 }
