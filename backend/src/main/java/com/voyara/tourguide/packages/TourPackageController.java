@@ -26,6 +26,11 @@ public class TourPackageController {
         return service.findAll();
     }
 
+    @GetMapping("/{id}/routes")
+    public List<com.voyara.tourguide.routes.Route> routes(@PathVariable Long id) {
+        return service.routesForPackage(id);
+    }
+
     @GetMapping("/{id}")
     public TourPackage one(@PathVariable Long id) {
         return service.findById(id);
