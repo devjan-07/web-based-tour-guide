@@ -34,13 +34,11 @@ public class AiChatService {
             """;
 
     private static final String CANCELLATION_POLICY = """
-            Voyara cancellation policy:
-            - Hotel rooms: cancel up to 24 hours before check-in for a full refund to the original payment method. Some boutique properties may require 48 hours; confirm exact terms at booking.
-            - Guided tours and day excursions: cancel up to 48 hours before the tour start for a full refund or re-booking credit. Large group tours may require 72 hours.
-            - Multi-day packages including transport, accommodation, and activities: cancel up to 7 days before the first scheduled day for an 80% refund. Voyara keeps a 20% admin fee. Later cancellations may receive travel credit valid for 12 months.
-            - Vehicle rentals: cancel up to 24 hours before pick-up for a full refund. Late cancellations may incur a 50% charge.
-            - Custom itineraries: terms are agreed in the proposal, usually with a 5-day notice period.
-            General rules: cancellation requests must be sent by email to cancellations@voyara.lk or through the booking portal. Approved refunds are issued within 5 to 7 business days. Promotional or pay-now no-refund offers may be excluded. For force-majeure events such as natural disasters, pandemics, or government travel bans, Voyara works with partners to provide refunds or re-booking credits regardless of the standard window.
+            Voyara cancellation guidance:
+            - A booking can be cancelled while its status is Pending or Confirmed.
+            - Paid bookings are not currently eligible for cancellation because the system does not implement a refund process.
+            - Completed and already Cancelled bookings cannot be cancelled again.
+            - For a booking-specific answer, direct the tourist to My Bookings and avoid claiming a refund or cancellation deadline that is not stored in the system.
             """;
 
     private final RestClient restClient;
