@@ -155,6 +155,28 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
                 )}
 
                 {item?.mode === "package" && (
+                  <div className="mt-8 rounded-2xl border border-gray-200 bg-gray-50 p-5">
+                    <h2 className="text-xl font-bold text-gray-900">Routes included in this package</h2>
+                    {routesLoading && <p className="mt-3 text-sm text-gray-500">Loading route details...</p>}
+                    {!routesLoading && packageRoutes.length === 0 && <p className="mt-3 text-sm text-gray-500">No active route details are linked to this package's destinations yet.</p>}
+                    {!routesLoading && packageRoutes.length > 0 && (
+                      <div className="mt-4 space-y-3">
+                        {packageRoutes.map((route) => (
+                          <div key={route.id} className="rounded-xl bg-white p-4">
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <p className="font-semibold text-gray-900">{route.routeName}</p>
+                              <span className="text-xs font-semibold text-gray-500">{route.distanceKm ? `${route.distanceKm} km` : "Distance not specified"}</span>
+                            </div>
+                            <p className="mt-1 text-sm text-gray-600">{route.startLocation} → {route.endLocation}</p>
+                            {route.estimatedDuration && <p className="mt-1 text-xs text-gray-500">Estimated duration: {route.estimatedDuration} minutes</p>}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {item?.mode === "package" && (
                   <div className="mt-8 rounded-2xl border border-rose-100 bg-rose-50 p-5">
                     <div className="flex items-start gap-3">
                       <Star className="mt-0.5 h-5 w-5 text-rose-500" />
