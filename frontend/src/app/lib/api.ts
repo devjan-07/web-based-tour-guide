@@ -17,6 +17,8 @@ export interface Destination {
   highlights: string;
 }
 
+export interface Route { id: number; destinationId: number; routeName: string; startLocation: string; endLocation: string; distanceKm?: number | null; estimatedDuration?: number | null; description?: string; status: "ACTIVE" | "INACTIVE"; }
+
 export interface TourPackage {
   id: number;
   name: string;
@@ -171,6 +173,7 @@ const PUBLIC_GET_PATHS = [
   "/accommodations",
   "/tour-guides",
   "/vehicles",
+  "/routes",
   "/reviews",
   "/ai-chat/welcome",
   "/ai-chat/suggestions",
@@ -250,7 +253,11 @@ function resource<T extends { id: Id }, Id extends string | number>(path: string
 }
 
 export const destinationsApi = resource<Destination, number>("/destinations");
-export const packagesApi = resource<TourPackage, number>("/packages");
+export const packagesApi = {
+  ...resource<TourPackage, number>("/packages"),
+  routes: (id: number) => request<Route[]>(`/packages/${id}/routes`),
+};
+export const routesApi = resource<Route, number>("/routes");
 export const bookingsApi = resource<Booking, string>("/bookings");
 export const touristBookingsApi = {
   list: () => request<Booking[]>("/tourist/bookings"),
