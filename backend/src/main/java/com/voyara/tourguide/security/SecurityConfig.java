@@ -32,6 +32,7 @@ public class SecurityConfig {
             "/api/accommodations", "/api/accommodations/**",
             "/api/tour-guides", "/api/tour-guides/**",
             "/api/vehicles", "/api/vehicles/**",
+            "/api/routes", "/api/routes/**",
             "/api/reviews", "/api/reviews/**"
     };
 
@@ -41,7 +42,8 @@ public class SecurityConfig {
             "/api/bookings", "/api/bookings/**",
             "/api/accommodations", "/api/accommodations/**",
             "/api/tour-guides", "/api/tour-guides/**",
-            "/api/vehicles", "/api/vehicles/**"
+            "/api/vehicles", "/api/vehicles/**",
+            "/api/routes", "/api/routes/**"
     };
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
