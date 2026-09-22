@@ -197,15 +197,14 @@ export function DashboardHome() {
       .sort((a, b) => b.value - a.value)
       .slice(0, 6);
 
-    const ratings = [
-      ...data.accommodations.map((item) => item.rating),
-      ...data.guides.map((item) => item.rating),
-    ].filter((rating) => Number.isFinite(rating) && rating > 0);
-    const totalReviews = [
-      ...data.accommodations.map((item) => item.reviews),
-      ...data.guides.map((item) => item.reviews),
-    ].reduce((sum, count) => sum + Number(count || 0), 0);
-    const averageRating = ratings.length ? ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length : 0;
+    const ratingSources = [
+      ...data.accommodations.map((item) => ({ rating: item.rating, reviews: item.reviews })),
+      ...data.guides.map((item) => ({ rating: item.rating, reviews: item.reviews })),
+      ...data.vehicles.map((item) => ({ rating: item.rating, reviews: item.reviews })),
+    ].filter((item) => Number.isFinite(item.rating) && item.rating > 0 && Number(item.reviews) > 0);
+    const totalReviews = ratingSources.reduce((sum, item) => sum + Number(item.reviews || 0), 0);
+    const weightedRatingTotal = ratingSources.reduce((sum, item) => sum + (Number(item.rating) * Number(item.reviews)), 0);
+    const averageRating = totalReviews > 0 ? weightedRatingTotal / totalReviews : 0;
 
     const bookingTrend = MONTHS.map((_, monthIndex) => data.bookings.filter((booking) => bookingDate(booking)?.getMonth() === monthIndex).length);
     const revenueTrend = revenueByMonth.map((item) => item.revenue);
