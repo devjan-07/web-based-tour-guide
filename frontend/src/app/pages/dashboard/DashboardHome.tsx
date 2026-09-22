@@ -173,9 +173,8 @@ export function DashboardHome() {
   const dashboard = useMemo(() => {
     const activeStatuses = new Set(["Confirmed", "Pending"]);
     const activeBookings = data.bookings.filter((booking) => activeStatuses.has(booking.status));
-    const totalRevenue = data.bookings.reduce((sum, booking) => sum + Number(booking.total || 0), 0);
-    const confirmedRevenue = data.bookings
-      .filter((booking) => booking.payment === "Paid" || booking.status === "Confirmed" || booking.status === "Completed")
+    const paidRevenue = data.bookings
+      .filter((booking) => booking.payment === "Paid")
       .reduce((sum, booking) => sum + Number(booking.total || 0), 0);
     const activeProperties = data.accommodations.filter((item) => item.status === "Active").length;
     const availableGuides = data.guides.filter((guide) => guide.status === "Available").length;
@@ -212,7 +211,7 @@ export function DashboardHome() {
     const revenueTrend = revenueByMonth.map((item) => item.revenue);
 
     const stats = [
-      { label: "Total Revenue", value: formatCurrency(totalRevenue), change: formatCurrency(confirmedRevenue), note: "confirmed value", icon: RupeeIcon, bg: "#fff0f3", color: "#FF385C", trend: trendFromValues(revenueTrend) },
+      { label: "Paid Revenue", value: formatCurrency(paidRevenue), change: `${data.bookings.filter((booking) => booking.payment === "Paid").length} paid`, note: "recorded payments", icon: RupeeIcon, bg: "#fff0f3", color: "#FF385C", trend: trendFromValues(revenueTrend) },
       { label: "Active Bookings", value: String(activeBookings.length), change: `${data.bookings.length} total`, note: "bookings", icon: CalendarCheck, bg: "#eff6ff", color: "#0057B8", trend: trendFromValues(bookingTrend) },
       { label: "Properties", value: String(data.accommodations.length), change: `${activeProperties} active`, note: `${availableVehicles} vehicles`, icon: BedDouble, bg: "#f0fdf4", color: "#16a34a", trend: trendFromValues(data.accommodations.map((item) => item.rooms)) },
       { label: "Tour Guides", value: String(data.guides.length), change: `${availableGuides} available`, note: "now", icon: UserCheck, bg: "#fefce8", color: "#ca8a04", trend: trendFromValues(data.guides.map((guide) => guide.toursCompleted)) },
@@ -303,10 +302,10 @@ export function DashboardHome() {
           <div className="flex items-center justify-between mb-5">
             <div>
               <h3 className="text-gray-900 dark:text-white" style={{ fontWeight: 700, fontSize: "0.95rem" }}>Monthly Revenue</h3>
-              <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">Jan – Dec 2026</p>
+              <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">Jan – Dec {new Date().getFullYear()}</p>
             </div>
             <span className="px-2.5 py-1 rounded-full text-xs font-semibold" style={{ background: "#fff0f3", color: "#FF385C" }}>
-              +18.4% YoY
+              Live booking data
             </span>
           </div>
           <ResponsiveContainer width="100%" height={220}>
