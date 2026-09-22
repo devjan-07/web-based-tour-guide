@@ -559,7 +559,7 @@ public class BookingService {
         if (booking.getGuests() < 1) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Guest count must be at least 1");
         }
-        if (booking.getRooms() == null || booking.getRooms() < 1) {
+        if (booking.getRooms() < 1) {
             booking.setRooms(1);
         }
         if (booking.getBookingType() != null) {
