@@ -5,5 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RouteRepository extends JpaRepository<Route, Long> {
     List<Route> findByDestinationId(Long destinationId);
+    List<Route> findByStatusIgnoreCase(String status);
     List<Route> findByDestinationIdAndStatusIgnoreCase(Long destinationId, String status);
 }
