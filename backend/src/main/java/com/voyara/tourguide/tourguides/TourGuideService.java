@@ -56,6 +56,7 @@ public class TourGuideService {
 
     @Transactional
     public TourGuide save(TourGuide guide) {
+        validateGuide(guide);
         guide.setRating(0.0);
         guide.setReviews(0);
         TourGuide saved = repository.save(guide);
@@ -67,6 +68,7 @@ public class TourGuideService {
 
     @Transactional
     public TourGuide update(Long id, TourGuide guide) {
+        validateGuide(guide);
         TourGuide existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Tour guide", id));
         existing.setName(guide.getName());
@@ -108,6 +110,29 @@ public class TourGuideService {
                 userRepository.delete(user);
             });
         }
+    }
+
+    private void validateGuide(TourGuide guide) {
+        if (guide.getName() == null || guide.getName().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Guide name is required");
+        }
+        if (guide.getPricePerDay() != null && guide.getPricePerDay().signum() < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Guide price per day cannot be negative");
+        }
+        if (guide.getExperience() < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Guide experience cannot be negative");
+        }
+        if (guide.getToursCompleted() < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Completed tours cannot be negative");
+        }
+        String status = guide.getStatus();
+        if (status == null || status.isBlank()) {
+            guide.setStatus("Available");
+        } else if (!List.of("Available", "Unavailable", "On Leave", "Busy", "Offline").contains(status)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unsupported guide status");
+        }
+        if (guide.getSpecialties() == null) guide.setSpecialties(new ArrayList<>());
+        if (guide.getLanguages() == null) guide.setLanguages(new ArrayList<>());
     }
 
     private void initializeCollections(TourGuide guide) {
