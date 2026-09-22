@@ -21,6 +21,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -246,7 +247,7 @@ public class BookingService {
 
     private Booking saveNewBooking(Booking booking, boolean strictCustomerBooking) {
         if (booking.getId() == null || booking.getId().isBlank()) {
-            booking.setId("BK-" + System.currentTimeMillis());
+            booking.setId("BK-" + UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase());
         }
         if (booking.getBookingType() == null || booking.getBookingType().isBlank()) {
             booking.setBookingType("PACKAGE");
@@ -485,6 +486,9 @@ public class BookingService {
     }
 
     private void normalizeBooking(Booking booking) {
+        if (booking.getGuests() == null) {
+            booking.setGuests(1);
+        }
         if (booking.getGuests() < 1) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Guest count must be at least 1");
         }
