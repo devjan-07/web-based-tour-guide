@@ -54,7 +54,7 @@ public class SecurityConfig {
             JwtAuthenticationFilter jwtAuthenticationFilter,
             CustomUserDetailsService userDetailsService,
             @Value("${app.security.enabled:true}") boolean securityEnabled,
-            @Value("${app.management.auth-required:false}") boolean managementAuthRequired,
+            @Value("${app.management.auth-required:true}") boolean managementAuthRequired,
             @Value("${app.cors.allowed-origins}") String[] allowedOrigins
     ) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
