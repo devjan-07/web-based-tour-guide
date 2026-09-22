@@ -31,6 +31,7 @@ class RouteServiceTest {
     @Test
     void rejectsRouteForUnknownDestination() {
         Route route = validRoute();
+        route.setDestinationId(99L);
         when(destinationRepository.existsById(99L)).thenReturn(false);
 
         ResponseStatusException error = assertThrows(ResponseStatusException.class, () -> service.save(route));
