@@ -4,7 +4,7 @@ import { ArrowLeft, CalendarDays, CheckCircle, Clock, CreditCard, HelpCircle, Ma
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
-import { destinationsApi, packagesApi, type Destination, type TourPackage } from "../lib/api";
+import { destinationsApi, packagesApi, type Destination, type TourPackage, type Route } from "../lib/api";
 
 type DetailMode = "destination" | "package";
 
@@ -27,6 +27,8 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
   const [item, setItem] = useState<DetailItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [packageRoutes, setPackageRoutes] = useState<Route[]>([]);
+  const [routesLoading, setRoutesLoading] = useState(false);
   const isTourist = isAuthenticated && user?.roles.includes("TOURIST");
 
   useEffect(() => {
@@ -40,6 +42,7 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
     let cancelled = false;
     setLoading(true);
     setError("");
+    setPackageRoutes([]);
 
     const request = mode === "destination"
       ? destinationsApi.get(numericId).then((data) => ({ mode: "destination" as const, data }))
@@ -47,6 +50,13 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
 
     request
       .then((data) => {
+        if (data.mode === "package") {
+          setRoutesLoading(true);
+          packagesApi.routes(data.data.id)
+            .then((routes) => { if (!cancelled) setPackageRoutes(routes); })
+            .catch(() => { if (!cancelled) setPackageRoutes([]); })
+            .finally(() => { if (!cancelled) setRoutesLoading(false); });
+        }
         if (!cancelled) setItem(data);
       })
       .catch((err) => {
