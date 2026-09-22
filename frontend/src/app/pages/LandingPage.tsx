@@ -9,7 +9,7 @@ import { Footer } from "../components/Footer";
 import { VoyAI } from "../components/VoyAI";
 import { useAuth } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router";
-import { Search, X, Globe2, Star, Users, MapPinned, ArrowUpRight, BedDouble, Car, Fuel } from "lucide-react";
+import { Search, X, Globe2, Star, Users, MapPinned, ArrowUpRight, BedDouble, Car, Fuel, SlidersHorizontal } from "lucide-react";
 import { accommodationSearchApi, destinationsApi, packagesApi, publicVehiclesApi, type Accommodation, type Destination, type TourPackage, type Vehicle } from "../lib/api";
 
 // Maps CategoryFilter labels → destination tag keywords
@@ -107,6 +107,9 @@ export default function LandingPage() {
   };
 
   const clearFilters = () => { setActiveCategory(""); setSearchQuery(""); setShowAll(false); };
+
+  const availableTourCategories = Array.from(new Set(allTours.map((tour) => tour.category).filter(Boolean))).sort();
+  const searchHasResults = filteredDestinations.length + filteredTours.length + filteredAccommodations.length + filteredVehicles.length > 0;
   const viewPackage = (packageId: number) => navigate(`/packages/${packageId}`);
   const viewDestination = (destinationId: number) => navigate(`/destinations/${destinationId}`);
 
@@ -221,6 +224,44 @@ export default function LandingPage() {
             </button>
           </div>
         </div>
+      )}
+
+      {isFiltered && (
+        <section className="px-4 pt-6">
+          <div className="mx-auto max-w-7xl rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                <SlidersHorizontal className="h-4 w-4 text-rose-500" />
+                Refine results
+              </div>
+              <select
+                value={activeCategory}
+                onChange={(event) => {
+                  setActiveCategory(event.target.value);
+                  setSearchQuery("");
+                  setShowAll(true);
+                }}
+                className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700"
+                aria-label="Filter tours by category"
+              >
+                <option value="">All categories</option>
+                {availableTourCategories.map((category) => <option key={category} value={category}>{category}</option>)}
+              </select>
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="rounded-xl border border-gray-200 px-3 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50"
+              >
+                Reset filters
+              </button>
+            </div>
+            {!searchHasResults && (
+              <div className="mt-4 rounded-xl bg-gray-50 p-4 text-sm text-gray-500">
+                No matching places, tours, stays, or vehicles were found. Try a broader destination, category, or search term.
+              </div>
+            )}
+          </div>
+        </section>
       )}
 
       {isTourist && (
