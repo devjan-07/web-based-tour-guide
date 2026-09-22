@@ -2,6 +2,10 @@ package com.voyara.tourguide.packages;
 
 import com.voyara.tourguide.common.ResourceNotFoundException;
 import com.voyara.tourguide.bookings.BookingRepository;
+import com.voyara.tourguide.destinations.Destination;
+import com.voyara.tourguide.destinations.DestinationRepository;
+import com.voyara.tourguide.routes.Route;
+import com.voyara.tourguide.routes.RouteRepository;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -13,10 +17,15 @@ import org.springframework.web.server.ResponseStatusException;
 public class TourPackageService {
     private final TourPackageRepository repository;
     private final BookingRepository bookingRepository;
+    private final DestinationRepository destinationRepository;
+    private final RouteRepository routeRepository;
 
-    public TourPackageService(TourPackageRepository repository, BookingRepository bookingRepository) {
+    public TourPackageService(TourPackageRepository repository, BookingRepository bookingRepository,
+            DestinationRepository destinationRepository, RouteRepository routeRepository) {
         this.repository = repository;
         this.bookingRepository = bookingRepository;
+        this.destinationRepository = destinationRepository;
+        this.routeRepository = routeRepository;
     }
 
     @Transactional(readOnly = true)
@@ -63,6 +72,19 @@ public class TourPackageService {
         }
         initializeCollections(existing);
         return existing;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Route> routesForPackage(Long id) {
+        TourPackage tourPackage = findById(id);
+        List<String> destinationNames = tourPackage.getDestinations() == null ? List.of() : tourPackage.getDestinations();
+        if (destinationNames.isEmpty()) return List.of();
+        List<Route> routes = new ArrayList<>();
+        for (Destination destination : destinationRepository.findAll()) {
+            boolean included = destinationNames.stream().anyMatch(name -> name != null && name.trim().equalsIgnoreCase(destination.getName()));
+            if (included) routes.addAll(routeRepository.findByDestinationIdAndStatusIgnoreCase(destination.getId(), "ACTIVE"));
+        }
+        return routes;
     }
 
     @Transactional
