@@ -109,7 +109,6 @@ export default function LandingPage() {
   const clearFilters = () => { setActiveCategory(""); setSearchQuery(""); setShowAll(false); };
 
   const availableTourCategories = Array.from(new Set(allTours.map((tour) => tour.category).filter(Boolean))).sort();
-  const searchHasResults = filteredDestinations.length + filteredTours.length + filteredAccommodations.length + filteredVehicles.length > 0;
   const viewPackage = (packageId: number) => navigate(`/packages/${packageId}`);
   const viewDestination = (destinationId: number) => navigate(`/destinations/${destinationId}`);
 
@@ -175,6 +174,7 @@ export default function LandingPage() {
   const displayedAccommodations = filteredAccommodations.slice(0, 4);
   const filteredVehicles = filterVehicles();
   const displayedVehicles = filteredVehicles.slice(0, 4);
+  const searchHasResults = filteredDestinations.length + filteredTours.length + filteredAccommodations.length + filteredVehicles.length > 0;
   const isFiltered = !!activeCategory || !!searchQuery;
   const isTourist = isAuthenticated && user?.roles.includes("TOURIST");
   const formatLkr = (value: number) => `රු${Number(value || 0).toLocaleString()}`;
