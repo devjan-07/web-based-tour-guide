@@ -143,6 +143,8 @@ export default function TouristDashboard() {
   }, [activeTab, bookings, summary.upcoming]);
 
   const cancelBooking = async (id: string) => {
+    const confirmed = window.confirm(`Cancel booking ${id}? This action cannot be undone.`);
+    if (!confirmed) return;
     setCancellingId(id);
     setError("");
     try {
