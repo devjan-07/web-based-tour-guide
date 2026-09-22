@@ -186,6 +186,7 @@ const AUTH_REQUIRED_WRITE_PATHS = [
   "/accommodations",
   "/tour-guides",
   "/vehicles",
+  "/routes",
   "/tourist",
 ];
 
@@ -195,7 +196,7 @@ function isPublicGetRequest(path: string, method: string) {
 }
 
 function isManagementRequest(path: string) {
-  return ["/destinations", "/packages", "/accommodations", "/tour-guides", "/vehicles"]
+  return ["/destinations", "/packages", "/accommodations", "/tour-guides", "/vehicles", "/routes"]
     .some((managementPath) => path === managementPath || path.startsWith(`${managementPath}/`));
 }
 
