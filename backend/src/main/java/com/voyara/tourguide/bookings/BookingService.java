@@ -65,17 +65,23 @@ public class BookingService {
     }
 
     public List<Booking> findAll() {
-        return repository.findAll();
+        List<Booking> bookings = repository.findAll();
+        refreshCompletedBookings(bookings);
+        return bookings;
     }
 
     public List<Booking> findByGuestEmail(String email) {
-        return repository.findByEmailIgnoreCaseOrderByCreatedAtDesc(email);
+        List<Booking> bookings = repository.findByEmailIgnoreCaseOrderByCreatedAtDesc(email);
+        refreshCompletedBookings(bookings);
+        return bookings;
     }
 
     @Transactional(readOnly = true)
     public List<Booking> findTouristBookings(String email) {
         AppUser tourist = findUser(email);
-        return repository.findByTouristIdOrderByCreatedAtDesc(tourist.getId());
+        List<Booking> bookings = repository.findByTouristIdOrderByCreatedAtDesc(tourist.getId());
+        refreshCompletedBookings(bookings);
+        return bookings;
     }
 
     @Transactional(readOnly = true)
@@ -136,6 +142,7 @@ public class BookingService {
     public Booking findTouristBooking(String email, String id) {
         AppUser tourist = findUser(email);
         Booking booking = findById(id);
+        refreshCompletedBookings(List.of(booking));
         if (booking.getTourist() == null || !booking.getTourist().getId().equals(tourist.getId())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found");
         }
@@ -290,6 +297,16 @@ public class BookingService {
         if (booking.getTourist() == null) {
             booking.setTourist(existing.getTourist());
         }
+        if (booking.getEmail() == null || booking.getEmail().isBlank()) {
+            booking.setEmail(existing.getEmail());
+        }
+        if (booking.getGuest() == null || booking.getGuest().isBlank()) {
+            booking.setGuest(existing.getGuest());
+        }
+        if (booking.getCreatedAt() == null) {
+            booking.setCreatedAt(existing.getCreatedAt());
+        }
+        validateStatusTransition(existing, booking);
         validateAndPriceBooking(booking, id, false);
         assignTouristByEmailIfPossible(booking);
         Booking saved = repository.save(booking);
@@ -482,6 +499,56 @@ public class BookingService {
 
         if (strictCustomerBooking || pricedFromResources) {
             candidate.setTotal(total);
+        }
+    }
+
+    private void validateStatusTransition(Booking existing, Booking candidate) {
+        String from = existing.getStatus() == null ? "Pending" : existing.getStatus();
+        String to = candidate.getStatus() == null ? from : candidate.getStatus();
+
+        if (from.equalsIgnoreCase(to)) {
+            return;
+        }
+
+        boolean allowed = switch (from.toLowerCase()) {
+            case "pending" -> to.equalsIgnoreCase("Confirmed") || to.equalsIgnoreCase("Cancelled");
+            case "confirmed" -> to.equalsIgnoreCase("Completed") || to.equalsIgnoreCase("Cancelled");
+            case "completed" -> false;
+            case "cancelled" -> false;
+            default -> false;
+        };
+
+        if (!allowed) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Invalid booking status transition: " + from + " -> " + to
+            );
+        }
+
+        if ("Completed".equalsIgnoreCase(to)
+                && (existing.getCheckOut() == null || existing.getCheckOut().isAfter(LocalDate.now()))) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "A booking can only be completed after the trip check-out date"
+            );
+        }
+    }
+
+    private void refreshCompletedBookings(List<Booking> bookings) {
+        boolean changed = false;
+        LocalDate today = LocalDate.now();
+
+        for (Booking booking : bookings) {
+            if ("Confirmed".equalsIgnoreCase(booking.getStatus())
+                    && booking.getCheckOut() != null
+                    && booking.getCheckOut().isBefore(today)) {
+                booking.setStatus("Completed");
+                changed = true;
+            }
+        }
+
+        if (changed) {
+            repository.saveAll(bookings);
         }
     }
 
