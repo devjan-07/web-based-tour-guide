@@ -553,9 +553,6 @@ public class BookingService {
     }
 
     private void normalizeBooking(Booking booking) {
-        if (booking.getGuests() == null) {
-            booking.setGuests(1);
-        }
         if (booking.getGuests() < 1) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Guest count must be at least 1");
         }
