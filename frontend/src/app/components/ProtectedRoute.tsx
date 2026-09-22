@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from "react-router";
 import { useAuth } from "../context/AuthContext";
 
-const AUTH_ENABLED = import.meta.env.VITE_AUTH_ENABLED !== "false";
+const AUTH_ENABLED = true;
 
 export function ProtectedRoute() {
   if (!AUTH_ENABLED) return <Outlet />;
