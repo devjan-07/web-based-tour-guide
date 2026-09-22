@@ -219,6 +219,23 @@ export default function TouristBookingDetail() {
                     <p className="text-sm text-gray-600">{booking.notes}</p>
                   </div>
                 )}
+
+                {(booking.accommodationProviderStatus || booking.vehicleProviderStatus) && (
+                  <div className="mt-5 rounded-2xl border border-gray-200 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-3">Partner confirmation</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {booking.accommodationProviderStatus && (
+                        <ProviderStatus label="Accommodation" value={booking.accommodationProviderStatus} />
+                      )}
+                      {booking.vehicleProviderStatus && (
+                        <ProviderStatus label="Transport provider" value={booking.vehicleProviderStatus} />
+                      )}
+                    </div>
+                    <p className="mt-3 text-xs text-gray-400">
+                      Your booking remains pending while a selected partner resource is awaiting confirmation.
+                    </p>
+                  </div>
+                )}
                 {booking.overallRating && (
                   <div className="mt-5 rounded-2xl bg-amber-50 p-4">
                     <p className="text-xs font-semibold uppercase tracking-wide text-amber-600 mb-1">Overall review</p>
@@ -445,6 +462,28 @@ function ReviewForm({ bookingId, target, submitted, onSaved }: { bookingId: stri
           </button>
         </div>
       )}
+    </div>
+  );
+}
+
+function ProviderStatus({ label, value }: { label: string; value: string }) {
+  const normalized = value.toLowerCase();
+  const confirmed = normalized === "confirmed";
+  const rejected = normalized === "rejected";
+  return (
+    <div className="rounded-xl bg-gray-50 p-3">
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-sm font-semibold text-gray-700">{label}</span>
+        <span
+          className="rounded-full px-2.5 py-1 text-xs font-semibold"
+          style={{
+            background: confirmed ? "#f0fdf4" : rejected ? "#fef2f2" : "#fffbeb",
+            color: confirmed ? "#16a34a" : rejected ? "#dc2626" : "#d97706",
+          }}
+        >
+          {value}
+        </span>
+      </div>
     </div>
   );
 }
