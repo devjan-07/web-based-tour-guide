@@ -117,6 +117,8 @@ export default function TouristBookingDetail() {
 
   const handleCancel = async () => {
     if (!booking) return;
+    const confirmed = window.confirm(`Cancel booking ${booking.id}? This action cannot be undone.`);
+    if (!confirmed) return;
     setCancelling(true);
     setError("");
     try {
