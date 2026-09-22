@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
-import { ArrowLeft, CalendarDays, CheckCircle, Clock, CreditCard, HelpCircle, MapPin, ShieldCheck, Tag, Users } from "lucide-react";
+import { ArrowLeft, CalendarDays, CheckCircle, Clock, CreditCard, HelpCircle, MapPin, ShieldCheck, Tag, Users, Star } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
@@ -140,6 +140,20 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
                           <span>{value}</span>
                         </div>
                       ))}
+                    </div>
+                  </div>
+                )}
+
+                {item?.mode === "package" && (
+                  <div className="mt-8 rounded-2xl border border-rose-100 bg-rose-50 p-5">
+                    <div className="flex items-start gap-3">
+                      <Star className="mt-0.5 h-5 w-5 text-rose-500" />
+                      <div>
+                        <h2 className="text-lg font-bold text-gray-900">Plan this package</h2>
+                        <p className="mt-1 text-sm leading-6 text-gray-600">
+                          Select your dates, group size, guide, accommodation, and vehicle during booking. Voyara validates availability before confirming the request.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 )}
