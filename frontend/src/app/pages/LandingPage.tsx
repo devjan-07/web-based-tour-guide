@@ -461,28 +461,98 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="py-16 px-4 max-w-7xl mx-auto">
-        <div className="flex items-end justify-between mb-8">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="w-6 h-0.5 rounded-full" style={{ background: "#00AA6C" }} />
-              <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#00AA6C" }}>Top Rated</p>
+      {/* C3: tour discovery — journeys are presented as editorial travel stories */}
+      <section id="journeys-section" className="overflow-hidden bg-[#f7f5ef] px-4 py-20 md:py-28">
+        <div className="mx-auto max-w-7xl">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.6 }}
+            className="mb-12 flex flex-col gap-5 md:flex-row md:items-end md:justify-between"
+          >
+            <div>
+              <p className="mb-3 text-xs font-bold uppercase tracking-[0.28em] text-emerald-700">
+                Curated journeys
+              </p>
+              <h2 className="max-w-3xl text-4xl font-semibold leading-tight tracking-[-0.035em] text-slate-950 md:text-5xl">
+                Don't just visit Sri Lanka.
+                <span className="block text-slate-400">Experience it.</span>
+              </h2>
             </div>
-            <h2 style={{ fontWeight: 800, fontSize: "1.9rem" }}>Most Popular Tours</h2>
-          </div>
-          {isFiltered && filteredTours.length === 0 && (
-            <span className="text-sm text-gray-400">No tours match this filter</span>
+            <p className="max-w-md text-sm leading-6 text-slate-600 md:text-right">
+              Explore the tour packages already available on Voyara, then open a journey to see its full details and plan your booking.
+            </p>
+          </motion.div>
+
+          {filteredTours.length > 0 ? (
+            <div className="flex snap-x snap-mandatory gap-6 overflow-x-auto pb-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {filteredTours.map((tour, index) => (
+                <motion.article
+                  key={tour.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.15 }}
+                  transition={{ duration: 0.55, delay: index * 0.05 }}
+                  onClick={() => viewPackage(tour.id)}
+                  className="group relative min-w-[82vw] cursor-pointer snap-start overflow-hidden rounded-[2rem] bg-slate-900 shadow-sm sm:min-w-[62vw] lg:min-w-[43vw]"
+                >
+                  <div className="relative aspect-[16/10] overflow-hidden">
+                    <img
+                      src={tour.image}
+                      alt={tour.title}
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+                    <div className="absolute left-5 right-5 top-5 flex items-center justify-between">
+                      <span className="rounded-full border border-white/25 bg-black/20 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-md">
+                        {tour.category || "Journey"}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={(event) => event.stopPropagation()}
+                        className="rounded-full bg-white/15 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-md"
+                      >
+                        {tour.duration}
+                      </button>
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
+                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
+                        {tour.location}
+                      </p>
+                      <h3 className="mt-2 max-w-2xl text-2xl font-semibold tracking-tight text-white md:text-3xl">
+                        {tour.title}
+                      </h3>
+                      <div className="mt-5 flex flex-wrap items-end justify-between gap-4">
+                        <div>
+                          <p className="text-xs text-white/60">From</p>
+                          <p className="text-xl font-bold text-white">
+                            {formatLkr(tour.price)}
+                            <span className="text-sm font-normal text-white/60"> / person</span>
+                          </p>
+                        </div>
+                        <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-slate-950 transition-transform group-hover:translate-x-1">
+                          View journey <ArrowUpRight className="h-4 w-4" />
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </motion.article>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-[2rem] border border-slate-200 bg-white px-6 py-16 text-center">
+              <p className="text-sm text-slate-500">No journeys match this filter.</p>
+            </div>
+          )}
+
+          {filteredTours.length > 1 && (
+            <div className="mt-6 flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+              <span>Swipe to explore</span>
+              <span>{filteredTours.length} journeys available</span>
+            </div>
           )}
         </div>
-        {filteredTours.length > 0 ? (
-          <div className="flex flex-col gap-5">
-            {filteredTours.map((t) => <TourCard key={t.id} {...t} onView={viewPackage} />)}
-          </div>
-        ) : (
-          <div className="text-center py-10">
-            <p className="text-gray-400 text-sm">No tours found for this filter.</p>
-          </div>
-        )}
       </section>
 
       <WhyUs />
