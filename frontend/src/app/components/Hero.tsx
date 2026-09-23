@@ -49,8 +49,8 @@ export function Hero({ onSearch, onClear, hasActiveFilter = false, onCategoryCha
     { icon: Trees, label: "Nature", cat: "Nature" },
   ];
 
-  const scrollFade = Math.max(0, 1 - scrollY / 520);
-  const imageScale = 1 + scrollY * 0.00019;
+  const scrollFade = Math.max(0, 1 - scrollY / 360);
+  const imageScale = 1 + scrollY * 0.00016;
 
   return (
     <section id="top" className="relative min-h-[112svh] md:min-h-[122svh] overflow-hidden bg-slate-950">
@@ -59,7 +59,7 @@ export function Hero({ onSearch, onClear, hasActiveFilter = false, onCategoryCha
         alt="Sri Lanka travel landscape"
         className="absolute inset-[-4%] h-[108%] w-[108%] object-cover will-change-transform"
         style={{
-          transform: `scale(${imageScale}) translate3d(0, ${scrollY * 0.06}px, 0)`,
+          transform: `scale(${imageScale}) translate3d(0, ${scrollY * 0.045}px, 0)`,
           filter: "saturate(1.06) contrast(1.03)",
         }}
       />
