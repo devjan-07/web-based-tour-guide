@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { motion } from "motion/react";
 import { Navbar } from "../components/Navbar";
 import { Hero } from "../components/Hero";
 import { DestinationCard } from "../components/DestinationCard";
@@ -185,29 +186,29 @@ export default function LandingPage() {
       <Navbar />
       <Hero onSearch={handleSearch} onClear={clearFilters} hasActiveFilter={isFiltered} onCategoryChange={handleCategoryChange} />
 
-      {/* Floating stats card overlapping the hero */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 -mt-12 md:-mt-14">
-        <div className="rounded-3xl shadow-xl overflow-hidden" style={{ background: "linear-gradient(135deg, #003580, #0057B8)" }}>
-          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-white/10">
-            {[
-              { value: `${localTourPackages.length}+`, label: "Sri Lanka Tours", icon: Globe2 },
-              { value: `${localDestinations.length}+`, label: "Local Places", icon: MapPinned },
-              { value: `${allAccommodations.length}+`, label: "Stays", icon: BedDouble },
-              { value: `${allVehicles.length}+`, label: "Vehicles", icon: Car },
-            ].map(({ value, label, icon: Icon }) => (
-              <div key={label} className="flex items-center gap-3 px-5 py-6 justify-center md:justify-start">
-                <div className="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
-                  <Icon className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <p className="text-white leading-none" style={{ fontWeight: 800, fontSize: "1.4rem" }}>{value}</p>
-                  <p className="text-white/70 text-xs mt-1">{label}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+      {/* C2: editorial introduction */}
+      <section className="relative overflow-hidden bg-[#f7f5ef] px-4 py-20 md:py-28">
+        <div className="mx-auto grid max-w-7xl items-end gap-10 md:grid-cols-[1.15fr_0.85fr]">
+          <motion.div initial={{ opacity: 0, y: 32 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.7 }}>
+            <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-emerald-700">A different way to explore</p>
+            <h2 className="max-w-4xl text-4xl font-semibold leading-[1.02] tracking-[-0.04em] text-slate-950 md:text-6xl">
+              Sri Lanka is not a checklist.
+              <span className="block text-slate-400">It is a journey.</span>
+            </h2>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.7, delay: 0.1 }} className="max-w-xl md:justify-self-end">
+            <p className="text-base leading-7 text-slate-600 md:text-lg">
+              Discover destinations, tours, places to stay and transport through one connected experience. Start with a place that catches your eye, then build the rest of your trip around it.
+            </p>
+            <div className="mt-7 flex flex-wrap gap-3 text-sm font-semibold text-slate-700">
+              <span className="rounded-full border border-slate-200 bg-white px-4 py-2">Discover</span>
+              <span className="rounded-full border border-slate-200 bg-white px-4 py-2">Choose</span>
+              <span className="rounded-full border border-slate-200 bg-white px-4 py-2">Plan</span>
+              <span className="rounded-full border border-slate-200 bg-white px-4 py-2">Go</span>
+            </div>
+          </motion.div>
         </div>
-      </div>
+      </section>
 
       {/* Active filter banner */}
       {isFiltered && (
@@ -293,8 +294,8 @@ export default function LandingPage() {
                 {isFiltered ? "Filtered results" : "Handpicked for you"}
               </p>
             </div>
-            <h2 style={{ fontWeight: 800, fontSize: "1.9rem" }}>
-              {isFiltered ? `${activeCategory || "Search"} Stays & Experiences` : "Featured Stays & Experiences"}
+            <h2 className="text-3xl font-semibold tracking-[-0.03em] text-slate-950 md:text-4xl">
+              {isFiltered ? `${activeCategory || "Search"} Stays & Experiences` : "Places worth building a trip around"}
             </h2>
           </div>
           {filteredDestinations.length > 4 && (
@@ -304,8 +305,12 @@ export default function LandingPage() {
           )}
         </div>
         {displayedDestinations.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {displayedDestinations.map((d) => <DestinationCard key={d.id} {...d} onView={viewDestination} />)}
+          <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
+            {displayedDestinations.map((d, index) => (
+              <motion.div key={d.id} initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.55, delay: index * 0.04 }}>
+                <DestinationCard {...d} onView={viewDestination} />
+              </motion.div>
+            ))}
           </div>
         ) : (
           <div className="text-center py-16">
@@ -316,29 +321,35 @@ export default function LandingPage() {
         )}
       </section>
 
-      <section id="transport-section" className="py-16" style={{ background: "#f9fafb" }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-8">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="w-6 h-0.5 rounded-full" style={{ background: "#0057B8" }} />
-              <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#0057B8" }}>Explore Sri Lanka</p>
+      {/* C2: destination discovery */}
+      <section id="transport-section" className="overflow-hidden bg-slate-950 py-20 text-white md:py-28">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.6 }} className="mb-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="mb-3 text-xs font-bold uppercase tracking-[0.28em] text-emerald-300">Explore the island</p>
+              <h2 className="text-4xl font-semibold tracking-[-0.035em] md:text-5xl">Where will you go first?</h2>
             </div>
-            <h2 style={{ fontWeight: 800, fontSize: "1.9rem" }}>Popular Destinations</h2>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {popular.map((d) => (
-              <div key={d.name} onClick={() => { handleSearch(d.name); const s = document.getElementById("listings-section"); if (s) s.scrollIntoView({ behavior: "smooth" }); }}
-                className="group relative rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300" style={{ aspectRatio: "3/4" }}>
-                <img src={d.img} alt={d.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                <div className="absolute inset-0 transition-opacity" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 62%)" }} />
-                <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center opacity-0 -translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                  <ArrowUpRight className="w-4 h-4" style={{ color: "#003580" }} />
+            <p className="max-w-md text-sm leading-6 text-slate-400 md:text-right">Browse real destinations from the platform and open any place to see its experiences and routes.</p>
+          </motion.div>
+          <div className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {popular.map((d, index) => (
+              <motion.button key={d.name} type="button"
+                onClick={() => { handleSearch(d.name); const section=document.getElementById("listings-section"); if(section) section.scrollIntoView({behavior:"smooth"}); }}
+                initial={{ opacity: 0, x: 35 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.55, delay: index * 0.06 }}
+                className="group relative min-w-[76vw] snap-start overflow-hidden rounded-[2rem] text-left sm:min-w-[48vw] lg:min-w-[31vw]">
+                <div className="aspect-[4/5] overflow-hidden"><img src={d.img} alt={d.name} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" /></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+                <div className="absolute left-5 right-5 top-5 flex items-center justify-between">
+                  <span className="rounded-full border border-white/25 bg-black/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md">0{index + 1}</span>
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-900 opacity-0 transition-all duration-300 group-hover:opacity-100"><ArrowUpRight className="h-4 w-4" /></span>
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 p-3">
-                  <p className="text-white font-bold text-sm">{d.name}</p>
-                  <p className="text-white/70 text-xs">{d.country}</p>
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/60">{d.country}</p>
+                  <h3 className="mt-1 text-2xl font-semibold tracking-tight">{d.name}</h3>
+                  <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-white/80">Explore destination <ArrowUpRight className="h-4 w-4" /></span>
                 </div>
-              </div>
+              </motion.button>
             ))}
           </div>
         </div>
