@@ -28,7 +28,7 @@ export function Hero({ onSearch, onClear, hasActiveFilter = false, onCategoryCha
 
   useEffect(() => {
     const timer = window.setTimeout(() => setVisible(true), 120);
-    const onScroll = () => setScrollY(Math.min(window.scrollY, 620));
+    const onScroll = () => setScrollY(Math.min(window.scrollY, 760));
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       window.clearTimeout(timer);
@@ -53,19 +53,19 @@ export function Hero({ onSearch, onClear, hasActiveFilter = false, onCategoryCha
   const imageScale = 1 + scrollY * 0.00016;
 
   return (
-    <section id="top" className="relative min-h-[760px] md:min-h-[860px] overflow-hidden bg-slate-950">
+    <section id="top" className="relative min-h-[112svh] md:min-h-[122svh] overflow-hidden bg-slate-950">
       <img
         src={heroImage}
         alt="Sri Lanka travel landscape"
-        className="absolute inset-0 h-full w-full object-cover will-change-transform"
+        className="absolute inset-[-4%] h-[108%] w-[108%] object-cover will-change-transform"
         style={{
           transform: `scale(${imageScale}) translate3d(0, ${scrollY * 0.045}px, 0)`,
           filter: "saturate(1.06) contrast(1.03)",
         }}
       />
 
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,12,18,0.52)_0%,rgba(5,12,18,0.10)_38%,rgba(5,12,18,0.18)_58%,rgba(5,12,18,0.82)_100%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_30%,rgba(255,255,255,0.16),transparent_28%),linear-gradient(90deg,rgba(0,0,0,0.22),transparent_58%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,12,18,0.42)_0%,rgba(5,12,18,0.06)_38%,rgba(5,12,18,0.12)_58%,rgba(5,12,18,0.72)_100%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_30%,rgba(255,255,255,0.20),transparent_30%),linear-gradient(90deg,rgba(0,0,0,0.16),transparent_62%)]" />
 
       <div className="absolute left-4 top-1/2 hidden -translate-y-1/2 md:flex flex-col items-center gap-4 text-white/55" style={{ opacity: scrollFade }}>
         <span className="text-[9px] font-bold tracking-[0.35em] [writing-mode:vertical-rl]">SCROLL TO EXPLORE</span>
@@ -73,7 +73,7 @@ export function Hero({ onSearch, onClear, hasActiveFilter = false, onCategoryCha
       </div>
 
       <div
-        className="relative z-10 mx-auto flex min-h-[760px] md:min-h-[860px] max-w-[1440px] flex-col justify-center px-5 pb-24 pt-36 sm:px-8 lg:px-16"
+        className="relative z-10 mx-auto flex min-h-[112svh] md:min-h-[122svh] max-w-[1440px] flex-col justify-center px-5 pb-24 pt-36 sm:px-8 lg:px-16"
         style={{ transform: `translate3d(0,-${scrollY * 0.035}px,0)` }}
       >
         <div className="max-w-5xl">
