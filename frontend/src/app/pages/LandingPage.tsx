@@ -316,7 +316,7 @@ export default function LandingPage() {
         )}
       </section>
 
-      <section className="py-16" style={{ background: "#f9fafb" }}>
+      <section id="transport-section" className="py-16" style={{ background: "#f9fafb" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-2">
@@ -344,7 +344,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="py-16 px-4 max-w-7xl mx-auto">
+      <section id="stays-section" className="py-16 px-4 max-w-7xl mx-auto">
         <div className="flex items-end justify-between mb-8">
           <div>
             <div className="flex items-center gap-2 mb-2">
