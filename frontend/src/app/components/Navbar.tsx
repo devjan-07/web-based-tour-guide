@@ -94,12 +94,14 @@ export function Navbar() {
         } backdrop-blur-2xl rounded-full`}
       >
         <div className="h-[68px] sm:h-[74px] px-3 sm:px-5 lg:px-6 flex items-center justify-between gap-3">
-          <Link to="/" className="flex items-center shrink-0 group" aria-label="Voyara home">
-            <img
-              src={logoImg}
-              alt="Voyara"
-              className={`h-9 sm:h-10 lg:h-11 w-auto object-contain transition-all duration-500 group-hover:scale-[1.03] ${overHero ? "brightness-0 invert drop-shadow-lg" : ""}`}
-            />
+          <Link to="/" className="group flex items-center gap-2.5 shrink-0" aria-label="Voyara home">
+            <span className={`relative flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-500 group-hover:scale-105 ${overHero ? "border-white/45 bg-white/10" : "border-emerald-800/20 bg-emerald-50"}`}>
+              <span className={`h-2.5 w-2.5 rounded-full ${overHero ? "bg-white" : "bg-emerald-800"}`} />
+              <span className={`absolute h-5 w-5 rounded-full border ${overHero ? "border-white/20" : "border-emerald-800/15"}`} />
+            </span>
+            <span className={`font-black tracking-[0.20em] text-[18px] sm:text-[20px] leading-none transition-colors duration-500 ${overHero ? "text-white" : "text-slate-900"}`}>
+              VOYARA
+            </span>
           </Link>
 
           <div className={`hidden lg:flex items-center gap-1 ${overHero ? "text-white" : "text-slate-700"}`}>
@@ -160,7 +162,7 @@ export function Navbar() {
                   {isAuthenticated ? firstName : "Account"}
                 </span>
                 <span className={`flex h-8 w-8 items-center justify-center rounded-full shadow-sm ${isAuthenticated ? "bg-emerald-700" : overHero ? "bg-white/15" : "bg-slate-800"}`}>
-                  <User className="w-4 h-4 text-white" />
+                  <span className="text-[11px] font-bold text-white">{isAuthenticated ? firstName.slice(0,1).toUpperCase() : "V"}</span>
                 </span>
               </button>
 
