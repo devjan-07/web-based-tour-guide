@@ -9,7 +9,7 @@ import { Footer } from "../components/Footer";
 import { VoyAI } from "../components/VoyAI";
 import { useAuth } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router";
-import { Search, X, Globe2, Star, Users, MapPinned, ArrowUpRight, BedDouble, Car, Fuel, SlidersHorizontal } from "lucide-react";
+import { Search, X, Star, Users, ArrowUpRight, Fuel, SlidersHorizontal } from "lucide-react";
 import { accommodationSearchApi, destinationsApi, packagesApi, publicVehiclesApi, type Accommodation, type Destination, type TourPackage, type Vehicle } from "../lib/api";
 
 // Maps CategoryFilter labels → destination tag keywords
@@ -184,30 +184,6 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white">
       <Navbar />
       <Hero onSearch={handleSearch} onClear={clearFilters} hasActiveFilter={isFiltered} onCategoryChange={handleCategoryChange} />
-
-      {/* Floating stats card overlapping the hero */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 -mt-12 md:-mt-14">
-        <div className="rounded-3xl shadow-xl overflow-hidden" style={{ background: "linear-gradient(135deg, #003580, #0057B8)" }}>
-          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-white/10">
-            {[
-              { value: `${localTourPackages.length}+`, label: "Sri Lanka Tours", icon: Globe2 },
-              { value: `${localDestinations.length}+`, label: "Local Places", icon: MapPinned },
-              { value: `${allAccommodations.length}+`, label: "Stays", icon: BedDouble },
-              { value: `${allVehicles.length}+`, label: "Vehicles", icon: Car },
-            ].map(({ value, label, icon: Icon }) => (
-              <div key={label} className="flex items-center gap-3 px-5 py-6 justify-center md:justify-start">
-                <div className="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
-                  <Icon className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <p className="text-white leading-none" style={{ fontWeight: 800, fontSize: "1.4rem" }}>{value}</p>
-                  <p className="text-white/70 text-xs mt-1">{label}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
 
       {/* Active filter banner */}
       {isFiltered && (
