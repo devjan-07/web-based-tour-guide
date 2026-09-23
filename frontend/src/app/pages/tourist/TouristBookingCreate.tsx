@@ -314,7 +314,7 @@ export default function TouristBookingCreate() {
                 </div>
               )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {currentStep === 1 && (\n              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Field icon={MapPin} label="Destination">
                   <input
                     value={destination}
@@ -377,7 +377,7 @@ export default function TouristBookingCreate() {
                 </Field>
               </div>
 
-              {currentStep === 2 && (\n              <OptionSection
+              )}\n\n              {currentStep === 2 && (\n              <OptionSection
                 title="Guide options"
                 description={`Available guides ${nearbyGuides.length ? "near this destination" : "for your trip request"}`}
                 loading={guidesLoading}
