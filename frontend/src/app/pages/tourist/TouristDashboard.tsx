@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
+import { motion } from "motion/react";
 import { Link } from "react-router";
-import { ArrowRight, BedDouble, CalendarCheck, Car, Clock, CreditCard, MapPin, Package, Plane, Search, UserRoundCheck, XCircle } from "lucide-react";
+import { ArrowRight, BedDouble, CalendarCheck, Car, Clock, CreditCard, MapPin, Package, Plane, Search, UserRoundCheck, XCircle, Compass, WalletCards } from "lucide-react";
 import { Navbar } from "../../components/Navbar";
 import { Footer } from "../../components/Footer";
 import { useAuth } from "../../context/AuthContext";
@@ -166,49 +167,36 @@ export default function TouristDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#f7f5ef]">
       <Navbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <section className="rounded-3xl overflow-hidden mb-6" style={{ background: "linear-gradient(135deg, #003580, #0057B8)" }}>
-          <div className="p-6 md:p-8 text-white">
-            <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-2">Tourist Dashboard</p>
-            <h1 className="text-3xl md:text-4xl font-extrabold mb-2">Welcome back, {firstName(user?.fullName)}</h1>
-            <p className="text-white/75 max-w-2xl">
-              Manage your Voyara bookings, track upcoming trips, and complete payments tied to {user?.email}.
-            </p>
-            {summary.nextBooking && (
-              <div className="mt-6 inline-flex flex-wrap items-center gap-3 rounded-2xl bg-white/10 px-4 py-3 backdrop-blur-sm">
-                <Plane className="w-5 h-5" />
-                <span className="text-sm font-semibold">Next trip:</span>
-                <span className="text-sm">{bookingTitle(summary.nextBooking)} · {bookingSubtitle(summary.nextBooking)}</span>
-                <span className="text-sm text-white/70">{formatDate(summary.nextBooking.checkIn)}</span>
-                {daysUntil(summary.nextBooking.checkIn) !== null && (
-                  <span className="text-sm font-semibold text-white">
-                    {daysUntil(summary.nextBooking.checkIn)! <= 0 ? "Starts today" : `Begins in ${daysUntil(summary.nextBooking.checkIn)} days`}
-                  </span>
-                )}
-              </div>
-            )}
+        <section className="relative mb-8 overflow-hidden rounded-[2rem] bg-slate-950 text-white">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(16,185,129,.28),transparent_32%)]" />
+          <div className="relative grid min-h-[360px] items-end gap-10 p-7 md:grid-cols-[1fr_auto] md:p-12">
+            <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .7 }}>
+              <p className="mb-3 text-xs font-bold uppercase tracking-[.28em] text-emerald-300">My Journey</p>
+              <h1 className="max-w-3xl text-5xl font-semibold leading-[.95] tracking-[-.045em] md:text-7xl">Welcome back, {firstName(user?.fullName)}.</h1>
+              <p className="mt-5 max-w-xl text-sm leading-7 text-white/60 md:text-base">Your trips, bookings and travel plans — all in one place.</p>
+              {summary.nextBooking && <div className="mt-7 inline-flex flex-wrap items-center gap-3 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-md"><Plane className="h-5 w-5 text-emerald-300" /><span className="text-sm font-semibold">Next: {bookingTitle(summary.nextBooking)}</span><span className="text-sm text-white/60">{formatDate(summary.nextBooking.checkIn)}</span>{daysUntil(summary.nextBooking.checkIn)! <= 0 ? <span className="text-xs font-bold text-emerald-300">Starts today</span> : <span className="text-xs font-bold text-emerald-300">In {daysUntil(summary.nextBooking.checkIn)} days</span>}</div>}
+            </motion.div>
+            <div className="hidden md:flex h-36 w-36 items-center justify-center rounded-full border border-white/10 bg-white/5"><Compass className="h-16 w-16 text-emerald-300" /></div>
           </div>
         </section>
 
-        <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          {cards.map(({ label, value, detail, icon: Icon, color, bg }) => (
-            <div key={label} className="bg-white rounded-2xl border border-gray-200 p-5">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4" style={{ background: bg }}>
-                <Icon className="w-5 h-5" style={{ color }} />
-              </div>
-              <p className="text-2xl font-extrabold text-gray-900">{value}</p>
-              <p className="text-xs text-gray-400 mt-1">{label} · {detail}</p>
-            </div>
+        <section className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {cards.map(({ label, value, detail, icon: Icon, color, bg }, index) => (
+            <motion.div key={label} initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .45, delay: index * .06 }} className="rounded-2xl border border-slate-200 bg-white p-5">
+              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: bg }}><Icon className="h-5 w-5" style={{ color }} /></div>
+              <p className="text-2xl font-extrabold text-slate-950">{value}</p><p className="mt-1 text-xs text-slate-400">{label} · {detail}</p>
+            </motion.div>
           ))}
         </section>
 
         <section className="bg-white rounded-3xl border border-gray-200 overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div className="flex items-center justify-between border-b border-slate-100 px-5 py-5">
             <div>
-              <h2 className="font-bold text-gray-900">My Bookings</h2>
-              <p className="text-xs text-gray-400 mt-0.5">Bookings owned by your tourist account</p>
+              <p className="text-xs font-bold uppercase tracking-[.22em] text-emerald-700">Your travel plans</p><h2 className="mt-2 text-3xl font-semibold tracking-[-.03em] text-slate-950">Trips & bookings</h2>
+              <p className="mt-1 text-sm text-slate-500">Keep an eye on upcoming journeys, payments and completed adventures.</p>
             </div>
             <Link to="/" className="inline-flex items-center gap-2 text-sm font-semibold" style={{ color: "#FF385C" }}>
               <Search className="w-4 h-4" /> Explore tours
