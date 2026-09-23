@@ -64,6 +64,8 @@ export default function TouristBookingCreate() {
   const [vehiclesLoading, setVehiclesLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [currentStep, setCurrentStep] = useState(1);
+  const steps = [{ number: 1, label: "Trip", caption: "Dates & travelers" }, { number: 2, label: "People & stay", caption: "Guide & accommodation" }, { number: 3, label: "Transport", caption: "Vehicle & pickup" }, { number: 4, label: "Review", caption: "Confirm request" }];
 
   useEffect(() => {
     if (!packageId) return;
@@ -293,6 +295,15 @@ export default function TouristBookingCreate() {
         {loading ? (
           <div className="bg-white rounded-3xl border border-gray-200 p-8 text-sm text-gray-400">Loading booking details...</div>
         ) : (
+          <div className="mb-5 overflow-x-auto"><div className="mx-auto flex min-w-[620px] max-w-4xl items-center justify-between rounded-3xl border border-slate-200 bg-white p-3 shadow-sm">
+            {steps.map((step, index) => <div key={step.number} className="flex flex-1 items-center">
+              <button type="button" onClick={() => step.number <= currentStep && setCurrentStep(step.number)} className="flex items-center gap-3 text-left">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold" style={{ background: step.number <= currentStep ? "#0f172a" : "#f1f5f9", color: step.number <= currentStep ? "white" : "#94a3b8" }}>{step.number}</span>
+                <span><span className="block text-sm font-bold text-slate-900">{step.label}</span><span className="block text-[11px] text-slate-400">{step.caption}</span></span>
+              </button>{index < steps.length - 1 && <span className="mx-3 h-px flex-1 bg-slate-200" />}
+            </div>)}
+          </div></div>
+
           <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-5">
             <section className="lg:col-span-2 bg-white rounded-3xl border border-gray-200 p-6">
               <h2 className="font-bold text-gray-900 mb-5">Travel details</h2>
@@ -366,7 +377,7 @@ export default function TouristBookingCreate() {
                 </Field>
               </div>
 
-              <OptionSection
+              {currentStep === 2 && (\n              <OptionSection
                 title="Guide options"
                 description={`Available guides ${nearbyGuides.length ? "near this destination" : "for your trip request"}`}
                 loading={guidesLoading}
@@ -479,7 +490,7 @@ export default function TouristBookingCreate() {
                 />
               )}
 
-              <div className="mt-5">
+              )}\n\n              {currentStep === 3 && (\n              <div className="mt-5">
                 <div className="flex items-center justify-between gap-4 mb-3">
                   <div>
                     <h3 className="font-bold text-gray-900">Vehicle options</h3>
@@ -575,7 +586,7 @@ export default function TouristBookingCreate() {
                 />
               )}
 
-              <div className="mt-4 rounded-2xl bg-gray-50 p-4">
+              )}\n\n              {currentStep === 4 && (\n              <div className="mt-4 rounded-2xl bg-gray-50 p-4">
                 <label className="block text-xs font-semibold uppercase tracking-wide text-gray-400 mb-2">Special requests</label>
                 <textarea
                   value={notes}
@@ -587,7 +598,7 @@ export default function TouristBookingCreate() {
               </div>
             </section>
 
-            <aside className="bg-white rounded-3xl border border-gray-200 p-6 h-fit">
+              )}\n\n            <aside className="bg-white rounded-3xl border border-gray-200 p-6 h-fit">
               <h2 className="font-bold text-gray-900 mb-5">Booking summary</h2>
               <div className="space-y-3 text-sm">
                 <SummaryRow label="Tourist" value={user?.fullName || "Current user"} />
@@ -613,16 +624,13 @@ export default function TouristBookingCreate() {
                 </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={submitting}
-                className="mt-5 w-full rounded-xl px-4 py-3 text-sm font-semibold text-white disabled:opacity-60"
-                style={{ background: "linear-gradient(135deg, #FF385C, #E31C5F)" }}
-              >
-                {submitting ? "Creating booking..." : "Confirm Booking Request"}
-              </button>
+              {currentStep === 4 ? (
+                <button type="submit" disabled={submitting} className="mt-5 w-full rounded-full bg-slate-950 px-4 py-3.5 text-sm font-bold text-white disabled:opacity-60">{submitting ? "Creating booking..." : "Confirm booking request"}</button>
+              ) : (
+                <button type="button" onClick={goNext} className="mt-5 w-full rounded-full bg-slate-950 px-4 py-3.5 text-sm font-bold text-white">Continue to {steps[currentStep].label}</button>
+              )}
             </aside>
-          </form>
+          {currentStep > 1 && <button type="button" onClick={goBack} className="mt-4 text-sm font-semibold text-slate-500 hover:text-slate-900">← Back to {steps[currentStep - 2].label}</button>}\n          </form>
         )}
       </main>
       <Footer />
