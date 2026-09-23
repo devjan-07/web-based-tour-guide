@@ -25,12 +25,13 @@ const navItems = [
 ];
 
 export function Navbar() {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const accountRef = useRef<HTMLDivElement>(null);
   const isHome = location.pathname === "/";
   const isAdmin = user?.roles.includes("ADMIN");
   const isTourist = user?.roles.includes("TOURIST");
@@ -45,25 +46,28 @@ export function Navbar() {
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setMenuOpen(false);
+      if (accountRef.current && !accountRef.current.contains(e.target as Node)) {
+        setAccountOpen(false);
       }
     }
-    if (menuOpen) document.addEventListener("mousedown", handleClickOutside);
+    if (accountOpen) document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [menuOpen]);
+  }, [accountOpen]);
 
   useEffect(() => {
-    setMenuOpen(false);
+    setMobileOpen(false);
+    setAccountOpen(false);
   }, [location.pathname]);
 
   const handleLogout = () => {
     logout();
-    setMenuOpen(false);
+    setAccountOpen(false);
     navigate("/", { replace: true });
   };
 
   const goToAnchor = (href: string) => {
+    setMobileOpen(false);
+
     if (href === "#top") {
       if (isHome) window.scrollTo({ top: 0, behavior: "smooth" });
       else navigate("/");
@@ -129,25 +133,38 @@ export function Navbar() {
 
             {isAuthenticated && <NotificationBell />}
 
-            <div className="relative" ref={dropdownRef}>
+            <button
+              type="button"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              aria-expanded={mobileOpen}
+              aria-label={mobileOpen ? "Close navigation menu" : "Open navigation menu"}
+              className={`lg:hidden flex h-11 w-11 items-center justify-center rounded-full transition-all duration-300 ${overHero
+                ? "border border-white/20 bg-white/10 text-white hover:bg-white/20"
+                : "border border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+              }`}
+            >
+              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+
+            <div className="relative" ref={accountRef}>
               <button
-                onClick={() => setMenuOpen(!menuOpen)}
-                aria-expanded={menuOpen}
+                onClick={() => setAccountOpen(!accountOpen)}
+                aria-expanded={accountOpen}
                 aria-label="Open account menu"
                 className={`flex items-center gap-2 rounded-full p-1.5 transition-all duration-300 ${overHero
-                  ? "bg-white/12 border border-white/20 hover:bg-white/20"
+                  ? "bg-white/10 border border-white/20 hover:bg-white/20"
                   : "bg-white border border-slate-200 hover:border-slate-300"
                 }`}
               >
                 <span className={`hidden sm:block px-1.5 text-xs font-semibold ${overHero ? "text-white" : "text-slate-700"}`}>
-                  {isAuthenticated ? firstName : "Menu"}
+                  {isAuthenticated ? firstName : "Account"}
                 </span>
                 <span className={`flex h-8 w-8 items-center justify-center rounded-full shadow-sm ${isAuthenticated ? "bg-emerald-700" : overHero ? "bg-white/15" : "bg-slate-800"}`}>
-                  <Menu className={`w-4 h-4 ${overHero && !isAuthenticated ? "text-white" : "text-white"}`} />
+                  <User className="w-4 h-4 text-white" />
                 </span>
               </button>
 
-              {menuOpen && (
+              {accountOpen && (
                 <div className="absolute right-0 top-14 w-[290px] overflow-hidden rounded-[24px] border border-slate-200/80 bg-white/95 shadow-[0_24px_70px_rgba(15,23,42,0.20)] backdrop-blur-2xl">
                   {isAuthenticated ? (
                     <>
@@ -205,20 +222,27 @@ export function Navbar() {
           </div>
         </div>
 
-        {menuOpen && (
+        {mobileOpen && (
           <div className="lg:hidden border-t border-white/10 px-2 pb-2 pt-2">
             <div className={`rounded-[20px] p-1 ${overHero ? "bg-black/10" : "bg-slate-50"}`}>
               {navItems.map((item) => (
                 <button
                   key={item.label}
                   type="button"
-                  onClick={() => { setMenuOpen(false); goToAnchor(item.href); }}
+                  onClick={() => goToAnchor(item.href)}
                   className={`w-full flex items-center justify-between rounded-2xl px-4 py-3 text-left text-sm font-semibold ${overHero ? "text-white hover:bg-white/10" : "text-slate-800 hover:bg-white"}`}
                 >
                   {item.label}
                   <ChevronRight className="w-4 h-4 opacity-50" />
                 </button>
               ))}
+              <Link
+                to={isTourist ? "/tourist/dashboard" : "/login"}
+                className={`mx-2 my-2 flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold ${overHero ? "bg-white text-slate-900" : "bg-emerald-800 text-white"}`}
+              >
+                {isTourist ? "Open my journey" : "Start exploring"}
+                <ArrowUpRight className="h-4 w-4" />
+              </Link>
             </div>
           </div>
         )}
