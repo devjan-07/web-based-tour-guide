@@ -1,4 +1,4 @@
-Verified |Verified |Verified |Verified |# Voyara — Major Function Enhancement Log
+# Voyara — Major Function Enhancement Log
 
 ## Branch Strategy
 
@@ -90,7 +90,33 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 - [x] Package customization → booking handoff
 - [x] My Trip → package customization handoff
 
+### 8. Public Tourism Experience
+- [x] Tourism-focused navigation
+- [x] Public Explore marketplace
+- [x] Public local guide discovery
+- [x] Public package comparison
+- [x] Trip-planning call to action on homepage
+- [x] Homepage language reshaped around travel discovery rather than CRUD resources
+- [x] Mobile-friendly tourism navigation
+- [x] Real internal footer navigation
+
 ## Commit Log
+| 2026-09-24 | `97da3c555c8205d2430c573ce91c5a654ea96779` | Add public tourism marketplace Explore page | Implemented; browser verification pending |
+| 2026-09-24 | `0aac82489f0821e5b600d7e9e125a64bf2304c47` | Add public local guide discovery page | Implemented; browser verification pending |
+| 2026-09-24 | `cafaa3d52ef777e8ed1c0298149680f191b022e2` | Expose tourism discovery routes | Implemented; browser verification pending |
+| 2026-09-24 | `b93f24dc715896f35d7fb6d8ca7e3adcb7ff7343` | Add primary tourism navigation | Implemented; browser verification pending |
+| 2026-09-24 | `778dda0d625c166f0fe7cf2c5d9d6b9722c247b4` | Complete tourism navigation menu | Implemented; browser verification pending |
+| 2026-09-24 | `764a1d6b20be176f5fa2f90792201aea56f26e61` | Refine tourism hero messaging | Implemented; browser verification pending |
+| 2026-09-24 | `d20d3b329932abca258a57ff1a4352536c4a1f89` | Reshape homepage around trip planning | Implemented; browser verification pending |
+| 2026-09-24 | `3120ae5ddfe214fbbf210a9b31996dad1608cff4` | Add trip planning call to action | Implemented; browser verification pending |
+| 2026-09-24 | `d621e1939080a30df379bacca6e4efbb99b164e9` | Polish tour card layout and ratings | Implemented; browser verification pending |
+| 2026-09-24 | `88aa35780bcb2e924e292fa0750c637f36998ed1` | Turn footer into real site navigation | Implemented; browser verification pending |
+| 2026-09-24 | `b92e49ac2681392105283218a3025d75295db9fd` | Remove unused footer icon import | Implemented; browser verification pending |
+| 2026-09-24 | `eff40baf514c3847bcc33d5d66127dd9aa1a2e67` | Make tourism navigation accessible on mobile | Implemented; browser verification pending |
+| 2026-09-24 | `5cda418fdb15f0a8dd7b591603803758c7140404` | Remove unused navbar import | Implemented; browser verification pending |
+| 2026-09-24 | `3c6ec0551056b8ecea3f1c90d9212b47249395e3` | Refine homepage travel discovery language | Implemented; browser verification pending |
+| 2026-09-24 | `92f69bd46b20c5398c23f1c90dd5e72bfffd285c` | Make package comparison publicly accessible | Implemented; browser verification pending |
+| 2026-09-24 | `d8253e076ba069407dda07e5cdd6fa4371b6b6be` | Update public package comparison link | Implemented; browser verification pending |
 
 | Date | Commit | Improvement | Status |
 |---|---|---|---|
@@ -164,7 +190,7 @@ Run after the enhancement batch is complete:
 - [x] Plan My Trip carries the selected destination into the booking flow.
 - [x] Plan My Trip package, guide, accommodation and vehicle matches are consistent with the existing recommendation APIs.
 - [x] Cross-module flows are checked after all enhancements are integrated.
-- [ ] Frontend production build completes successfully.
+- [ ] Frontend production build completes successfully.\n- [ ] Public Explore page browser verification completes.\n- [ ] Public guide discovery browser verification completes.\n- [ ] Public package comparison browser verification completes.
 - [ ] Package detail page opens “Customize this package” for active packages.
 - [ ] Package customization loads the selected package and its existing destinations/duration/price.
 - [ ] Changing guests, dates, language, luggage or driver requirement refreshes guide/accommodation/vehicle recommendations.
