@@ -14,6 +14,7 @@ import TouristAccommodationBooking from "./pages/tourist/TouristAccommodationBoo
 import TouristVehicleBooking from "./pages/tourist/TouristVehicleBooking";
 import PlanMyTrip from "./pages/tourist/PlanMyTrip";
 import MyTrip from "./pages/tourist/MyTrip";
+import ComparePackages from "./pages/tourist/ComparePackages";
 import { DashboardLayout } from "./pages/dashboard/DashboardLayout";
 import { DashboardHome } from "./pages/dashboard/DashboardHome";
 import { AccommodationManagement } from "./pages/dashboard/AccommodationManagement";
@@ -46,6 +47,7 @@ export const router = createBrowserRouter([
           { path: "/tourist/dashboard", Component: TouristDashboard },
           { path: "/tourist/plan", Component: PlanMyTrip },
           { path: "/tourist/my-trip", Component: MyTrip },
+          { path: "/tourist/compare-packages", Component: ComparePackages },
           { path: "/tourist/bookings/new", Component: TouristBookingCreate },
           { path: "/tourist/bookings/:id", Component: TouristBookingDetail },
           { path: "/tourist/accommodations/:id/book", Component: TouristAccommodationBooking },
