@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -23,6 +24,15 @@ public class TourGuideController {
     @GetMapping
     public List<TourGuide> all() {
         return service.findAll();
+    }
+
+    @GetMapping("/recommendations")
+    public List<GuideRecommendation> recommendations(
+            @RequestParam(required = false) String language,
+            @RequestParam(required = false) String specialty,
+            @RequestParam(required = false) String location
+    ) {
+        return service.recommend(language, specialty, location);
     }
 
     @GetMapping("/{id}")
