@@ -95,8 +95,11 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <Link to="/" className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-900 mb-5">
-          <ArrowLeft className="w-4 h-4" /> Back to explore
+        <Link
+          to={mode === "destination" ? "/explore?tab=destinations" : "/explore?tab=tours"}
+          className="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-gray-500 transition hover:text-gray-900"
+        >
+          <ArrowLeft className="h-4 w-4" /> Back to {mode === "destination" ? "destinations" : "tour packages"}
         </Link>
 
         {loading && (
@@ -113,15 +116,15 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
         )}
 
         {!loading && detail && (
-          <article className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
-            <div className="relative min-h-[360px]">
+          <article className="overflow-hidden rounded-[2rem] border border-gray-200 bg-white shadow-sm">
+            <div className="relative min-h-[420px] overflow-hidden md:min-h-[500px]">
               <img
                 src={detail.image || "https://images.unsplash.com/photo-1586500036706-41963de24d8b?w=1200"}
                 alt={detail.title}
                 className="absolute inset-0 h-full w-full object-cover"
               />
               <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.78), rgba(0,0,0,0.08) 58%, rgba(0,0,0,0.18))" }} />
-              <div className="absolute inset-x-0 bottom-0 p-6 md:p-8 text-white">
+              <div className="absolute inset-x-0 bottom-0 p-6 text-white md:p-10">
                 <div className="mb-3 flex flex-wrap items-center gap-2">
                   <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wide backdrop-blur">
                     {detail.typeLabel}
@@ -132,21 +135,37 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
                     </span>
                   )}
                 </div>
-                <h1 className="max-w-3xl text-3xl font-extrabold leading-tight md:text-5xl">{detail.title}</h1>
-                <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-white/85">
-                  <span className="inline-flex items-center gap-1.5"><MapPin className="w-4 h-4" /> {detail.location}</span>
+                <h1 className="max-w-4xl text-4xl font-extrabold leading-[1.05] tracking-tight md:text-6xl">{detail.title}</h1>
+                <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/90">
+                  <span className="inline-flex items-center gap-1.5"><MapPin className="h-4 w-4" /> {detail.location}</span>
+                  {item?.mode === "package" && <span className="inline-flex items-center gap-1.5"><Clock className="h-4 w-4" /> {detail.durationLabel}</span>}
+                  {item?.mode === "package" && detail.priceLabel && <span className="font-semibold">{detail.priceLabel}</span>}
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-8 p-6 md:grid-cols-[1fr_320px] md:p-8">
+            <div className="grid grid-cols-1 gap-8 p-5 sm:p-6 md:grid-cols-[1fr_340px] md:p-8">
               <section>
                 <div className="mb-6 flex flex-wrap gap-2">
                   {detail.tags.map((tag) => (
-                    <span key={tag} className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600">
+                    <span key={tag} className="rounded-full bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-600">
                       {tag}
                     </span>
                   ))}
+                </div>
+                <div className="mb-8 grid gap-3 sm:grid-cols-3">
+                  <div className="rounded-2xl bg-gray-50 p-4">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gray-400">Location</p>
+                    <p className="mt-1 text-sm font-bold text-gray-800">{detail.location}</p>
+                  </div>
+                  <div className="rounded-2xl bg-gray-50 p-4">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gray-400">{item?.mode === "package" ? "Duration" : "Season"}</p>
+                    <p className="mt-1 text-sm font-bold text-gray-800">{item?.mode === "package" ? detail.durationLabel : detail.seasonLabel}</p>
+                  </div>
+                  <div className="rounded-2xl bg-gray-50 p-4">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gray-400">{item?.mode === "package" ? "Group size" : "Travel styles"}</p>
+                    <p className="mt-1 text-sm font-bold text-gray-800">{item?.mode === "package" ? detail.groupLabel : `${detail.tags.length || 0} categories`}</p>
+                  </div>
                 </div>
 
                 {item?.mode === "destination" && (
@@ -239,7 +258,7 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
                     {routesLoading && <p className="mt-3 text-sm text-gray-500">Loading route details...</p>}
                     {!routesLoading && packageRoutes.length === 0 && <p className="mt-3 text-sm text-gray-500">No active route details are linked to this package's destinations yet.</p>}
                     {!routesLoading && packageRoutes.length > 0 && (
-                      <div className="mt-4 space-y-3">
+                      <div className="mt-5 space-y-3">
                         {packageRoutes.map((route) => (
                           <div key={route.id} className="rounded-xl bg-white p-4">
                             <div className="flex flex-wrap items-center justify-between gap-2">
@@ -287,8 +306,14 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
                 </div>
               </section>
 
-              <aside className="h-fit rounded-2xl border border-gray-200 bg-gray-50 p-5">
-                <h2 className="font-bold text-gray-900">Details</h2>
+              <aside className="h-fit rounded-[1.5rem] border border-gray-200 bg-gray-50 p-5 shadow-sm md:sticky md:top-24">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-gray-400">Your trip</p>
+                    <h2 className="mt-1 text-xl font-extrabold text-gray-900">Plan this {item?.mode === "package" ? "package" : "destination"}</h2>
+                  </div>
+                  {item?.mode === "package" && <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-gray-700">{detail.priceLabel}</span>}
+                </div>
                 <div className="mt-4 space-y-3">
                   {detail.facts.map(({ icon: Icon, label, value }) => (
                     <div key={label} className="flex items-start gap-3 rounded-xl bg-white p-3">
@@ -315,21 +340,21 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
                         });
                         setSavedToTrip(next.some((tripItem) => tripItem.type === item.mode && tripItem.id === item.data.id));
                       }}
-                      className="mt-5 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-800 hover:bg-gray-50"
+                      className="mt-5 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-800 transition hover:bg-gray-100"
                     >
                       {savedToTrip ? "Added to My Trip" : "Add to My Trip"}
                     </button>
                     {item.mode === "package" && (
                       <Link
                         to={`/tourist/packages/${item.data.id}/customize`}
-                        className="mt-3 flex w-full items-center justify-center rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-700 hover:bg-blue-100"
+                        className="mt-3 flex w-full items-center justify-center rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-700 transition hover:bg-blue-100"
                       >
                         Customize this package
                       </Link>
                     )}
                     <button
                       onClick={() => navigate(bookingPath)}
-                      className="mt-3 w-full rounded-xl px-4 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                      className="mt-3 w-full rounded-xl px-4 py-3.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90"
                       style={{ background: "linear-gradient(135deg, #FF385C, #E31C5F)" }}
                     >
                       Book this trip
@@ -350,9 +375,12 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
                     Tourist accounts can create trip bookings from this page.
                   </div>
                 )}
-                <Link to="/help" className="mt-3 flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-100">
+                <Link to="/help" className="mt-3 flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-100">
                   <HelpCircle className="h-4 w-4" /> Need help?
                 </Link>
+                <p className="mt-4 text-center text-[11px] leading-5 text-gray-400">
+                  {item?.mode === "package" ? "Your final booking total is calculated by the booking service after availability is checked." : "Choose your dates and trip details after selecting this destination."}
+                </p>
               </aside>
             </div>
           </article>
@@ -375,6 +403,10 @@ function toDetail(item: DetailItem) {
       tags: data.categories || [],
       description: data.description || "Explore this Sri Lankan destination with Voyara's curated travel planning details.",
       included: splitList(data.highlights),
+      seasonLabel: data.bestSeason || "Year round",
+      durationLabel: "",
+      groupLabel: "",
+      priceLabel: "",
       facts: [
         { icon: MapPin, label: "Country", value: data.country || "Sri Lanka" },
         { icon: Tag, label: "Best season", value: data.bestSeason || "Year round" },
@@ -392,6 +424,10 @@ function toDetail(item: DetailItem) {
     tags: [data.category, data.difficulty].filter(Boolean),
     description: data.description || "Review this package's travel details before deciding whether to book.",
     included: splitList(data.included),
+    seasonLabel: "",
+    durationLabel: `${Number(data.duration || 0)} day${Number(data.duration || 0) === 1 ? "" : "s"}`,
+    groupLabel: `Up to ${Number(data.maxGroup || 0)} people`,
+    priceLabel: `LKR ${Number(data.price || 0).toLocaleString()} / person`,
     facts: [
       { icon: Clock, label: "Duration", value: `${Number(data.duration || 0)} day${Number(data.duration || 0) === 1 ? "" : "s"}` },
       { icon: Users, label: "Group size", value: `Up to ${Number(data.maxGroup || 0)} people` },
