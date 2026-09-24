@@ -217,6 +217,20 @@ export default function TouristBookingCreate() {
     [selectedVehicleId, vehicles]
   );
 
+  const goNext = () => {
+    if (currentStep === 1 && (!checkIn || !checkOut || new Date(checkOut) <= new Date(checkIn) || guests < 1)) {
+      setError("Please complete valid trip dates and traveler details before continuing.");
+      return;
+    }
+    setError("");
+    setCurrentStep((step) => Math.min(4, step + 1));
+  };
+
+  const goBack = () => {
+    setError("");
+    setCurrentStep((step) => Math.max(1, step - 1));
+  };
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError("");
@@ -295,6 +309,7 @@ export default function TouristBookingCreate() {
         {loading ? (
           <div className="bg-white rounded-3xl border border-gray-200 p-8 text-sm text-gray-400">Loading booking details...</div>
         ) : (
+          <>
           <div className="mb-5 overflow-x-auto"><div className="mx-auto flex min-w-[620px] max-w-4xl items-center justify-between rounded-3xl border border-slate-200 bg-white p-3 shadow-sm">
             {steps.map((step, index) => <div key={step.number} className="flex flex-1 items-center">
               <button type="button" onClick={() => step.number <= currentStep && setCurrentStep(step.number)} className="flex items-center gap-3 text-left">
@@ -611,6 +626,7 @@ export default function TouristBookingCreate() {
             </aside>
           {currentStep > 1 && <button type="button" onClick={goBack} className="mt-4 text-sm font-semibold text-slate-500 hover:text-slate-900">← Back to {steps[currentStep - 2].label}</button>}
           </form>
+          </>
         )}
       </main>
       <Footer />
