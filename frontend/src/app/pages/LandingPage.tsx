@@ -298,11 +298,11 @@ export default function LandingPage() {
             <div className="flex items-center gap-2 mb-2">
               <span className="w-6 h-0.5 rounded-full" style={{ background: "#FF385C" }} />
               <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#FF385C" }}>
-                {isFiltered ? "Filtered results" : "Handpicked for you"}
+                {isFiltered ? "Filtered results" : "Handpicked places"}
               </p>
             </div>
             <h2 style={{ fontWeight: 800, fontSize: "1.9rem" }}>
-              {isFiltered ? `${activeCategory || "Search"} Stays & Experiences` : "Featured Stays & Experiences"}
+              {isFiltered ? `${activeCategory || "Search"} Stays & Experiences` : "Places to start your journey"}
             </h2>
           </div>
           {filteredDestinations.length > 4 && (
@@ -390,7 +390,7 @@ export default function LandingPage() {
               <span className="w-6 h-0.5 rounded-full" style={{ background: "#7c3aed" }} />
               <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#7c3aed" }}>Places to stay</p>
             </div>
-            <h2 style={{ fontWeight: 800, fontSize: "1.9rem" }}>Available Accommodations</h2>
+            <h2 style={{ fontWeight: 800, fontSize: "1.9rem" }}>Stay somewhere you will love</h2>
           </div>
           {isFiltered && filteredAccommodations.length === 0 && (
             <span className="text-sm text-gray-400">No stays match this filter</span>
@@ -443,7 +443,7 @@ export default function LandingPage() {
               <span className="w-6 h-0.5 rounded-full" style={{ background: "#00AA6C" }} />
               <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#00AA6C" }}>Top Rated</p>
             </div>
-            <h2 style={{ fontWeight: 800, fontSize: "1.9rem" }}>Most Popular Tours</h2>
+            <h2 style={{ fontWeight: 800, fontSize: "1.9rem" }}>Journeys made for you</h2>
             <div className="mt-3 flex flex-wrap gap-2"><select value={packageSort} onChange={(event) => setPackageSort(event.target.value as "rating" | "price" | "duration")} className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700"><option value="rating">Recommended</option><option value="price">Lowest price</option><option value="duration">Shortest trip</option></select><Link to="/tourist/compare-packages" className="rounded-xl bg-gray-900 px-3 py-2 text-sm font-semibold text-white">Compare packages</Link></div>
           </div>
           {isFiltered && filteredTours.length === 0 && (
