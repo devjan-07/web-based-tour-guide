@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import type { ReactNode } from "react";
 import { motion, useScroll, useTransform } from "motion/react";
 import { Navbar } from "../components/Navbar";
 import { Hero } from "../components/Hero";
@@ -184,9 +185,10 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
-      <Hero onSearch={handleSearch} onClear={clearFilters} hasActiveFilter={isFiltered} onCategoryChange={handleCategoryChange} />
-
-      <CinematicIntroSection />
+      <CinematicJourney>
+        <Hero onSearch={handleSearch} onClear={clearFilters} hasActiveFilter={isFiltered} onCategoryChange={handleCategoryChange} />
+        <CinematicIntroSection />
+      </CinematicJourney>
 
       {/* Active filter banner */}
       {isFiltered && (
@@ -541,48 +543,68 @@ export default function LandingPage() {
   );
 }
 
-function CinematicIntroSection() {
-  const sectionRef = useRef<HTMLElement | null>(null);
+function CinematicJourney({ children }: { children: ReactNode }) {
+  const journeyRef = useRef<HTMLDivElement | null>(null);
   const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
+    target: journeyRef,
+    offset: ["start start", "end start"],
   });
-  const imageScale = useTransform(scrollYProgress, [0, 0.5, 1], [1.08, 1.22, 1.08]);
-  const imageY = useTransform(scrollYProgress, [0, 1], ["-3%", "3%"]);
-  const textY = useTransform(scrollYProgress, [0, 1], ["10%", "-10%"]);
+
+  // One image stays behind both the Hero and the intro. The scroll progress
+  // controls a single continuous camera push-in instead of swapping images.
+  const imageScale = useTransform(scrollYProgress, [0, 0.42, 0.78, 1], [1.02, 1.10, 1.24, 1.34]);
+  const imageY = useTransform(scrollYProgress, [0, 1], ["0%", "-5%"]);
 
   return (
-    <section ref={sectionRef} className="relative h-[135vh] overflow-hidden bg-slate-950">
-      <div className="sticky top-0 h-screen overflow-hidden">
+    <div ref={journeyRef} className="relative overflow-hidden bg-slate-950">
+      <div className="pointer-events-none sticky top-0 z-0 h-screen overflow-hidden">
         <motion.img
           src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Sigiriya%20L%C3%B6wenfelsen%20Sri%20Lanka%20%2829959786832%29.jpg"
-          alt="Aerial view of Sigiriya Rock Fortress surrounded by the Sri Lankan forest"
+          alt="Aerial view of Sigiriya Rock Fortress surrounded by Sri Lankan forest"
           className="absolute inset-0 h-full w-full object-cover will-change-transform"
           style={{ scale: imageScale, y: imageY }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/75" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_55%_42%,rgba(255,255,255,0.10),transparent_34%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_55%_40%,rgba(255,255,255,0.12),transparent_34%)]" />
+      </div>
 
-        <motion.div
-          style={{ y: textY }}
-          className="relative z-10 mx-auto flex h-full max-w-7xl items-center px-5 sm:px-8 lg:px-16"
-        >
+      <div className="relative z-10 -mt-[100vh]">
+        {children}
+      </div>
+
+      <div className="pointer-events-none absolute bottom-2 right-5 z-30 text-[7px] text-white/35 sm:right-8 lg:right-16">
+        Photo: dronepicr / Wikimedia Commons · CC BY 2.0
+      </div>
+    </div>
+  );
+}
+
+function CinematicIntroSection() {
+  return (
+    <section className="relative h-[135vh] overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/5 to-black/65" />
+      <div className="relative z-10 flex h-screen items-center">
+        <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-16">
           <div className="max-w-5xl text-white">
             <p className="mb-5 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.32em] text-emerald-200">
               <span className="h-px w-10 bg-emerald-200/70" />
               A different way to explore
             </p>
+
             <h2 className="max-w-5xl text-5xl font-semibold leading-[0.92] tracking-[-0.055em] sm:text-6xl md:text-8xl lg:text-[7.5rem]">
               Sri Lanka is not
               <span className="block text-white/55">a checklist.</span>
             </h2>
+
             <p className="mt-5 max-w-3xl text-2xl font-light tracking-[-0.025em] text-white/90 sm:text-3xl md:text-5xl">
               It is a journey.
             </p>
 
             <div className="mt-9 flex flex-wrap gap-3">
               {["Discover", "Choose", "Plan", "Go"].map((item) => (
-                <span key={item} className="rounded-full border border-white/25 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-md">
+                <span
+                  key={item}
+                  className="rounded-full border border-white/25 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-md"
+                >
                   {item}
                 </span>
               ))}
@@ -592,19 +614,15 @@ function CinematicIntroSection() {
               Start with a place that catches your eye, then build the rest of your trip around it — stays, transport, guides and experiences included.
             </p>
           </div>
-        </motion.div>
-
-        <div className="absolute bottom-7 left-5 right-5 z-10 flex items-end justify-between sm:left-8 sm:right-8 lg:left-16 lg:right-16">
-          <p className="text-[9px] font-semibold uppercase tracking-[0.25em] text-white/55">
-            Sigiriya · Sri Lanka
-          </p>
-          <p className="max-w-xs text-right text-[9px] font-semibold uppercase tracking-[0.18em] text-white/50">
-            Scroll to reveal the journey
-          </p>
         </div>
+      </div>
 
-        <p className="absolute bottom-2 right-5 z-10 text-[7px] text-white/35 sm:right-8 lg:right-16">
-          Photo: dronepicr / Wikimedia Commons · CC BY-SA 4.0
+      <div className="absolute bottom-7 left-5 right-5 z-10 flex items-end justify-between sm:left-8 sm:right-8 lg:left-16 lg:right-16">
+        <p className="text-[9px] font-semibold uppercase tracking-[0.25em] text-white/55">
+          Sigiriya · Sri Lanka
+        </p>
+        <p className="max-w-xs text-right text-[9px] font-semibold uppercase tracking-[0.18em] text-white/50">
+          Scroll to reveal the journey
         </p>
       </div>
     </section>
