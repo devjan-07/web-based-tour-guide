@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
-import { ArrowLeft, CalendarDays, CheckCircle, Clock, CreditCard, HelpCircle, MapPin, ShieldCheck, Tag, Users, Star } from "lucide-react";
+import { ArrowLeft, CalendarDays, CheckCircle, Clock, CreditCard, HelpCircle, MapPin, ShieldCheck, Tag, Users, Star, Sparkles } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
@@ -136,6 +136,27 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
                     </span>
                   ))}
                 </div>
+
+                {item?.mode === "destination" && (
+                  <div className="mb-8 rounded-2xl border border-rose-100 bg-rose-50/60 p-5">
+                    <div className="flex items-start gap-3">
+                      <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-rose-500" />
+                      <div className="w-full">
+                        <h2 className="text-lg font-bold text-gray-900">Perfect for</h2>
+                        <p className="mt-1 text-sm text-gray-600">
+                          A quick travel-style guide based on this destination's existing categories and travel data.
+                        </p>
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          {getTravelSignals(item.data).map((signal) => (
+                            <span key={signal} className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm">
+                              {signal}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <h2 className="text-xl font-bold text-gray-900">About this experience</h2>
                 <p className="mt-3 max-w-3xl text-sm leading-7 text-gray-600">{detail.description}</p>
@@ -293,6 +314,27 @@ function toDetail(item: DetailItem) {
       { icon: CalendarDays, label: "Difficulty", value: data.difficulty || "Easy" },
     ],
   };
+}
+
+function getTravelSignals(destination: Destination) {
+  const values = new Set((destination.categories || []).map((value) => value.toLowerCase()));
+  const signals: string[] = [];
+
+  const add = (label: string, matches: string[]) => {
+    if (matches.some((match) => Array.from(values).some((value) => value.includes(match)))) {
+      signals.push(label);
+    }
+  };
+
+  add("Nature & scenery", ["nature", "wildlife", "mountain", "beach", "water", "scenic"]);
+  add("Adventure", ["adventure", "hiking", "trek", "safari", "water sport", "surf"]);
+  add("Culture & heritage", ["culture", "heritage", "history", "temple", "spiritual", "architecture"]);
+  add("Food experiences", ["food", "culinary", "cuisine"]);
+  add("Photography", ["photography", "photo", "scenic"]);
+  add("Relaxation", ["wellness", "relax", "beach", "spa"]);
+
+  if (signals.length === 0) signals.push("Flexible travel");
+  return Array.from(new Set(signals)).slice(0, 4);
 }
 
 function splitList(value?: string) {
