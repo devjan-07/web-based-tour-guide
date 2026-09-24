@@ -12,6 +12,7 @@ import {
   MapPin,
   Sparkles,
 } from "lucide-react";
+import heroImage from "../../imports/image-4.png";
 
 interface HeroProps {
   onSearch?: (query: string) => void;
@@ -49,9 +50,21 @@ export function Hero({ onSearch, onClear, hasActiveFilter = false, onCategoryCha
   ];
 
   const scrollFade = Math.max(0, 1 - scrollY / 360);
+  const imageScale = 1 + scrollY * 0.00016;
+
   return (
-    <section id="top" className="relative min-h-[760px] md:min-h-[860px] overflow-hidden">
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,12,18,0.48)_0%,rgba(5,12,18,0.06)_38%,rgba(5,12,18,0.12)_58%,rgba(5,12,18,0.78)_100%)]" />
+    <section id="top" className="relative min-h-[760px] md:min-h-[860px] overflow-hidden bg-slate-950">
+      <img
+        src={heroImage}
+        alt="Sri Lanka travel landscape"
+        className="absolute inset-0 h-full w-full object-cover will-change-transform"
+        style={{
+          transform: `scale(${imageScale}) translate3d(0, ${scrollY * 0.045}px, 0)`,
+          filter: "saturate(1.06) contrast(1.03)",
+        }}
+      />
+
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,12,18,0.52)_0%,rgba(5,12,18,0.10)_38%,rgba(5,12,18,0.18)_58%,rgba(5,12,18,0.82)_100%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_30%,rgba(255,255,255,0.16),transparent_28%),linear-gradient(90deg,rgba(0,0,0,0.22),transparent_58%)]" />
 
       <div className="absolute left-4 top-1/2 hidden -translate-y-1/2 md:flex flex-col items-center gap-4 text-white/55" style={{ opacity: scrollFade }}>
