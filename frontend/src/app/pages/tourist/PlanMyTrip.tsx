@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import type { ComponentType, ReactNode } from "react";
 import { Link } from "react-router";
 import { ArrowRight, BedDouble, CalendarDays, Car, CheckCircle, Compass, Languages, MapPin, Package, Sparkles, Users } from "lucide-react";
 import { Navbar } from "../../components/Navbar";
@@ -285,7 +286,7 @@ export default function PlanMyTrip() {
   );
 }
 
-function PlannerField({ icon: Icon, label, children }: { icon: typeof MapPin; label: string; children: React.ReactNode }) {
+function PlannerField({ icon: Icon, label, children }: { icon: ComponentType<{ className?: string }>; label: string; children: ReactNode }) {
   return (
     <label className="block rounded-2xl bg-gray-50 p-4">
       <span className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-gray-400"><Icon className="h-4 w-4" /> {label}</span>
@@ -294,7 +295,7 @@ function PlannerField({ icon: Icon, label, children }: { icon: typeof MapPin; la
   );
 }
 
-function RecommendationCard({ title, icon: Icon, empty, children }: { title: string; icon: typeof Package; empty: string; children: React.ReactNode }) {
+function RecommendationCard({ title, icon: Icon, empty, children }: { title: string; icon: ComponentType<{ className?: string }>; empty: string; children: ReactNode }) {
   const hasChildren = Array.isArray(children) ? children.length > 0 : !!children;
   return (
     <section className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
