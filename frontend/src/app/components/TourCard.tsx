@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Clock, Users, Heart, MapPin } from "lucide-react";
+import { Clock, Users, Heart, MapPin, Star } from "lucide-react";
 
 interface TourCardProps {
   id: number;
@@ -14,7 +14,7 @@ interface TourCardProps {
   onView?: (id: number) => void;
 }
 
-export function TourCard({ id, image, title, location, price, duration, maxGroup, badge, category, onView }: TourCardProps) {
+export function TourCard({ id, image, title, location, price, duration, maxGroup, badge, category, rating = 0, onView }: TourCardProps) {
   const [liked, setLiked] = useState(false);
   const [imgError, setImgError] = useState(false);
 
@@ -50,7 +50,7 @@ export function TourCard({ id, image, title, location, price, duration, maxGroup
         <div className="flex items-start justify-between gap-2 mb-2">
           <div className="flex-1 min-w-0">
             <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: "#FF385C" }}>{category}</span>
-            <h3 className="text-gray-900 mt-0.5 group-hover:text-gray-700 transition-colors" style={{ fontWeight: 700, fontSize: "1rem", lineHeight: 1.3 }}>{title}</h3>
+            <div className="flex items-start justify-between gap-3">\n              <h3 className="text-gray-900 mt-0.5 group-hover:text-gray-700 transition-colors" style={{ fontWeight: 700, fontSize: "1rem", lineHeight: 1.3 }}>{title}</h3>
             <div className="flex items-center gap-1 mt-1 text-sm text-gray-500">
               <MapPin className="w-3.5 h-3.5" />
               <span>{location}</span>
