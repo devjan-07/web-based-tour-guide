@@ -1,470 +1,138 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowRight, Search, Sparkles, Star } from "lucide-react";
+import { Link, useNavigate } from "react-router";
 import { Navbar } from "../components/Navbar";
 import { Hero } from "../components/Hero";
 import { DestinationCard } from "../components/DestinationCard";
 import { TourCard } from "../components/TourCard";
-import { ReviewSection } from "../components/ReviewSection";
-import { WhyUs } from "../components/WhyUs";
 import { Footer } from "../components/Footer";
 import { VoyAI } from "../components/VoyAI";
 import { useAuth } from "../context/AuthContext";
-import { Link, useNavigate } from "react-router";
-import { Search, X, Globe2, Star, Users, MapPinned, ArrowUpRight, BedDouble, Car, Fuel, SlidersHorizontal } from "lucide-react";
-import { accommodationSearchApi, destinationsApi, packagesApi, publicVehiclesApi, type Accommodation, type Destination, type TourPackage, type Vehicle } from "../lib/api";
+import { destinationsApi, packagesApi, type Destination, type TourPackage } from "../lib/api";
 
-// Maps CategoryFilter labels → destination tag keywords
 const categoryTagMap: Record<string, string[]> = {
-  "Beaches":     ["Beach", "Beaches"],
-  "City Tours":  ["City", "Architecture", "Walking", "Urban"],
-  "Hiking":      ["Hiking", "Trek", "Trekking"],
-  "Food & Drink":["Food", "Culinary", "Food & Drink"],
-  "Water Sports":["Sailing", "Snorkeling", "Water", "Water Sports"],
-  "Cultural":    ["Cultural", "History", "Spiritual", "Heritage"],
-  "Nature":      ["Nature", "Wildlife", "Forest"],
-  "Arts":        ["Arts", "Art"],
-  "Aerial":      ["Aerial"],
-  "Wildlife":    ["Wildlife", "Nature"],
-  "Winter":      ["Winter", "Snow"],
-  "Wellness":    ["Wellness", "Spa"],
-  "Nightlife":   ["Nightlife", "Night"],
-  "Photography": ["Photography"],
+  Beaches: ["Beach", "Beaches"],
+  Cultural: ["Cultural", "Culture", "History", "Spiritual", "Heritage"],
+  Adventure: ["Adventure", "Hiking", "Trek", "Trekking", "Water", "Surf"],
+  "Food & Drink": ["Food", "Culinary", "Food & Drink"],
+  Nature: ["Nature", "Wildlife", "Forest", "Scenic"],
 };
 
 export default function LandingPage() {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [destinations, setDestinations] = useState<Destination[]>([]);
-  const [tourPackages, setTourPackages] = useState<TourPackage[]>([]);
-  const [accommodations, setAccommodations] = useState<Accommodation[]>([]);
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [activeCategory, setActiveCategory] = useState("");
+  const [packages, setPackages] = useState<TourPackage[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [showAll, setShowAll] = useState(false);
-  const [packageSort, setPackageSort] = useState<"rating" | "price" | "duration">("rating");
+  const [activeCategory, setActiveCategory] = useState("");
+  const [showAllResults, setShowAllResults] = useState(false);
 
   useEffect(() => {
-    destinationsApi.list().then(setDestinations).catch((error) => console.error("Failed to load destinations", error));
-    packagesApi.list().then(setTourPackages).catch((error) => console.error("Failed to load packages", error));
-    accommodationSearchApi.list().then(setAccommodations).catch((error) => console.error("Failed to load accommodations", error));
-    publicVehiclesApi.list().then(setVehicles).catch((error) => console.error("Failed to load vehicles", error));
+    Promise.all([destinationsApi.list(), packagesApi.list()])
+      .then(([destinationItems, packageItems]) => {
+        setDestinations(destinationItems.filter((item) => item.status !== "Hidden"));
+        setPackages(packageItems.filter((item) => item.status === "Active"));
+      })
+      .catch((error) => console.error("Failed to load homepage discovery data", error));
   }, []);
 
-  const localDestinations = destinations.filter((d) => d.country?.trim().toLowerCase() === "sri lanka");
-  const localDestinationNames = new Set(localDestinations.map((d) => d.name.trim().toLowerCase()));
-  const localTourPackages = tourPackages.filter((t) =>
-    t.destinations.some((destination) => localDestinationNames.has(destination.trim().toLowerCase()) || destination.toLowerCase().includes("sri lanka"))
-  );
+  const sriLankanDestinations = useMemo(() => destinations.filter((item) => item.country?.trim().toLowerCase() === "sri lanka"), [destinations]);
+  const localNames = useMemo(() => new Set(sriLankanDestinations.map((item) => item.name.trim().toLowerCase())), [sriLankanDestinations]);
+  const sriLankanPackages = useMemo(() => packages.filter((item) => item.destinations?.some((destination) => localNames.has(destination.trim().toLowerCase()) || destination.toLowerCase().includes("sri lanka"))), [localNames, packages]);
 
-  const allDestinations = localDestinations.map((d) => ({
-    id: d.id,
-    image: d.image,
-    title: d.name,
-    location: [d.name, d.country].filter(Boolean).join(", "),
-    badge: d.status === "Featured" ? "Featured" : undefined,
-    tags: d.categories || [],
-  }));
-
-  const allTours = localTourPackages.map((t) => ({
-    id: t.id,
-    image: t.image,
-    title: t.name,
-    location: t.destinations.join(", "),
-    price: t.price || 0,
-    duration: `${t.duration} days`,
-    maxGroup: t.maxGroup,
-    badge: t.status === "Active" ? undefined : t.status,
-    category: t.category,
-    rating: t.rating || 0,
-  }));
-
-  const allAccommodations = accommodations
-    .filter((item) => item.status === "Active" && item.country?.trim().toLowerCase() === "sri lanka")
-    .map((item) => ({
-      ...item,
-      tags: [item.type, item.location, ...(item.amenities || [])].filter(Boolean),
-    }));
-
-  const allVehicles = vehicles
-    .filter((item) => item.status === "Available")
-    .map((item) => ({
-      ...item,
-      tags: [item.type, item.brand, item.model, item.transmission, item.fuel, item.location, ...(item.features || [])].filter(Boolean),
-    }));
-
-  const popular = localDestinations
-    .slice()
-    .slice(0, 6)
-    .map((d) => ({ name: d.name, country: d.country, img: d.image }));
-
-  const handleSearch = (q: string) => {
-    setSearchQuery(q);
-    setActiveCategory("");
-    setShowAll(true);
-  };
-
-  const handleCategoryChange = (cat: string) => {
-    setActiveCategory(cat);
-    setSearchQuery("");
-    setShowAll(true);
-  };
-
-  const clearFilters = () => { setActiveCategory(""); setSearchQuery(""); setShowAll(false); };
-
-  const availableTourCategories = Array.from(new Set(allTours.map((tour) => tour.category).filter(Boolean))).sort();
-  const viewPackage = (packageId: number) => navigate(`/packages/${packageId}`);
-  const viewDestination = (destinationId: number) => navigate(`/destinations/${destinationId}`);
-
-  const filterDestinations = () => {
-    let list = allDestinations;
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      list = list.filter((d) => d.title.toLowerCase().includes(q) || d.location.toLowerCase().includes(q));
-    }
+  const filteredDestinations = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    let result = sriLankanDestinations;
+    if (query) result = result.filter((item) => [item.name, item.country, ...(item.categories || [])].join(" ").toLowerCase().includes(query));
     if (activeCategory) {
-      const allowed = categoryTagMap[activeCategory] ?? [];
-      list = list.filter((d) => d.tags.some((t) => allowed.some((a) => t.toLowerCase().includes(a.toLowerCase()))));
+      const allowed = categoryTagMap[activeCategory] || [activeCategory];
+      result = result.filter((item) => (item.categories || []).some((tag) => allowed.some((allowedTag) => tag.toLowerCase().includes(allowedTag.toLowerCase()))));
     }
-    return list;
-  };
+    return result;
+  }, [activeCategory, searchQuery, sriLankanDestinations]);
 
-  const filterTours = () => {
-    let list = allTours;
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      list = list.filter((t) => t.title.toLowerCase().includes(q) || t.location.toLowerCase().includes(q));
-    }
+  const filteredPackages = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    let result = sriLankanPackages;
+    if (query) result = result.filter((item) => [item.name, item.category, ...(item.destinations || [])].join(" ").toLowerCase().includes(query));
     if (activeCategory) {
-      list = list.filter((t) => t.category === activeCategory);
+      const allowed = categoryTagMap[activeCategory] || [activeCategory];
+      result = result.filter((item) => allowed.some((allowedTag) => item.category?.toLowerCase().includes(allowedTag.toLowerCase())));
     }
-    return list;
-  };
+    return result;
+  }, [activeCategory, searchQuery, sriLankanPackages]);
 
-  const filterAccommodations = () => {
-    let list = allAccommodations;
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      list = list.filter((item) =>
-        [item.name, item.type, item.location, item.country, ...(item.amenities || [])].join(" ").toLowerCase().includes(q)
-      );
-    }
-    if (activeCategory) {
-      const allowed = categoryTagMap[activeCategory] ?? [activeCategory];
-      list = list.filter((item) => item.tags.some((tag) => allowed.some((allowedTag) => tag.toLowerCase().includes(allowedTag.toLowerCase()))));
-    }
-    return list;
-  };
+  const isFiltering = Boolean(searchQuery.trim() || activeCategory);
+  const totalResults = filteredDestinations.length + filteredPackages.length;
+  const featuredDestinations = sriLankanDestinations.slice().sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0)).slice(0, 6);
+  const featuredPackages = sriLankanPackages.slice().sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0)).slice(0, 3);
+  const categories = Array.from(new Set(sriLankanDestinations.flatMap((item) => item.categories || []))).filter(Boolean).slice(0, 10);
 
-  const filterVehicles = () => {
-    let list = allVehicles;
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      list = list.filter((item) =>
-        [item.name, item.brand, item.model, item.type, item.transmission, item.fuel, item.location, ...(item.features || [])].join(" ").toLowerCase().includes(q)
-      );
-    }
-    if (activeCategory) {
-      const allowed = categoryTagMap[activeCategory] ?? [activeCategory];
-      list = list.filter((item) => item.tags.some((tag) => allowed.some((allowedTag) => tag.toLowerCase().includes(allowedTag.toLowerCase()))));
-    }
-    return list;
-  };
-
-  const filteredDestinations = filterDestinations();
-  const displayedDestinations = showAll ? filteredDestinations : filteredDestinations.slice(0, 4);
-  const filteredTours = filterTours().slice().sort((a, b) => packageSort === "price" ? a.price - b.price : packageSort === "duration" ? parseInt(a.duration) - parseInt(b.duration) : b.rating - a.rating);
-  const filteredAccommodations = filterAccommodations();
-  const displayedAccommodations = filteredAccommodations.slice(0, 4);
-  const filteredVehicles = filterVehicles();
-  const displayedVehicles = filteredVehicles.slice(0, 4);
-  const searchHasResults = filteredDestinations.length + filteredTours.length + filteredAccommodations.length + filteredVehicles.length > 0;
-  const isFiltered = !!activeCategory || !!searchQuery;
-  const isTourist = isAuthenticated && user?.roles.includes("TOURIST");
-  const formatLkr = (value: number) => `රු${Number(value || 0).toLocaleString()}`;
-  const bookingLink = (target: string) => isTourist ? target : `/login?redirect=${encodeURIComponent(target)}`;
+  const clearDiscovery = () => { setSearchQuery(""); setActiveCategory(""); setShowAllResults(false); };
+  const handleSearch = (query: string) => { setSearchQuery(query); setActiveCategory(""); setShowAllResults(true); };
+  const handleCategory = (category: string) => { setActiveCategory(category); setSearchQuery(""); setShowAllResults(true); };
+  const scrollToDiscovery = () => document.getElementById("discovery")?.scrollIntoView({ behavior: "smooth" });
+  const displayedDestinations = showAllResults ? filteredDestinations : filteredDestinations.slice(0, 4);
+  const displayedPackages = showAllResults ? filteredPackages : filteredPackages.slice(0, 3);
 
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
-      <Hero onSearch={handleSearch} onClear={clearFilters} hasActiveFilter={isFiltered} onCategoryChange={handleCategoryChange} />
-
-      {/* Floating stats card overlapping the hero */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 -mt-12 md:-mt-14">
-        <div className="rounded-3xl shadow-xl overflow-hidden" style={{ background: "linear-gradient(135deg, #003580, #0057B8)" }}>
-          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-white/10">
-            {[
-              { value: `${localTourPackages.length}+`, label: "Sri Lanka Tours", icon: Globe2 },
-              { value: `${localDestinations.length}+`, label: "Local Places", icon: MapPinned },
-              { value: `${allAccommodations.length}+`, label: "Stays", icon: BedDouble },
-              { value: `${allVehicles.length}+`, label: "Vehicles", icon: Car },
-            ].map(({ value, label, icon: Icon }) => (
-              <div key={label} className="flex items-center gap-3 px-5 py-6 justify-center md:justify-start">
-                <div className="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
-                  <Icon className="w-5 h-5 text-white" />
-                </div>
+      <Hero
+        onSearch={(query) => { handleSearch(query); setTimeout(scrollToDiscovery, 0); }}
+        onClear={clearDiscovery}
+        hasActiveFilter={isFiltering}
+        onCategoryChange={(category) => { handleCategory(category); setTimeout(scrollToDiscovery, 0); }}
+      />
+      <main>
+        {isFiltering ? (
+          <section id="discovery" className="scroll-mt-20 border-b border-gray-100 bg-gray-50 px-4 py-10">
+            <div className="mx-auto max-w-7xl">
+              <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
                 <div>
-                  <p className="text-white leading-none" style={{ fontWeight: 800, fontSize: "1.4rem" }}>{value}</p>
-                  <p className="text-white/70 text-xs mt-1">{label}</p>
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-rose-500">Search results</p>
+                  <h2 className="mt-2 text-2xl font-extrabold text-gray-900 md:text-3xl">{searchQuery ? "Results for “" + searchQuery + "”" : activeCategory + " travel"}</h2>
+                  <p className="mt-2 text-sm text-gray-500">{totalResults} {totalResults === 1 ? "result" : "results"} across destinations and tour packages.</p>
                 </div>
+                <button type="button" onClick={clearDiscovery} className="self-start rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 md:self-auto">Clear search</button>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Active filter banner */}
-      {isFiltered && (
-        <div className="bg-rose-50 border-b border-rose-100 py-3 px-4">
-          <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm text-rose-700">
-              <Search className="w-4 h-4" />
-              {searchQuery && <span>Results for <strong>"{searchQuery}"</strong></span>}
-              {activeCategory && <span>Filtered by <strong>{activeCategory}</strong></span>}
-              <span className="text-rose-400">— {filteredDestinations.length} place{filteredDestinations.length !== 1 ? "s" : ""}, {filteredTours.length} tour{filteredTours.length !== 1 ? "s" : ""}, {filteredAccommodations.length} stay{filteredAccommodations.length !== 1 ? "s" : ""}, {filteredVehicles.length} vehicle{filteredVehicles.length !== 1 ? "s" : ""}</span>
+              {totalResults === 0 ? <EmptySearch onClear={clearDiscovery} /> : <div className="mt-8 space-y-12">
+                {displayedDestinations.length > 0 && <DiscoveryGroup title="Destinations" actionLabel={filteredDestinations.length > 4 ? "Show all destinations" : undefined} onAction={() => setShowAllResults(true)}><div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">{displayedDestinations.map((item) => <DestinationCard key={item.id} id={item.id} image={item.image} title={item.name} location={[item.name, item.country].filter(Boolean).join(", ")} badge={item.status === "Featured" ? "Featured" : undefined} tags={item.categories || []} onView={(id) => navigate("/destinations/" + id)} />)}</div></DiscoveryGroup>}
+                {displayedPackages.length > 0 && <DiscoveryGroup title="Tour packages" actionLabel={filteredPackages.length > 3 ? "Show all packages" : undefined} onAction={() => setShowAllResults(true)}><div className="space-y-5">{displayedPackages.map((item) => <TourCard key={item.id} id={item.id} image={item.image} title={item.name} location={item.destinations.join(", ")} price={item.price || 0} duration={String(item.duration) + " days"} maxGroup={item.maxGroup} badge={item.status === "Active" ? undefined : item.status} category={item.category} rating={item.rating || 0} onView={(id) => navigate("/packages/" + id)} />)}</div></DiscoveryGroup>}
+              </div>}
             </div>
-            <button onClick={clearFilters} className="flex items-center gap-1 text-xs font-semibold text-rose-600 hover:text-rose-800 transition-colors">
-              <X className="w-3.5 h-3.5" /> Clear
-            </button>
-          </div>
-        </div>
-      )}
-
-      {isFiltered && (
-        <section className="px-4 pt-6">
-          <div className="mx-auto max-w-7xl rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-                <SlidersHorizontal className="h-4 w-4 text-rose-500" />
-                Refine results
-              </div>
-              <select
-                value={activeCategory}
-                onChange={(event) => {
-                  setActiveCategory(event.target.value);
-                  setSearchQuery("");
-                  setShowAll(true);
-                }}
-                className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700"
-                aria-label="Filter tours by category"
-              >
-                <option value="">All categories</option>
-                {availableTourCategories.map((category) => <option key={category} value={category}>{category}</option>)}
-              </select>
-              <button
-                type="button"
-                onClick={clearFilters}
-                className="rounded-xl border border-gray-200 px-3 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50"
-              >
-                Reset filters
-              </button>
-            </div>
-            {!searchHasResults && (
-              <div className="mt-4 rounded-xl bg-gray-50 p-4 text-sm text-gray-500">
-                No matching places, tours, stays, or vehicles were found. Try a broader destination, category, or search term.
-              </div>
-            )}
-          </div>
-        </section>
-      )}
-
-      {isTourist && (
-        <section className="px-4 pt-8">
-          <div className="mx-auto flex max-w-7xl flex-col gap-4 rounded-3xl border border-rose-100 bg-rose-50 p-5 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-rose-500">Tourist tools</p>
-              <h2 className="mt-1 text-xl font-extrabold text-gray-900">Plan a trip or check your bookings</h2>
-              <p className="mt-1 text-sm text-gray-500">Open a destination for details, then book when you are ready.</p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Link to="/tourist/plan" className="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-100">
-                Plan my trip
-              </Link>
-              <Link to="/tourist/my-trip" className="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-100">
-                My trip
-              </Link>
-              <a href="#listings-section" className="rounded-xl bg-white/70 px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-white">
-                Explore trips
-              </a>
-              <Link to="/tourist/dashboard" className="rounded-xl px-4 py-2.5 text-sm font-semibold text-white" style={{ background: "#FF385C" }}>
-                My bookings
-              </Link>
-            </div>
-          </div>
-        </section>
-      )}
-
-      <section id="listings-section" className="py-16 px-4 max-w-7xl mx-auto">
-        <div className="flex items-end justify-between mb-8">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="w-6 h-0.5 rounded-full" style={{ background: "#FF385C" }} />
-              <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#FF385C" }}>
-                {isFiltered ? "Filtered results" : "Handpicked places"}
-              </p>
-            </div>
-            <h2 style={{ fontWeight: 800, fontSize: "1.9rem" }}>
-              {isFiltered ? `${activeCategory || "Search"} Stays & Experiences` : "Places to start your journey"}
-            </h2>
-          </div>
-          {filteredDestinations.length > 4 && (
-            <button onClick={() => setShowAll((v) => !v)} className="hidden md:block text-sm font-semibold underline text-gray-700">
-              {showAll ? "Show less" : `Show all ${filteredDestinations.length}`}
-            </button>
-          )}
-        </div>
-        {displayedDestinations.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {displayedDestinations.map((d) => <DestinationCard key={d.id} {...d} onView={viewDestination} />)}
-          </div>
+          </section>
         ) : (
-          <div className="text-center py-16">
-            <Search className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500 font-medium">No stays match your search.</p>
-            <button onClick={clearFilters} className="mt-3 text-sm font-semibold underline" style={{ color: "#FF385C" }}>Clear filters</button>
-          </div>
-        )}
-      </section>
-
-      <section className="py-12 px-4 max-w-7xl mx-auto">
-        <div className="mb-6">
-          <p className="text-sm font-semibold uppercase tracking-widest text-rose-500">Discover your style</p>
-          <h2 className="mt-2 text-2xl font-extrabold text-gray-900">Find destinations by travel style</h2>
-          <p className="mt-1 text-sm text-gray-500">Explore destinations using the categories already maintained in Voyara.</p>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          {Array.from(new Set(localDestinations.flatMap((item) => item.categories || []))).slice(0, 12).map((category) => (
-            <button key={category} type="button" onClick={() => { handleCategoryChange(category); document.getElementById("listings-section")?.scrollIntoView({ behavior: "smooth" }); }} className="rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:border-rose-300 hover:text-rose-600">
-              {category}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className="py-16" style={{ background: "#f9fafb" }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-8">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="w-6 h-0.5 rounded-full" style={{ background: "#0057B8" }} />
-              <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#0057B8" }}>Explore Sri Lanka</p>
-            </div>
-            <h2 style={{ fontWeight: 800, fontSize: "1.9rem" }}>Popular Destinations</h2>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {popular.map((d) => (
-              <div key={d.name} onClick={() => { handleSearch(d.name); const s = document.getElementById("listings-section"); if (s) s.scrollIntoView({ behavior: "smooth" }); }}
-                className="group relative rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300" style={{ aspectRatio: "3/4" }}>
-                <img src={d.img} alt={d.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                <div className="absolute inset-0 transition-opacity" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 62%)" }} />
-                <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center opacity-0 -translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                  <ArrowUpRight className="w-4 h-4" style={{ color: "#003580" }} />
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 p-3">
-                  <p className="text-white font-bold text-sm">{d.name}</p>
-                  <p className="text-white/70 text-xs">{d.country}</p>
-                </div>
+          <>
+            <section id="discovery" className="scroll-mt-20 px-4 py-14 md:py-16">
+              <div className="mx-auto max-w-7xl">
+                <SectionHeading eyebrow="Explore Sri Lanka" title="Start with a place" description="Browse destinations by the kind of trip you want to have." action={<Link to="/explore" className="hidden items-center gap-2 text-sm font-bold text-gray-700 hover:text-rose-500 sm:inline-flex">Explore all <ArrowRight className="h-4 w-4" /></Link>} />
+                <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">{[{ label: "Beaches", value: "Beaches" }, { label: "Culture", value: "Cultural" }, { label: "Adventure", value: "Adventure" }, { label: "Food", value: "Food & Drink" }, { label: "Nature", value: "Nature" }].map(({ label, value }) => <button key={value} type="button" onClick={() => { handleCategory(value); scrollToDiscovery(); }} className="rounded-2xl border border-gray-200 bg-white px-4 py-4 text-left text-sm font-bold text-gray-800 shadow-sm transition hover:-translate-y-0.5 hover:border-rose-200 hover:shadow-md"><Sparkles className="mb-3 h-4 w-4 text-rose-500" />{label}</button>)}</div>
+                <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">{featuredDestinations.map((destination) => <Link key={destination.id} to={"/destinations/" + destination.id} className="group relative aspect-[3/4] overflow-hidden rounded-2xl bg-gray-100 shadow-sm"><img src={destination.image} alt={destination.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" onError={(event) => { event.currentTarget.src = "https://images.unsplash.com/photo-1586500036706-41963de24d8b?auto=format&fit=crop&w=900&q=80"; }} /><div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/5 to-transparent" /><div className="absolute inset-x-0 bottom-0 p-3"><p className="text-sm font-extrabold text-white">{destination.name}</p><div className="mt-1 flex items-center gap-1 text-xs text-white/75"><Star className="h-3 w-3 fill-current" />{Number(destination.rating || 0).toFixed(1)}</div></div></Link>)}</div>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-14 px-4">
-        <div className="mx-auto max-w-7xl rounded-[2rem] bg-[#062a56] p-6 text-white md:p-8">
-          <div className="grid gap-8 md:grid-cols-[1.2fr_0.8fr] md:items-center">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.22em] text-rose-300">Travel, your way</p>
-              <h2 className="mt-2 text-2xl font-black md:text-3xl">Not sure where to start?</h2>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70">Tell Voyara where you want to go, your dates, group size and preferences. The trip planner brings together suitable tours, guides, stays and transport before you book.</p>
-            </div>
-            <div className="flex flex-wrap gap-3 md:justify-end">
-              <Link to="/tourist/plan" className="inline-flex items-center gap-2 rounded-xl bg-[#FF385C] px-5 py-3 text-sm font-bold text-white hover:opacity-90">Plan my trip <ArrowUpRight className="h-4 w-4" /></Link>
-              <Link to="/explore" className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-5 py-3 text-sm font-bold text-white ring-1 ring-white/20 hover:bg-white/15">Explore everything</Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 px-4 max-w-7xl mx-auto">
-        <div className="flex items-end justify-between mb-8">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="w-6 h-0.5 rounded-full" style={{ background: "#7c3aed" }} />
-              <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#7c3aed" }}>Places to stay</p>
-            </div>
-            <h2 style={{ fontWeight: 800, fontSize: "1.9rem" }}>Stay somewhere you will love</h2>
-          </div>
-          {isFiltered && filteredAccommodations.length === 0 && (
-            <span className="text-sm text-gray-400">No stays match this filter</span>
-          )}
-        </div>
-        {displayedAccommodations.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {displayedAccommodations.map((item) => (
-              <article key={item.id} className="rounded-2xl overflow-hidden bg-white border border-gray-200 shadow-sm hover:shadow-xl transition-all">
-                <div className="relative h-44">
-                  <img src={item.image} alt={item.name} className="h-full w-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=900&q=80"; }} />
-                  <span className="absolute left-3 top-3 rounded-full bg-white/95 px-2.5 py-1 text-xs font-bold text-gray-800">{item.type}</span>
-                </div>
-                <div className="p-4">
-                  <h3 className="font-bold text-gray-900 truncate">{item.name}</h3>
-                  <p className="mt-1 text-xs text-gray-500">{[item.location, item.country].filter(Boolean).join(", ")}</p>
-                  <div className="mt-3 flex items-center justify-between gap-3">
-                    <span className="font-extrabold text-gray-900">{formatLkr(item.price)} <span className="text-xs font-medium text-gray-400">/night</span></span>
-                    <span className="inline-flex items-center gap-1 text-sm font-semibold text-gray-700"><Star className="h-3.5 w-3.5" style={{ color: "#FF385C", fill: "#FF385C" }} />{Number(item.rating || 0).toFixed(1)}</span>
-                  </div>
-                  <div className="mt-3 flex flex-wrap gap-1.5">
-                    {(item.amenities || []).slice(0, 3).map((tag) => (
-                      <span key={tag} className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">{tag}</span>
-                    ))}
-                    {(item.amenities || []).length > 3 && <span className="text-xs text-gray-400">+{(item.amenities || []).length - 3}</span>}
-                  </div>
-                  <p className="mt-3 text-xs text-gray-400">{item.rooms} rooms</p>
-                  <Link
-                    to={bookingLink(`/tourist/accommodations/${item.id}/book`)}
-                    className="mt-4 inline-flex w-full items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold text-white"
-                    style={{ background: "#FF385C" }}
-                  >
-                    Book stay
-                  </Link>
-                </div>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-10">
-            <p className="text-gray-400 text-sm">No accommodations found.</p>
-          </div>
+            </section>
+            <section className="border-y border-gray-100 bg-gray-50 px-4 py-14 md:py-16"><div className="mx-auto max-w-7xl"><SectionHeading eyebrow="Travel styles" title="Choose the feeling, then choose the place" description="Use the categories already maintained in Voyara to narrow your inspiration." /><div className="mt-7 flex flex-wrap gap-2.5">{categories.map((category) => <button key={category} type="button" onClick={() => { handleCategory(category); scrollToDiscovery(); }} className="rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-rose-300 hover:text-rose-600">{category}</button>)}</div></div></section>
+            <section className="px-4 py-14 md:py-16"><div className="mx-auto max-w-7xl"><SectionHeading eyebrow="Curated journeys" title="Tours worth building a trip around" description="Compare package details, open the full itinerary, then customise when you are ready." action={<Link to="/compare-packages" className="hidden items-center gap-2 text-sm font-bold text-gray-700 hover:text-rose-500 sm:inline-flex">Compare packages <ArrowRight className="h-4 w-4" /></Link>} /><div className="mt-7 space-y-5">{featuredPackages.map((item) => <TourCard key={item.id} id={item.id} image={item.image} title={item.name} location={item.destinations.join(", ")} price={item.price || 0} duration={String(item.duration) + " days"} maxGroup={item.maxGroup} badge={item.status === "Active" ? undefined : item.status} category={item.category} rating={item.rating || 0} onView={(id) => navigate("/packages/" + id)} />)}</div>{featuredPackages.length === 0 && <div className="mt-7 rounded-2xl border border-dashed border-gray-200 p-8 text-center text-sm text-gray-500">Tour packages will appear here when active packages are available.</div>}</div></section>
+            <section className="px-4 pb-14 md:pb-16"><div className="mx-auto grid max-w-7xl gap-4 md:grid-cols-3">{[{ step: "01", title: "Discover", text: "Explore destinations, packages and local guides." }, { step: "02", title: "Plan", text: "Save ideas, compare packages and match trip resources to your needs." }, { step: "03", title: "Book", text: "Choose dates and create your booking when the plan is ready." }].map(({ step, title, text }) => <div key={step} className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm"><span className="text-xs font-black tracking-[0.2em] text-rose-500">{step}</span><h3 className="mt-3 text-lg font-extrabold text-gray-900">{title}</h3><p className="mt-2 text-sm leading-6 text-gray-500">{text}</p></div>)}</div></section>
+            <section className="px-4 pb-16"><div className="mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-[#062a56] p-7 text-white md:p-10"><div className="grid gap-8 md:grid-cols-[1.2fr_0.8fr] md:items-center"><div><p className="text-xs font-bold uppercase tracking-[0.2em] text-rose-300">Plan around you</p><h2 className="mt-2 text-2xl font-black md:text-3xl">Not sure where to start?</h2><p className="mt-3 max-w-2xl text-sm leading-6 text-white/70">Give Voyara your destination, dates, group size and preferences. The trip planner brings together suitable tours, guides, stays and transport using the resources already in the system.</p></div><div className="flex flex-wrap gap-3 md:justify-end"><Link to="/tourist/plan" className="inline-flex items-center gap-2 rounded-xl bg-[#FF385C] px-5 py-3 text-sm font-bold text-white hover:opacity-90">Plan my trip <ArrowRight className="h-4 w-4" /></Link><Link to="/explore" className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-5 py-3 text-sm font-bold text-white ring-1 ring-white/20 hover:bg-white/15">Explore first</Link></div></div></div></section>
+            <section className="border-t border-gray-100 bg-gray-50 px-4 py-12"><div className="mx-auto flex max-w-7xl flex-col gap-4 md:flex-row md:items-center md:justify-between"><div><p className="text-sm font-bold text-gray-900">Already planning a trip?</p><p className="mt-1 text-sm text-gray-500">Keep saved destinations and packages together in My Trip.</p></div><div className="flex flex-wrap gap-3">{isAuthenticated ? <><Link to="/tourist/my-trip" className="rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-bold text-white">Open My Trip</Link><Link to="/tourist/dashboard" className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-bold text-gray-700">My bookings</Link></> : <><Link to="/login?mode=signup" className="rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-bold text-white">Create an account</Link><Link to="/login" className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-bold text-gray-700">Log in</Link></>}</div></div></section>
+          </>
         )}
-      </section>
-
-      <section className="py-16 px-4 max-w-7xl mx-auto">
-        <div className="flex items-end justify-between mb-8">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="w-6 h-0.5 rounded-full" style={{ background: "#00AA6C" }} />
-              <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#00AA6C" }}>Top Rated</p>
-            </div>
-            <h2 style={{ fontWeight: 800, fontSize: "1.9rem" }}>Journeys made for you</h2>
-            <div className="mt-3 flex flex-wrap gap-2"><select value={packageSort} onChange={(event) => setPackageSort(event.target.value as "rating" | "price" | "duration")} className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700"><option value="rating">Recommended</option><option value="price">Lowest price</option><option value="duration">Shortest trip</option></select><Link to="/compare-packages" className="rounded-xl bg-gray-900 px-3 py-2 text-sm font-semibold text-white">Compare packages</Link></div>
-          </div>
-          {isFiltered && filteredTours.length === 0 && (
-            <span className="text-sm text-gray-400">No tours match this filter</span>
-          )}
-        </div>
-        {filteredTours.length > 0 ? (
-          <div className="flex flex-col gap-5">
-            {filteredTours.map((t) => <TourCard key={t.id} {...t} onView={viewPackage} />)}
-          </div>
-        ) : (
-          <div className="text-center py-10">
-            <p className="text-gray-400 text-sm">No tours found for this filter.</p>
-          </div>
-        )}
-      </section>
-
-      <WhyUs />
-      <ReviewSection />
+      </main>
       <Footer />
       {isAuthenticated && <VoyAI />}
     </div>
   );
+}
+
+function SectionHeading({ eyebrow, title, description, action }: { eyebrow: string; title: string; description: string; action?: React.ReactNode }) {
+  return <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.2em] text-rose-500">{eyebrow}</p><h2 className="mt-2 text-2xl font-extrabold tracking-tight text-gray-900 md:text-3xl">{title}</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-gray-500">{description}</p></div>{action}</div>;
+}
+
+function DiscoveryGroup({ title, actionLabel, onAction, children }: { title: string; actionLabel?: string; onAction?: () => void; children: React.ReactNode }) {
+  return <section><div className="mb-5 flex items-center justify-between gap-3"><h3 className="text-lg font-extrabold text-gray-900">{title}</h3>{actionLabel && onAction && <button type="button" onClick={onAction} className="text-sm font-bold text-gray-600 hover:text-rose-500">{actionLabel}</button>}</div>{children}</section>;
+}
+
+function EmptySearch({ onClear }: { onClear: () => void }) {
+  return <div className="mt-8 rounded-3xl border border-dashed border-gray-200 bg-white p-10 text-center"><Search className="mx-auto h-10 w-10 text-gray-300" /><h3 className="mt-4 text-lg font-extrabold text-gray-900">Nothing matched that search</h3><p className="mx-auto mt-2 max-w-md text-sm leading-6 text-gray-500">Try a destination name, travel style, or tour package keyword.</p><button type="button" onClick={onClear} className="mt-5 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-bold text-white">Browse all</button></div>;
 }
