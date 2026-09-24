@@ -7,7 +7,9 @@ import com.voyara.tourguide.destinations.DestinationRepository;
 import com.voyara.tourguide.users.AppUser;
 import com.voyara.tourguide.users.AppUserRepository;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import org.springframework.stereotype.Service;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,6 +59,82 @@ public class AccommodationService {
                 .toList();
         accommodations.forEach(this::initializeCollections);
         return accommodations;
+    }
+
+    @Transactional(readOnly = true)
+    public List<AccommodationRecommendation> recommend(
+            Long destinationId,
+            String destination,
+            Integer travellers,
+            Integer maxDailyBudget,
+            String accommodationType,
+            String preferences
+    ) {
+        int requestedTravellers = travellers == null ? 1 : Math.max(1, travellers);
+        String requestedType = accommodationType == null ? "" : accommodationType.trim().toLowerCase(Locale.ROOT);
+        List<String> requestedPreferences = preferences == null ? List.of() :
+                java.util.Arrays.stream(preferences.split(","))
+                        .map(String::trim)
+                        .filter(item -> !item.isBlank())
+                        .map(item -> item.toLowerCase(Locale.ROOT))
+                        .toList();
+
+        return findByDestination(destinationId, destination).stream()
+                .filter(item -> item.getRooms() > 0)
+                .map(item -> {
+                    int score = 40;
+                    List<String> reasons = new ArrayList<>();
+
+                    if (requestedType.isBlank() || item.getType().toLowerCase(Locale.ROOT).contains(requestedType)) {
+                        score += 15;
+                        if (!requestedType.isBlank()) reasons.add("Stay type match");
+                    }
+
+                    if (item.getRooms() >= Math.max(1, (int) Math.ceil(requestedTravellers / 2.0))) {
+                        score += 10;
+                        reasons.add("Suitable room capacity");
+                    }
+
+                    if (maxDailyBudget != null && maxDailyBudget > 0) {
+                        if (item.getPrice().doubleValue() <= maxDailyBudget) {
+                            score += 15;
+                            reasons.add("Within nightly budget");
+                        } else {
+                            score -= 20;
+                            reasons.add("Above nightly budget");
+                        }
+                    }
+
+                    if (!requestedPreferences.isEmpty()) {
+                        long matched = requestedPreferences.stream()
+                                .filter(pref -> item.getAmenities() != null && item.getAmenities().stream()
+                                        .anyMatch(amenity -> amenity != null && amenity.toLowerCase(Locale.ROOT).contains(pref)))
+                                .count();
+                        if (matched > 0) {
+                            score += (int) Math.min(15, matched * 5);
+                            reasons.add(matched == 1 ? "Preference match" : "Multiple preference matches");
+                        }
+                    }
+
+                    if (item.getRating() >= 4.5) {
+                        score += 5;
+                        reasons.add("Highly rated");
+                    }
+
+                    if (destination != null && !destination.isBlank()
+                            && item.getLocation() != null
+                            && item.getLocation().toLowerCase(Locale.ROOT).contains(destination.trim().toLowerCase(Locale.ROOT))) {
+                        score += 10;
+                        reasons.add("Location match");
+                    }
+
+                    return new AccommodationRecommendation(AccommodationResponse.from(item), Math.max(0, Math.min(score, 100)), reasons);
+                })
+                .sorted(Comparator.comparingInt(AccommodationRecommendation::suitabilityScore).reversed()
+                        .thenComparing(a -> a.accommodation().rating(), Comparator.reverseOrder())
+                        .thenComparing(a -> a.accommodation().price()))
+                .limit(6)
+                .toList();
     }
 
     @Transactional(readOnly = true)
