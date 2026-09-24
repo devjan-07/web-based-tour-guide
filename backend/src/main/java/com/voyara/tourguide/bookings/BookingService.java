@@ -206,6 +206,47 @@ public class BookingService {
         return saved;
     }
 
+    @Transactional(readOnly = true)
+    public TripReadiness getTripReadiness(String email, String id) {
+        Booking booking = findTouristBooking(email, id);
+        return buildTripReadiness(booking);
+    }
+
+    private TripReadiness buildTripReadiness(Booking booking) {
+        List<String> completed = new java.util.ArrayList<>();
+        List<String> pending = new java.util.ArrayList<>();
+
+        completed.add("Booking created");
+        if ("Confirmed".equalsIgnoreCase(booking.getStatus()) || "Completed".equalsIgnoreCase(booking.getStatus())) {
+            completed.add("Booking confirmed");
+        } else if ("Cancelled".equalsIgnoreCase(booking.getStatus())) {
+            pending.add("Booking is cancelled");
+        } else {
+            pending.add("Booking confirmation");
+        }
+
+        if (booking.getPackageId() != null || (booking.getPkg() != null && !booking.getPkg().isBlank())) completed.add("Travel package selected");
+        else pending.add("Travel package selection");
+
+        if (booking.getGuideId() != null || (booking.getGuide() != null && !booking.getGuide().isBlank())) completed.add("Tour guide selected");
+        else pending.add("Tour guide selection");
+
+        if (booking.getAccommodationId() != null || (booking.getAccommodation() != null && !booking.getAccommodation().isBlank())) completed.add("Accommodation selected");
+        else pending.add("Accommodation selection");
+
+        if (booking.getVehicleId() != null || (booking.getVehicle() != null && !booking.getVehicle().isBlank())) completed.add("Transport selected");
+        else pending.add("Transport selection");
+
+        if ("Paid".equalsIgnoreCase(booking.getPayment())) completed.add("Payment completed");
+        else if (!"Cancelled".equalsIgnoreCase(booking.getStatus())) pending.add("Payment");
+
+        int totalChecks = completed.size() + pending.size();
+        int percent = totalChecks == 0 ? 0 : (completed.size() * 100) / totalChecks;
+        String nextAction = pending.isEmpty() ? "Your trip is ready." : pending.get(0);
+
+        return new TripReadiness(booking.getId(), percent, booking.getStatus(), nextAction, completed, pending);
+    }
+
     public Booking findById(String id) {
         return repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Booking", id));
     }
