@@ -40,6 +40,7 @@ export default function LandingPage() {
   const [activeCategory, setActiveCategory] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [showAll, setShowAll] = useState(false);
+  const [packageSort, setPackageSort] = useState<"rating" | "price" | "duration">("rating");
 
   useEffect(() => {
     destinationsApi.list().then(setDestinations).catch((error) => console.error("Failed to load destinations", error));
@@ -169,7 +170,7 @@ export default function LandingPage() {
 
   const filteredDestinations = filterDestinations();
   const displayedDestinations = showAll ? filteredDestinations : filteredDestinations.slice(0, 4);
-  const filteredTours = filterTours();
+  const filteredTours = filterTours().slice().sort((a, b) => packageSort === "price" ? a.price - b.price : packageSort === "duration" ? parseInt(a.duration) - parseInt(b.duration) : b.category.localeCompare(a.category) || 0);
   const filteredAccommodations = filterAccommodations();
   const displayedAccommodations = filteredAccommodations.slice(0, 4);
   const filteredVehicles = filterVehicles();
@@ -464,6 +465,7 @@ export default function LandingPage() {
               <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#00AA6C" }}>Top Rated</p>
             </div>
             <h2 style={{ fontWeight: 800, fontSize: "1.9rem" }}>Most Popular Tours</h2>
+            <div className="mt-3 flex flex-wrap gap-2"><select value={packageSort} onChange={(event) => setPackageSort(event.target.value as "rating" | "price" | "duration")} className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700"><option value="rating">Recommended</option><option value="price">Lowest price</option><option value="duration">Shortest trip</option></select><Link to="/tourist/compare-packages" className="rounded-xl bg-gray-900 px-3 py-2 text-sm font-semibold text-white">Compare packages</Link></div>
           </div>
           {isFiltered && filteredTours.length === 0 && (
             <span className="text-sm text-gray-400">No tours match this filter</span>
