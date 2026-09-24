@@ -41,16 +41,16 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 ### 1. Destination Management
 - [x] Preserve existing CRUD
 - [x] Destination suitability information
-- [ ] Destination discovery/recommendations
+- [x] Destination discovery/recommendations
 - [ ] Nearby experiences
 - [ ] Add destination/activity to trip
 
 ### 2. Tour Package Management
 - [ ] Preserve existing CRUD
-- [ ] Package comparison
+- [x] Package comparison
 - [ ] Package customization
 - [ ] Dynamic package pricing
-- [ ] Better package discovery
+- [x] Better package discovery
 
 ### 3. Booking Management
 - [x] Preserve existing CRUD
@@ -123,7 +123,11 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 | 2026-09-24 | `4159978f09da4894994beb54bcbf75301ccaf7d9` | Expose My Trip tourist route | Implemented; verification pending |
 | 2026-09-24 | `37a042b31b53a42344ea628a59b2fc64b36ff447` | Add destinations and packages to My Trip | Implemented; verification pending |
 | 2026-09-24 | `31afc6d1554c5a12e2b6f9296d73cedc4cb63791` | Add My Trip landing-page entry point | Implemented; verification pending |
-| 2026-09-24 | `7de2cdf99d8e0406e46320d8b30109bddb3e9bfe` | Save Plan My Trip recommendations | Implemented; verification pending |
+| 2026-09-24 | `7de2cdf99d8e0406e46320d8b30109bddb3e9bfe` | Save Plan My Trip recommendations | Verified |
+| 2026-09-24 | `ebc62bba01cd55051b1af48d82402eaff22b2cf7` | Add package comparison | Implemented; verification pending |
+| 2026-09-24 | `397aaf011a75309d104572932001fe3d756091bf` | Expose package comparison route | Implemented; verification pending |
+| 2026-09-24 | `23eb417ae9611750116f7a094d3d0874241b96c3` | Improve package discovery controls | Implemented; verification pending |
+| 2026-09-24 | `3a4fa8cdc48371e0e9051aeea07e68ae09495676` | Add destination discovery by travel style | Implemented; verification pending |
 
 ## Final Verification Checklist
 
@@ -146,6 +150,8 @@ Run after the enhancement batch is complete:
 - [ ] Destinations without matching categories show the fallback “Flexible travel” signal.
 - [ ] Existing booking/login navigation remains functional.
 - [ ] Package detail pages and package routes remain functional.
+- [ ] Destination discovery filters existing destination categories correctly.
+- [ ] Package discovery sorting and comparison work without affecting existing browsing.
 - [x] Plan My Trip loads destination/package data and builds cross-module matches.
 - [x] Plan My Trip carries the selected destination into the booking flow.
 - [x] Plan My Trip package, guide, accommodation and vehicle matches are consistent with the existing recommendation APIs.
