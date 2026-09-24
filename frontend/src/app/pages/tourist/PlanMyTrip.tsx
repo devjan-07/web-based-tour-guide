@@ -236,7 +236,8 @@ export default function PlanMyTrip() {
                 {guideRecommendations.map((item) => (
                   <div key={item.guide.id} className="rounded-2xl border border-gray-200 p-4">
                     <div className="flex items-start justify-between gap-3"><div><p className="font-bold text-gray-900">{item.guide.name}</p><p className="mt-1 text-xs text-gray-400">{item.guide.location || item.guide.country} · {item.guide.experience} years</p></div><Fit score={item.suitabilityScore} /></div>
-                    <p className="mt-3 text-xs text-gray-500">{item.reasons.slice(0, 2).join(" · ")}</p>\n                    <button type="button" onClick={() => addTripItem({ type: "guide", id: item.guide.id, title: item.guide.name, subtitle: "Guide · " + (item.guide.location || item.guide.country), destination: selectedDestination?.name, day: 1 })} className="mt-3 w-full rounded-xl border border-gray-200 px-3 py-2 text-xs font-bold text-gray-700">Add to My Trip</button>
+                    <p className="mt-3 text-xs text-gray-500">{item.reasons.slice(0, 2).join(" · ")}</p>
+                    <button type="button" onClick={() => addTripItem({ type: "guide", id: item.guide.id, title: item.guide.name, subtitle: "Guide · " + (item.guide.location || item.guide.country), destination: selectedDestination?.name, day: 1 })} className="mt-3 w-full rounded-xl border border-gray-200 px-3 py-2 text-xs font-bold text-gray-700">Add to My Trip</button>
                   </div>
                 ))}
               </RecommendationCard>
@@ -246,7 +247,8 @@ export default function PlanMyTrip() {
                   <div key={item.accommodation.id} className="rounded-2xl border border-gray-200 p-4">
                     <div className="flex items-start justify-between gap-3"><div><p className="font-bold text-gray-900">{item.accommodation.name}</p><p className="mt-1 text-xs text-gray-400">{item.accommodation.type} · {item.accommodation.location}</p></div><Fit score={item.suitabilityScore} /></div>
                     <p className="mt-3 text-sm font-extrabold text-gray-900">LKR {Number(item.accommodation.price || 0).toLocaleString()} / night</p>
-                    <p className="mt-1 text-xs text-gray-500">{item.reasons.slice(0, 2).join(" · ")}</p>\n                    <button type="button" onClick={() => addTripItem({ type: "accommodation", id: item.accommodation.id, title: item.accommodation.name, subtitle: item.accommodation.type + " · " + item.accommodation.location, destination: selectedDestination?.name, day: 1 })} className="mt-3 w-full rounded-xl border border-gray-200 px-3 py-2 text-xs font-bold text-gray-700">Add to My Trip</button>
+                    <p className="mt-1 text-xs text-gray-500">{item.reasons.slice(0, 2).join(" · ")}</p>
+                    <button type="button" onClick={() => addTripItem({ type: "accommodation", id: item.accommodation.id, title: item.accommodation.name, subtitle: item.accommodation.type + " · " + item.accommodation.location, destination: selectedDestination?.name, day: 1 })} className="mt-3 w-full rounded-xl border border-gray-200 px-3 py-2 text-xs font-bold text-gray-700">Add to My Trip</button>
                   </div>
                 ))}
               </RecommendationCard>
@@ -263,7 +265,8 @@ export default function PlanMyTrip() {
                     <div key={item.vehicle.id} className="rounded-2xl border border-gray-200 p-4">
                       <div className="flex items-start justify-between gap-3"><div><p className="font-bold text-gray-900">{item.vehicle.name}</p><p className="mt-1 text-xs text-gray-400">{item.vehicle.type} · {item.vehicle.capacity} seats · {item.vehicle.transmission}</p></div><Fit score={item.suitabilityScore} /></div>
                       <p className="mt-3 text-sm font-extrabold text-gray-900">LKR {Number(item.vehicle.pricePerDay || 0).toLocaleString()} / day</p>
-                      <p className="mt-1 text-xs text-gray-500">{item.reasons.slice(0, 2).join(" · ")}</p>\n                      <button type="button" onClick={() => addTripItem({ type: "vehicle", id: item.vehicle.id, title: item.vehicle.name, subtitle: item.vehicle.type + " · " + item.vehicle.capacity + " seats", destination: selectedDestination?.name, day: 1 })} className="mt-3 w-full rounded-xl border border-gray-200 px-3 py-2 text-xs font-bold text-gray-700">Add to My Trip</button>
+                      <p className="mt-1 text-xs text-gray-500">{item.reasons.slice(0, 2).join(" · ")}</p>
+                      <button type="button" onClick={() => addTripItem({ type: "vehicle", id: item.vehicle.id, title: item.vehicle.name, subtitle: item.vehicle.type + " · " + item.vehicle.capacity + " seats", destination: selectedDestination?.name, day: 1 })} className="mt-3 w-full rounded-xl border border-gray-200 px-3 py-2 text-xs font-bold text-gray-700">Add to My Trip</button>
                     </div>
                   ))}
                 </div>
