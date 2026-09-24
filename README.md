@@ -125,6 +125,9 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 | 2026-09-24 | `c79fbb03c6b219e788ee229f9c55f5eab1a0c91d` | Remove stray literal newline escapes from trip planner source | Implemented; browser verification pending |
 | 2026-09-24 | `01e0a8ef7cd4841c295c61f5b2fbdfb1a3cd9a42` | Polish booking experience with responsive review summary and loading state | Implemented; browser verification pending |
 | 2026-09-24 | `1d5eeeed56c0d9d19a9f651ee10443639084ef2b` | Redesign destination and package detail experience around tourism discovery and booking | Implemented; browser verification pending |
+| 2026-09-24 | `35407a04ea38c2ebabe4554b5f8a09e443b67387` | Polish Plan My Trip visual consistency and recommendation sections | Implemented; browser verification pending |
+| 2026-09-24 | `2948cc5c360ddbcbfec5859bad6ea1a1fd5ba52e` | Polish My Trip itinerary experience and responsive controls | Implemented; browser verification pending |
+| 2026-09-24 | `12c35c103f427be233c227d044ef8758983126cd` | Polish public package comparison experience | Implemented; browser verification pending |
 
 | Date | Commit | Improvement | Status |
 |---|---|---|---|
@@ -195,6 +198,7 @@ Run after the enhancement batch is complete:
 - [ ] Existing booking/login navigation remains functional.
 - [ ] Package detail pages and package routes remain functional.
 - [ ] Destination detail and package detail layouts are browser-verified after the tourism detail-page redesign.
+- [ ] Compare Packages, Plan My Trip and My Trip pages are browser-verified after the consistency polish.
 - [x] Destination discovery filters existing destination categories correctly.
 - [x] Package discovery sorting and comparison work without affecting existing browsing.
 - [x] Plan My Trip loads destination/package data and builds cross-module matches.
