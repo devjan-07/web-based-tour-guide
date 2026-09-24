@@ -81,8 +81,8 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 - [x] Location/trip suitability
 
 ### 7. Cross-Module Travel Experience
-- [ ] Add-to-trip workflow
-- [ ] Itinerary planning
+- [x] Add-to-trip workflow
+- [x] Itinerary planning
 - [x] Connect destination, package, guide, vehicle and accommodation
 - [x] Plan My Trip experience
 
@@ -116,6 +116,14 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 | 2026-09-24 | `c111822c301096e808c12e5aecd34ad753edd497` | Trip planner component typing fix | Implemented; verified |
 | 2026-09-24 | `6f56d26ad5265dd1e89eb9a3843289e0648e106e` | Expose Plan My Trip tourist route | Implemented; verified |
 | 2026-09-24 | `3664e340e25e3d4c2164761649f1ee8e0b113112` | Add Plan My Trip landing-page entry point | Implemented; verified |
+
+| 2026-09-24 | `39e3b682fc80c5dd7612fd19a1b2d63aebb09574` | Verify Plan My Trip integration | Verified |
+| 2026-09-24 | `47f7da97f624042ffc1a05fb16e751c7c045cdf8` | Add local trip planning state | Implemented; verification pending |
+| 2026-09-24 | `73bf32d04debbe17ce31bd39b615fb465b97d908` | Add My Trip itinerary builder | Implemented; verification pending |
+| 2026-09-24 | `4159978f09da4894994beb54bcbf75301ccaf7d9` | Expose My Trip tourist route | Implemented; verification pending |
+| 2026-09-24 | `37a042b31b53a42344ea628a59b2fc64b36ff447` | Add destinations and packages to My Trip | Implemented; verification pending |
+| 2026-09-24 | `31afc6d1554c5a12e2b6f9296d73cedc4cb63791` | Add My Trip landing-page entry point | Implemented; verification pending |
+| 2026-09-24 | `7de2cdf99d8e0406e46320d8b30109bddb3e9bfe` | Save Plan My Trip recommendations | Implemented; verification pending |
 
 ## Final Verification Checklist
 
