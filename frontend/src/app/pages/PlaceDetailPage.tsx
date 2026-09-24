@@ -5,6 +5,7 @@ import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
 import { destinationsApi, guidesApi, packagesApi, type Destination, type GuideRecommendation, type TourPackage, type Route } from "../lib/api";
+import { addTripItem } from "../lib/tripPlanner";
 
 type DetailMode = "destination" | "package";
 
@@ -30,6 +31,7 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
   const [packageRoutes, setPackageRoutes] = useState<Route[]>([]);
   const [routesLoading, setRoutesLoading] = useState(false);
   const [guideRecommendations, setGuideRecommendations] = useState<GuideRecommendation[]>([]);
+  const [savedToTrip, setSavedToTrip] = useState(false);
   const isTourist = isAuthenticated && user?.roles.includes("TOURIST");
 
   useEffect(() => {
@@ -45,6 +47,7 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
     setError("");
     setPackageRoutes([]);
     setGuideRecommendations([]);
+    setSavedToTrip(false);
 
     const request = mode === "destination"
       ? destinationsApi.get(numericId).then((data) => ({ mode: "destination" as const, data }))
@@ -298,13 +301,32 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
                   ))}
                 </div>
                 {isTourist && (
-                  <button
-                    onClick={() => navigate(bookingPath)}
-                    className="mt-5 w-full rounded-xl px-4 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-                    style={{ background: "linear-gradient(135deg, #FF385C, #E31C5F)" }}
-                  >
-                    Book this trip
-                  </button>
+                  <>
+                    <button
+                      onClick={() => {
+                        if (!item) return;
+                        const next = addTripItem({
+                          type: item.mode,
+                          id: item.data.id,
+                          title: detail.title,
+                          subtitle: detail.location,
+                          destination: detail.location,
+                          day: 1,
+                        });
+                        setSavedToTrip(next.some((tripItem) => tripItem.type === item.mode && tripItem.id === item.data.id));
+                      }}
+                      className="mt-5 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-800 hover:bg-gray-50"
+                    >
+                      {savedToTrip ? "Added to My Trip" : "Add to My Trip"}
+                    </button>
+                    <button
+                      onClick={() => navigate(bookingPath)}
+                      className="mt-3 w-full rounded-xl px-4 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                      style={{ background: "linear-gradient(135deg, #FF385C, #E31C5F)" }}
+                    >
+                      Book this trip
+                    </button>
+                  </>
                 )}
                 {!isAuthenticated && (
                   <Link
