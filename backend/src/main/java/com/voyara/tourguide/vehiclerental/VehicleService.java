@@ -6,7 +6,9 @@ import com.voyara.tourguide.users.AppUser;
 import com.voyara.tourguide.users.AppUserRepository;
 import java.time.Year;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +31,66 @@ public class VehicleService {
     public List<Vehicle> findAll() { return initialize(repository.findAll()); }
     @Transactional(readOnly = true)
     public List<Vehicle> findPublic() { return initialize(repository.findByStatusIgnoreCase("Available")); }
+    @Transactional(readOnly = true)
+    public List<VehicleRecommendation> recommend(Integer passengers, Integer luggage, Boolean driverRequired, String location, Integer maxDailyBudget) {
+        int requestedPassengers = passengers == null ? 1 : Math.max(1, passengers);
+        int requestedLuggage = luggage == null ? 0 : Math.max(0, luggage);
+        boolean needsDriver = driverRequired == null || driverRequired;
+
+        return repository.findByStatusIgnoreCase("Available").stream()
+                .filter(vehicle -> vehicle.getCapacity() >= requestedPassengers)
+                .map(vehicle -> {
+                    int score = 35;
+                    List<String> reasons = new ArrayList<>();
+
+                    int spareSeats = vehicle.getCapacity() - requestedPassengers;
+                    if (spareSeats <= 1) { score += 15; reasons.add("Good passenger fit"); }
+                    else if (spareSeats <= 3) { score += 10; reasons.add("Comfortable passenger capacity"); }
+
+                    if (requestedLuggage == 0) {
+                        score += 10;
+                        reasons.add("Suitable for light luggage");
+                    } else if (vehicle.getCapacity() >= requestedPassengers + Math.max(1, requestedLuggage / 2)) {
+                        score += 10;
+                        reasons.add("Extra capacity for luggage");
+                    }
+
+                    if (needsDriver) {
+                        score += 10;
+                        reasons.add("Driver can be requested");
+                    }
+
+                    if (location != null && !location.isBlank()
+                            && vehicle.getLocation() != null
+                            && vehicle.getLocation().toLowerCase(Locale.ROOT).contains(location.trim().toLowerCase(Locale.ROOT))) {
+                        score += 15;
+                        reasons.add("Pickup area match");
+                    }
+
+                    if (maxDailyBudget != null && maxDailyBudget > 0) {
+                        if (vehicle.getPricePerDay().doubleValue() <= maxDailyBudget) {
+                            score += 10;
+                            reasons.add("Within daily budget");
+                        } else {
+                            score -= 15;
+                            reasons.add("Above daily budget");
+                        }
+                    }
+
+                    if ("Automatic".equalsIgnoreCase(vehicle.getTransmission())) {
+                        score += 3;
+                        reasons.add("Automatic transmission");
+                    }
+
+                    return new VehicleRecommendation(VehicleResponse.from(vehicle), Math.max(0, Math.min(score, 100)), reasons);
+                })
+                .sorted(Comparator.comparingInt(VehicleRecommendation::suitabilityScore).reversed()
+                        .thenComparing(v -> v.vehicle().rating(), Comparator.reverseOrder())
+                        .thenComparing(v -> v.vehicle().pricePerDay()))
+                .limit(6)
+                .toList();
+    }
+
     @Transactional(readOnly = true)
     public Vehicle findById(Long id) {
         Vehicle value = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Vehicle", id));
