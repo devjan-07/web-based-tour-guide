@@ -190,7 +190,7 @@ export default function LandingPage() {
       <section className="relative overflow-hidden bg-[#f7f5ef] px-4 py-20 md:py-28">
         <div className="mx-auto grid max-w-7xl items-end gap-10 md:grid-cols-[1.15fr_0.85fr]">
           <motion.div initial={{ opacity: 0, y: 32 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.7 }}>
-            <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-emerald-700">A different way to explore</p>
+            <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-[#12372f]">A different way to explore</p>
             <h2 className="max-w-4xl text-4xl font-semibold leading-[1.02] tracking-[-0.04em] text-slate-950 md:text-6xl">
               Sri Lanka is not a checklist.
               <span className="block text-slate-400">It is a journey.</span>
@@ -212,15 +212,15 @@ export default function LandingPage() {
 
       {/* Active filter banner */}
       {isFiltered && (
-        <div className="bg-rose-50 border-b border-rose-100 py-3 px-4">
+        <div className="bg-emerald-50 border-b border-emerald-100 py-3 px-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm text-rose-700">
+            <div className="flex items-center gap-2 text-sm text-emerald-800">
               <Search className="w-4 h-4" />
               {searchQuery && <span>Results for <strong>"{searchQuery}"</strong></span>}
               {activeCategory && <span>Filtered by <strong>{activeCategory}</strong></span>}
-              <span className="text-rose-400">— {filteredDestinations.length} place{filteredDestinations.length !== 1 ? "s" : ""}, {filteredTours.length} tour{filteredTours.length !== 1 ? "s" : ""}, {filteredAccommodations.length} stay{filteredAccommodations.length !== 1 ? "s" : ""}, {filteredVehicles.length} vehicle{filteredVehicles.length !== 1 ? "s" : ""}</span>
+              <span className="text-emerald-500">— {filteredDestinations.length} place{filteredDestinations.length !== 1 ? "s" : ""}, {filteredTours.length} tour{filteredTours.length !== 1 ? "s" : ""}, {filteredAccommodations.length} stay{filteredAccommodations.length !== 1 ? "s" : ""}, {filteredVehicles.length} vehicle{filteredVehicles.length !== 1 ? "s" : ""}</span>
             </div>
-            <button onClick={clearFilters} className="flex items-center gap-1 text-xs font-semibold text-rose-600 hover:text-rose-800 transition-colors">
+            <button onClick={clearFilters} className="flex items-center gap-1 text-xs font-semibold text-[#12372f] hover:text-emerald-900 transition-colors">
               <X className="w-3.5 h-3.5" /> Clear
             </button>
           </div>
@@ -232,7 +232,7 @@ export default function LandingPage() {
           <div className="mx-auto max-w-7xl rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
             <div className="flex flex-wrap items-center gap-3">
               <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-                <SlidersHorizontal className="h-4 w-4 text-rose-500" />
+                <SlidersHorizontal className="h-4 w-4 text-emerald-500" />
                 Refine results
               </div>
               <select
@@ -267,9 +267,9 @@ export default function LandingPage() {
 
       {isTourist && (
         <section className="px-4 pt-8">
-          <div className="mx-auto flex max-w-7xl flex-col gap-4 rounded-3xl border border-rose-100 bg-rose-50 p-5 md:flex-row md:items-center md:justify-between">
+          <div className="mx-auto flex max-w-7xl flex-col gap-4 rounded-3xl border border-emerald-100 bg-emerald-50 p-5 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-rose-500">Tourist tools</p>
+              <p className="text-xs font-bold uppercase tracking-widest text-emerald-500">Tourist tools</p>
               <h2 className="mt-1 text-xl font-extrabold text-gray-900">Plan a trip or check your bookings</h2>
               <p className="mt-1 text-sm text-gray-500">Open a destination for details, then book when you are ready.</p>
             </div>
@@ -277,7 +277,7 @@ export default function LandingPage() {
               <a href="#listings-section" className="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-100">
                 Explore trips
               </a>
-              <Link to="/tourist/dashboard" className="rounded-xl px-4 py-2.5 text-sm font-semibold text-white" style={{ background: "#FF385C" }}>
+              <Link to="/tourist/dashboard" className="rounded-xl px-4 py-2.5 text-sm font-semibold text-white" style={{ background: "#12372f" }}>
                 My bookings
               </Link>
             </div>
@@ -289,8 +289,8 @@ export default function LandingPage() {
         <div className="flex items-end justify-between mb-8">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="w-6 h-0.5 rounded-full" style={{ background: "#FF385C" }} />
-              <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#FF385C" }}>
+              <span className="w-6 h-0.5 rounded-full" style={{ background: "#12372f" }} />
+              <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#12372f" }}>
                 {isFiltered ? "Filtered results" : "Handpicked for you"}
               </p>
             </div>
@@ -316,7 +316,7 @@ export default function LandingPage() {
           <div className="text-center py-16">
             <Search className="w-10 h-10 text-gray-300 mx-auto mb-3" />
             <p className="text-gray-500 font-medium">No stays match your search.</p>
-            <button onClick={clearFilters} className="mt-3 text-sm font-semibold underline" style={{ color: "#FF385C" }}>Clear filters</button>
+            <button onClick={clearFilters} className="mt-3 text-sm font-semibold underline" style={{ color: "#12372f" }}>Clear filters</button>
           </div>
         )}
       </section>
@@ -326,7 +326,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.6 }} className="mb-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="mb-3 text-xs font-bold uppercase tracking-[0.28em] text-emerald-300">Explore the island</p>
+              <p className="mb-3 text-xs font-bold uppercase tracking-[0.28em] text-[#d9b77a]">Explore the island</p>
               <h2 className="text-4xl font-semibold tracking-[-0.035em] md:text-5xl">Where will you go first?</h2>
             </div>
             <p className="max-w-md text-sm leading-6 text-slate-400 md:text-right">Browse real destinations from the platform and open any place to see its experiences and routes.</p>
@@ -359,8 +359,8 @@ export default function LandingPage() {
         <div className="flex items-end justify-between mb-8">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="w-6 h-0.5 rounded-full" style={{ background: "#7c3aed" }} />
-              <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#7c3aed" }}>Places to stay</p>
+              <span className="w-6 h-0.5 rounded-full" style={{ background: "#12372f" }} />
+              <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#12372f" }}>Places to stay</p>
             </div>
             <h2 style={{ fontWeight: 800, fontSize: "1.9rem" }}>Available Accommodations</h2>
           </div>
@@ -381,7 +381,7 @@ export default function LandingPage() {
                   <p className="mt-1 text-xs text-gray-500">{[item.location, item.country].filter(Boolean).join(", ")}</p>
                   <div className="mt-3 flex items-center justify-between gap-3">
                     <span className="font-extrabold text-gray-900">{formatLkr(item.price)} <span className="text-xs font-medium text-gray-400">/night</span></span>
-                    <span className="inline-flex items-center gap-1 text-sm font-semibold text-gray-700"><Star className="h-3.5 w-3.5" style={{ color: "#FF385C", fill: "#FF385C" }} />{Number(item.rating || 0).toFixed(1)}</span>
+                    <span className="inline-flex items-center gap-1 text-sm font-semibold text-gray-700"><Star className="h-3.5 w-3.5" style={{ color: "#12372f", fill: "#12372f" }} />{Number(item.rating || 0).toFixed(1)}</span>
                   </div>
                   <div className="mt-3 flex flex-wrap gap-1.5">
                     {(item.amenities || []).slice(0, 3).map((tag) => (
@@ -393,7 +393,7 @@ export default function LandingPage() {
                   <Link
                     to={bookingLink(`/tourist/accommodations/${item.id}/book`)}
                     className="mt-4 inline-flex w-full items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold text-white"
-                    style={{ background: "#FF385C" }}
+                    style={{ background: "#12372f" }}
                   >
                     Book stay
                   </Link>
@@ -413,8 +413,8 @@ export default function LandingPage() {
           <div className="flex items-end justify-between mb-8">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="w-6 h-0.5 rounded-full" style={{ background: "#ea580c" }} />
-                <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#ea580c" }}>Transport</p>
+                <span className="w-6 h-0.5 rounded-full" style={{ background: "#9e8b63" }} />
+                <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#9e8b63" }}>Transport</p>
               </div>
               <h2 style={{ fontWeight: 800, fontSize: "1.9rem" }}>Available Vehicles</h2>
             </div>
@@ -445,7 +445,7 @@ export default function LandingPage() {
                     <Link
                       to={bookingLink(`/tourist/vehicles/${item.id}/book`)}
                       className="mt-4 inline-flex w-full items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold text-white"
-                      style={{ background: "#FF385C" }}
+                      style={{ background: "#12372f" }}
                     >
                       Book vehicle
                     </Link>
@@ -472,7 +472,7 @@ export default function LandingPage() {
             className="mb-12 flex flex-col gap-5 md:flex-row md:items-end md:justify-between"
           >
             <div>
-              <p className="mb-3 text-xs font-bold uppercase tracking-[0.28em] text-emerald-700">
+              <p className="mb-3 text-xs font-bold uppercase tracking-[0.28em] text-[#12372f]">
                 Curated journeys
               </p>
               <h2 className="max-w-3xl text-4xl font-semibold leading-tight tracking-[-0.035em] text-slate-950 md:text-5xl">
