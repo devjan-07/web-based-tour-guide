@@ -4,7 +4,7 @@ import { ArrowRight, BedDouble, CalendarCheck, Car, Clock, CreditCard, MapPin, P
 import { Navbar } from "../../components/Navbar";
 import { Footer } from "../../components/Footer";
 import { useAuth } from "../../context/AuthContext";
-import { touristBookingsApi, type Booking } from "../../lib/api";
+import { notificationsApi, tripReadinessApi, touristBookingsApi, type Booking, type Notification, type TripReadiness } from "../../lib/api";
 
 const statusStyle: Record<string, { bg: string; color: string }> = {
   Confirmed: { bg: "#f0fdf4", color: "#16a34a" },
@@ -97,6 +97,8 @@ export default function TouristDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [readiness, setReadiness] = useState<TripReadiness | null>(null);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -141,6 +143,19 @@ export default function TouristDashboard() {
     if (activeTab === "All") return bookings;
     return bookings.filter((booking) => booking.status === activeTab);
   }, [activeTab, bookings, summary.upcoming]);
+
+  useEffect(() => {
+    const nextId = summary.nextBooking?.id;
+    if (!nextId) {
+      setReadiness(null);
+      return;
+    }
+    tripReadinessApi.get(nextId).then(setReadiness).catch(() => setReadiness(null));
+  }, [summary.nextBooking?.id]);
+
+  useEffect(() => {
+    notificationsApi.list().then((items) => setNotifications(items.filter((item) => !item.read).slice(0, 3))).catch(() => setNotifications([]));
+  }, []);
 
   const cancelBooking = async (id: string) => {
     const confirmed = window.confirm(`Cancel booking ${id}? This action cannot be undone.`);
@@ -203,6 +218,43 @@ export default function TouristDashboard() {
             </div>
           ))}
         </section>
+
+        {(readiness || notifications.length > 0) && (
+          <section className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-4 mb-6">
+            {readiness && (
+              <div className="rounded-3xl border border-gray-200 bg-white p-5">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">Trip command center</p>
+                    <h2 className="mt-1 text-lg font-bold text-gray-900">Trip readiness</h2>
+                  </div>
+                  <span className="text-lg font-extrabold text-gray-900">{readiness.completionPercent}%</span>
+                </div>
+                <div className="mt-4 h-2 overflow-hidden rounded-full bg-gray-100">
+                  <div className="h-full rounded-full" style={{ width: `${readiness.completionPercent}%`, background: "#FF385C" }} />
+                </div>
+                <p className="mt-3 text-sm text-gray-600">{readiness.nextAction}</p>
+                <Link to={`/tourist/bookings/${readiness.bookingId}`} className="mt-4 inline-flex items-center gap-2 text-sm font-semibold" style={{ color: "#FF385C" }}>
+                  Open trip details <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            )}
+            {notifications.length > 0 && (
+              <div className="rounded-3xl border border-gray-200 bg-white p-5">
+                <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">Action center</p>
+                <h2 className="mt-1 text-lg font-bold text-gray-900">Needs your attention</h2>
+                <div className="mt-3 space-y-2">
+                  {notifications.map((notification) => (
+                    <div key={notification.id} className="rounded-xl bg-gray-50 p-3">
+                      <p className="text-sm font-semibold text-gray-800">{notification.title}</p>
+                      <p className="mt-1 text-xs leading-5 text-gray-500">{notification.message}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </section>
+        )}
 
         <section className="bg-white rounded-3xl border border-gray-200 overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
