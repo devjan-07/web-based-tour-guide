@@ -620,9 +620,9 @@ export default function TouristBookingCreate() {
               </div>
 
               {currentStep === 4 ? (
-                <button type="submit" disabled={submitting} className="mt-5 w-full rounded-full bg-slate-950 px-4 py-3.5 text-sm font-bold text-white disabled:opacity-60">{submitting ? "Creating booking..." : "Confirm booking request"}</button>
+                <button type="submit" disabled={submitting} className="mt-5 w-full rounded-full bg-[#d9b77a] px-4 py-3.5 text-sm font-bold text-[#17201d] disabled:opacity-60">{submitting ? "Creating booking..." : "Confirm booking request"}</button>
               ) : (
-                <button type="button" onClick={goNext} className="mt-5 w-full rounded-full bg-slate-950 px-4 py-3.5 text-sm font-bold text-white">Continue to {steps[currentStep].label}</button>
+                <button type="button" onClick={goNext} className="mt-5 w-full rounded-full bg-[#d9b77a] px-4 py-3.5 text-sm font-bold text-[#17201d]">Continue to {steps[currentStep].label}</button>
               )}
             </aside>
           {currentStep > 1 && <button type="button" onClick={goBack} className="mt-4 text-sm font-semibold text-slate-500 hover:text-slate-900">← Back to {steps[currentStep - 2].label}</button>}
@@ -685,7 +685,7 @@ function primaryDestinationName(destination: string) {
 
 function ChoiceBadge({ selected }: { selected: boolean }) {
   return (
-    <span className="rounded-full px-2.5 py-1 text-xs font-semibold" style={{ background: selected ? "#FF385C" : "#f3f4f6", color: selected ? "white" : "#6b7280" }}>
+    <span className="rounded-full px-2.5 py-1 text-xs font-semibold" style={{ background: selected ? "#12372f" : "#f3f4f6", color: selected ? "white" : "#6b7280" }}>
       {selected ? "Selected" : "Choose"}
     </span>
   );
@@ -712,8 +712,8 @@ function OwnOptionCard({
       onClick={onClick}
       className="text-left rounded-2xl border p-4 transition-colors"
       style={{
-        borderColor: selected ? "#FF385C" : "#e5e7eb",
-        background: selected ? "#fff5f7" : "#fff",
+        borderColor: selected ? "#12372f" : "#e5e7eb",
+        background: selected ? "#eef2ed" : "#fff",
       }}
     >
       <div className="flex items-start justify-between gap-3">
@@ -781,9 +781,9 @@ function Field({ icon: Icon, label, children }: { icon: ComponentType<{ classNam
 
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-start justify-between gap-4 border-b border-gray-100 pb-3">
-      <span className="text-gray-400">{label}</span>
-      <span className="font-semibold text-gray-800 text-right">{value}</span>
+    <div className="flex items-start justify-between gap-4 border-b border-white/10 pb-3">
+      <span className="text-white/45">{label}</span>
+      <span className="font-semibold text-white text-right">{value}</span>
     </div>
   );
 }
