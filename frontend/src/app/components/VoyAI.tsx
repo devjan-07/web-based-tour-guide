@@ -68,7 +68,7 @@ export function VoyAI() {
       {/* Floating launcher */}
       <motion.button
         onClick={() => setOpen((v) => !v)}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 pl-4 pr-5 py-3.5 rounded-full text-white shadow-xl overflow-hidden"
+        className="fixed bottom-6 right-4 sm:right-6 z-50 flex items-center gap-2.5 pl-4 pr-5 py-3.5 rounded-full text-white shadow-xl overflow-hidden"
         style={{ background: "linear-gradient(135deg, #003580, #0057B8)" }}
         whileHover={{ scale: 1.04 }}
         whileTap={{ scale: 0.96 }}
@@ -111,7 +111,7 @@ export function VoyAI() {
             transition={{ type: "spring", stiffness: 320, damping: 28 }}
             className="fixed bottom-24 right-6 z-50 flex flex-col rounded-[26px] overflow-hidden origin-bottom-right"
             style={{
-              width: 380,
+              width: 'min(380px, calc(100vw - 2rem))',
               height: 560,
               maxHeight: "calc(100vh - 8rem)",
               boxShadow: "0 24px 60px -12px rgba(0,53,128,0.35), 0 8px 20px -8px rgba(0,0,0,0.25)",
@@ -136,7 +136,7 @@ export function VoyAI() {
                     <p className="font-bold text-[15px] leading-none tracking-tight">voyAI</p>
                     <p className="text-white/70 text-xs mt-1 flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      Online · replies instantly
+                      Travel support
                     </p>
                   </div>
                 </div>
