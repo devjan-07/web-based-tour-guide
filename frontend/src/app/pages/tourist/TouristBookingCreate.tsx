@@ -6,7 +6,7 @@ import { Navbar } from "../../components/Navbar";
 import { Footer } from "../../components/Footer";
 import { ResourceReviews, RatingStars } from "../../components/ResourceReviews";
 import { useAuth } from "../../context/AuthContext";
-import { TOUR_GUIDE_LANGUAGES, accommodationSearchApi, guidesApi, packagesApi, publicVehiclesApi, touristBookingsApi, type Accommodation, type Guide, type TourPackage, type Vehicle } from "../../lib/api";
+import { TOUR_GUIDE_LANGUAGES, accommodationRecommendationsApi, guidesApi, packagesApi, vehicleRecommendationsApi, touristBookingsApi, type Accommodation, type AccommodationRecommendation, type Guide, type TourPackage, type Vehicle, type VehicleRecommendation } from "../../lib/api";
 
 function today() {
   return new Date().toISOString().slice(0, 10);
@@ -47,6 +47,11 @@ export default function TouristBookingCreate() {
   const [accommodations, setAccommodations] = useState<Accommodation[]>([]);
   const [selectedAccommodationId, setSelectedAccommodationId] = useState<number | null>(null);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [vehicleRecommendations, setVehicleRecommendations] = useState<VehicleRecommendation[]>([]);
+  const [accommodationRecommendations, setAccommodationRecommendations] = useState<AccommodationRecommendation[]>([]);
+  const [accommodationBudget, setAccommodationBudget] = useState(0);
+  const [accommodationType, setAccommodationType] = useState("");
+  const [accommodationPreferences, setAccommodationPreferences] = useState("");
   const [selectedVehicleId, setSelectedVehicleId] = useState<number | null>(null);
   const [languagePreference, setLanguagePreference] = useState("English");
   const [rooms, setRooms] = useState(1);
@@ -114,10 +119,20 @@ export default function TouristBookingCreate() {
   useEffect(() => {
     let cancelled = false;
     setAccommodationsLoading(true);
-    accommodationSearchApi
-      .list({ destinationId: primaryDestinationId || undefined, destination: primaryDestinationId ? undefined : primaryDestinationName(destination) })
-      .then((items) => {
-        if (!cancelled) setAccommodations(items.filter((accommodation) => accommodation.status === "Active"));
+    accommodationRecommendationsApi
+      .list({
+        destinationId: primaryDestinationId || undefined,
+        destination: primaryDestinationId ? undefined : primaryDestinationName(destination),
+        travellers: guests,
+        maxDailyBudget: accommodationBudget || undefined,
+        accommodationType: accommodationType || undefined,
+        preferences: accommodationPreferences || undefined,
+      })
+      .then((recommendations) => {
+        if (!cancelled) {
+          setAccommodationRecommendations(recommendations);
+          setAccommodations(recommendations.map((item) => item.accommodation));
+        }
       })
       .catch((err) => {
         if (!cancelled) console.error("Failed to load accommodations", err);
@@ -129,16 +144,22 @@ export default function TouristBookingCreate() {
     return () => {
       cancelled = true;
     };
-  }, [destination, primaryDestinationId]);
+  }, [destination, primaryDestinationId, guests, accommodationBudget, accommodationType, accommodationPreferences]);
 
   useEffect(() => {
     let cancelled = false;
     setVehiclesLoading(true);
-    publicVehiclesApi
-      .list()
-      .then((items) => {
+    vehicleRecommendationsApi
+      .list({
+        passengers: guests,
+        luggage: luggageCount,
+        driverRequired,
+        location: pickupLocation || primaryDestinationName(destination),
+      })
+      .then((recommendations) => {
         if (cancelled) return;
-        const available = items.filter((vehicle) => vehicle.status === "Available");
+        setVehicleRecommendations(recommendations);
+        const available = recommendations.map((item) => item.vehicle);
         setVehicles(available);
         setSelectedVehicleId((current) => current && available.some((vehicle) => vehicle.id === current) ? current : null);
       })
@@ -154,7 +175,7 @@ export default function TouristBookingCreate() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [guests, luggageCount, driverRequired, pickupLocation, destination]);
 
   const nearbyGuides = useMemo(() => {
     const nearby = guides.filter((guide) => isNearDestination(destination, guide.location, guide.country));
@@ -430,6 +451,24 @@ export default function TouristBookingCreate() {
                 </div>
               )}
 
+              <div className="mt-5 rounded-2xl border border-gray-200 p-4">
+                <h3 className="font-bold text-gray-900">Stay preferences</h3>
+                <p className="mt-0.5 text-xs text-gray-400">These preferences improve the accommodation matches shown below.</p>
+                <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+                  <Field icon={CreditCard} label="Max nightly budget">
+                    <input type="number" min="0" value={accommodationBudget || ""} onChange={(event) => setAccommodationBudget(Number(event.target.value))} placeholder="Optional" className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
+                  </Field>
+                  <Field icon={BedDouble} label="Stay type">
+                    <select value={accommodationType} onChange={(event) => setAccommodationType(event.target.value)} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none">
+                      <option value="">Any type</option><option>Hotel</option><option>Villa</option><option>Resort</option><option>Hostel</option><option>Apartment</option>
+                    </select>
+                  </Field>
+                  <Field icon={CheckCircle} label="Preferences">
+                    <input value={accommodationPreferences} onChange={(event) => setAccommodationPreferences(event.target.value)} placeholder="pool, wifi, breakfast" className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
+                  </Field>
+                </div>
+              </div>
+
               <OptionSection
                 title="Accommodation options"
                 description={`Active stays near ${primaryDestinationName(destination) || "this destination"}`}
@@ -463,6 +502,17 @@ export default function TouristBookingCreate() {
                         <span>{accommodation.rooms} rooms</span>
                         <span>{accommodation.status}</span>
                       </div>
+                      {accommodationRecommendations.find((item) => item.accommodation.id === accommodation.id) && (
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {(() => {
+                            const match = accommodationRecommendations.find((item) => item.accommodation.id === accommodation.id)!;
+                            return <>
+                              <span className="rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-bold text-emerald-700">{match.suitabilityScore}% fit</span>
+                              {match.reasons.slice(0, 2).map((reason) => <span key={reason} className="rounded-full bg-gray-100 px-2 py-1 text-[11px] font-semibold text-gray-600">{reason}</span>)}
+                            </>;
+                          })()}
+                        </div>
+                      )}
                       {accommodation.amenities?.length > 0 && (
                         <p className="mt-2 text-xs text-gray-400">{accommodation.amenities.slice(0, 4).join(" · ")}</p>
                       )}
@@ -529,6 +579,17 @@ export default function TouristBookingCreate() {
                             <span>{vehicle.transmission}</span>
                             <span className="font-semibold text-gray-800">LKR {Number(vehicle.pricePerDay || 0).toLocaleString()} / day</span>
                           </div>
+                          {vehicleRecommendations.find((item) => item.vehicle.id === vehicle.id) && (
+                            <div className="mt-2 flex flex-wrap gap-1.5">
+                              {(() => {
+                                const match = vehicleRecommendations.find((item) => item.vehicle.id === vehicle.id)!;
+                                return <>
+                                  <span className="rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-bold text-emerald-700">{match.suitabilityScore}% fit</span>
+                                  {match.reasons.slice(0, 2).map((reason) => <span key={reason} className="rounded-full bg-gray-100 px-2 py-1 text-[11px] font-semibold text-gray-600">{reason}</span>)}
+                                </>;
+                              })()}
+                            </div>
+                          )}
                           {vehicle.location && <p className="mt-2 text-xs text-gray-400">{vehicle.location}</p>}
                         </button>
                       );
