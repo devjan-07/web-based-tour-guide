@@ -78,6 +78,8 @@ export interface Booking {
   createdAt: string;
 }
 
+export interface GuideRecommendation { guide: Guide; suitabilityScore: number; reasons: string[]; }
+
 export interface Guide {
   id: number;
   name: string;
@@ -260,6 +262,19 @@ export const packagesApi = {
 };
 export const routesApi = resource<Route, number>("/routes");
 export const bookingsApi = resource<Booking, string>("/bookings");
+export interface TripReadiness {
+  bookingId: string;
+  completionPercent: number;
+  status: string;
+  nextAction: string;
+  completed: string[];
+  pending: string[];
+}
+
+export const tripReadinessApi = {
+  get: (id: string) => request<TripReadiness>(`/tourist/bookings/${id}/readiness`),
+};
+
 export const touristBookingsApi = {
   list: () => request<Booking[]>("/tourist/bookings"),
   detail: (id: string) => request<Booking>(`/tourist/bookings/${id}`),
@@ -321,7 +336,17 @@ export interface DailyReport {
 export const reportsApi = {
   daily: (date?: string) => request<DailyReport>(`/reports/daily${date ? `?date=${encodeURIComponent(date)}` : ""}`),
 };
-export const guidesApi = resource<Guide, number>("/tour-guides");
+export const guidesApi = {
+  ...resource<Guide, number>("/tour-guides"),
+  recommendations: (params: { language?: string; specialty?: string; location?: string } = {}) => {
+    const query = new URLSearchParams();
+    if (params.language) query.set("language", params.language);
+    if (params.specialty) query.set("specialty", params.specialty);
+    if (params.location) query.set("location", params.location);
+    const suffix = query.toString() ? `?${query.toString()}` : "";
+    return request<GuideRecommendation[]>(`/tour-guides/recommendations${suffix}`);
+  },
+};
 export const accommodationsApi = resource<Accommodation, number>("/admin/accommodations");
 export const reassignAccommodationOwner = (id: number, ownerUserId: number) => request<Accommodation>(`/admin/accommodations/${id}/owner`, { method: "PATCH", body: JSON.stringify({ ownerUserId }) });
 export const partnerAccommodationsApi = resource<Accommodation, number>("/stakeholder/accommodations");
