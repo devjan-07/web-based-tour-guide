@@ -367,6 +367,22 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <section className="py-14 px-4">
+        <div className="mx-auto max-w-7xl rounded-[2rem] bg-[#062a56] p-6 text-white md:p-8">
+          <div className="grid gap-8 md:grid-cols-[1.2fr_0.8fr] md:items-center">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.22em] text-rose-300">Travel, your way</p>
+              <h2 className="mt-2 text-2xl font-black md:text-3xl">Not sure where to start?</h2>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70">Tell Voyara where you want to go, your dates, group size and preferences. The trip planner brings together suitable tours, guides, stays and transport before you book.</p>
+            </div>
+            <div className="flex flex-wrap gap-3 md:justify-end">
+              <Link to="/tourist/plan" className="inline-flex items-center gap-2 rounded-xl bg-[#FF385C] px-5 py-3 text-sm font-bold text-white hover:opacity-90">Plan my trip <ArrowUpRight className="h-4 w-4" /></Link>
+              <Link to="/explore" className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-5 py-3 text-sm font-bold text-white ring-1 ring-white/20 hover:bg-white/15">Explore everything</Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 px-4 max-w-7xl mx-auto">
         <div className="flex items-end justify-between mb-8">
           <div>
