@@ -319,12 +319,14 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
                     >
                       {savedToTrip ? "Added to My Trip" : "Add to My Trip"}
                     </button>
-                    <Link
-                      to={`/tourist/packages/${item.data.id}/customize`}
-                      className="mt-3 flex w-full items-center justify-center rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-700 hover:bg-blue-100"
-                    >
-                      Customize this package
-                    </Link>
+                    {item.mode === "package" && (
+                      <Link
+                        to={`/tourist/packages/${item.data.id}/customize`}
+                        className="mt-3 flex w-full items-center justify-center rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-700 hover:bg-blue-100"
+                      >
+                        Customize this package
+                      </Link>
+                    )}
                     <button
                       onClick={() => navigate(bookingPath)}
                       className="mt-3 w-full rounded-xl px-4 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
