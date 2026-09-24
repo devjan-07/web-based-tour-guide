@@ -312,7 +312,7 @@ export default function TouristBookingCreate() {
         </section>
 
         {loading ? (
-          <div className="bg-white rounded-3xl border border-gray-200 p-8 text-sm text-gray-400">Loading booking details...</div>
+          <div className="rounded-3xl border border-gray-200 bg-white p-8 text-sm text-gray-400 shadow-sm">Loading booking details...</div>
         ) : (
           <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
             <section className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -648,7 +648,7 @@ export default function TouristBookingCreate() {
               </div>
             </section>
 
-            <aside className="bg-white rounded-3xl border border-gray-200 p-6 h-fit">
+            <aside className="h-fit rounded-3xl border border-gray-200 bg-white p-6 shadow-sm lg:sticky lg:top-24">
               <h2 className="font-bold text-gray-900 mb-5">Booking summary</h2>
               <div className="space-y-3 text-sm">
                 <SummaryRow label="Tourist" value={user?.fullName || "Current user"} />
