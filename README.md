@@ -124,6 +124,7 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 | 2026-09-24 | `a936363357e4e05cb4a23dc7fdedb8963c2e4490` | Align hero search scrolling with the homepage discovery section | Implemented; browser verification pending |
 | 2026-09-24 | `c79fbb03c6b219e788ee229f9c55f5eab1a0c91d` | Remove stray literal newline escapes from trip planner source | Implemented; browser verification pending |
 | 2026-09-24 | `01e0a8ef7cd4841c295c61f5b2fbdfb1a3cd9a42` | Polish booking experience with responsive review summary and loading state | Implemented; browser verification pending |
+| 2026-09-24 | `1d5eeeed56c0d9d19a9f651ee10443639084ef2b` | Redesign destination and package detail experience around tourism discovery and booking | Implemented; browser verification pending |
 
 | Date | Commit | Improvement | Status |
 |---|---|---|---|
@@ -193,6 +194,7 @@ Run after the enhancement batch is complete:
 - [ ] Destinations without matching categories show the fallback “Flexible travel” signal.
 - [ ] Existing booking/login navigation remains functional.
 - [ ] Package detail pages and package routes remain functional.
+- [ ] Destination detail and package detail layouts are browser-verified after the tourism detail-page redesign.
 - [x] Destination discovery filters existing destination categories correctly.
 - [x] Package discovery sorting and comparison work without affecting existing browsing.
 - [x] Plan My Trip loads destination/package data and builds cross-module matches.
