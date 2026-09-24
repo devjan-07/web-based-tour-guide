@@ -31,12 +31,12 @@ export function Hero({ onSearch, onClear, hasActiveFilter = false, onCategoryCha
       />
 
       <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
-        <p className="text-white/80 text-sm mb-2 tracking-widest uppercase font-medium">Discover Sri Lanka</p>
+        <p className="text-white/80 text-sm mb-2 tracking-widest uppercase font-medium">Sri Lanka, your way</p>
         <h1 className="text-white text-center mb-2" style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 800, lineHeight: 1.15 }}>
-          Find Your Next Adventure
+          Plan the trip you will remember.
         </h1>
         <p className="text-white/75 text-center text-base mb-8 max-w-md">
-          Explore expert-guided tours, top-rated attractions & the best travel deals in Sri Lanka
+          Discover destinations, local guides, stays and experiences — then build your itinerary around what matters to you.
         </p>
 
         <div className="w-full max-w-3xl rounded-2xl bg-white p-2 shadow-2xl">
@@ -45,7 +45,7 @@ export function Hero({ onSearch, onClear, hasActiveFilter = false, onCategoryCha
             <input
               type="search"
               aria-label="Search destinations, tours, accommodations, and vehicles"
-              placeholder="Search destinations, tours, accommodations, or vehicles"
+              placeholder="Where do you want to go?"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
