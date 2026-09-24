@@ -39,7 +39,7 @@ export function DestinationShowcase({ destinations, onExplore }: DestinationShow
       if (items.length < 2) return;
       const target = event.target as HTMLElement | null;
       if (target?.matches("input, textarea, select, [contenteditable='true']")) return;
-      if (event.key === "ArrowRight")
+      if (event.key === "ArrowRight") {
         event.preventDefault();
         setDirection(1);
         setActiveIndex((current) => (current + 1) % items.length);
