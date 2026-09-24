@@ -163,6 +163,8 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 | 2026-09-24 | `8e0d8dce2dcfd0b8521fc78c51a845dae7b05e4e` | Link package details to customization | Implemented; verification pending |
 | 2026-09-24 | `49a790adbcd945c8a5400aa1e2728007ab6471b3` | Connect My Trip to package customization | Implemented; verification pending |
 
+| 2026-09-24 | `8f1a45555b757a3964607dceeb5f936ed20d291c` | Rebuild footer navigation cleanly | Implemented; browser verification pending |
+| 2026-09-24 | `c72727e70fd90856ae87c6d88d564093806f3f25` | Remove stray navbar brace | Implemented; browser verification pending |
 ## Final Verification Checklist
 
 Run after the enhancement batch is complete:
