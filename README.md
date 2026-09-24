@@ -95,6 +95,7 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 |---|---|---|---|
 | 2026-09-24 | `853dbdcc0536aba03219d5e271793671d83f18d1` | Pre-enhancement baseline | Known good |
 | 2026-09-24 | `c984fbeb03af50eed747134535014c4e16921053` | Destination Smart Discovery — travel-style “Perfect for” signals | Implemented; final verification pending |
+| 2026-09-24 | `8e2b380d2e3f45f6d00b6bb1e46741451a2b1c80` | Tour Package Discovery — package-fit signals | Implemented; final verification pending |
 
 ## Final Verification Checklist
 
