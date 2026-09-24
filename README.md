@@ -106,6 +106,15 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 | 2026-09-24 | `0cb426360ac5bcbee9b5e5018a79dc639904ca5d` | Frontend booking-readiness and guide-matching APIs | Implemented; final verification pending |
 | 2026-09-24 | `6e1fc6bd245af049714040ef8f9e91e83a99b37a` | Tourist trip command center and action center | Implemented; final verification pending |
 | 2026-09-24 | `8fbbc7e567185fdfc54289ea04673a7c43545b7f` | Availability-aware guide matches on destination pages | Implemented; final verification pending |
+| 2026-09-24 | `3575493a0a6eaf01c376901f666be6ada40f541e` | Smart vehicle recommendation model | Implemented; final verification pending |
+| 2026-09-24 | `a51137b26c366d6d8985cdc54cf0a6ae7bc9c48d` | Accommodation matching model | Implemented; final verification pending |
+| 2026-09-24 | `7e79d43210ca7d07e99b9bd3d7ef79b1073083aa` | Vehicle passenger/luggage/location matching | Implemented; final verification pending |
+| 2026-09-24 | `90013348c62babb71ceb9a832345f4f24ce7da3b` | Vehicle recommendation API | Implemented; final verification pending |
+| 2026-09-24 | `28c9f7c37133cc4fd5f13b43241f6d1aa9d5cec8` | Accommodation budget/preference matching | Implemented; final verification pending |
+| 2026-09-24 | `f08d4012c591700c77e77db4708e441d884c8c69` | Accommodation recommendation API | Implemented; final verification pending |
+| 2026-09-24 | `edac6b7f409f47de08f89f3549263a67a74d1be6` | Vehicle/accommodation frontend recommendation APIs | Implemented; final verification pending |
+| 2026-09-24 | `b130ef377f4e8aba16d7972175232d5065b7a0b7` | Smart matching integrated into booking flow | Implemented; final verification pending |
+| 2026-09-24 | `2fdd50b56d6041269da102078e918b8ffc56ed16` | Driver-service feature matching refinement | Implemented; final verification pending |
 
 ## Final Verification Checklist
 
@@ -120,6 +129,11 @@ Run after the enhancement batch is complete:
 - [ ] Trip readiness endpoint returns sensible completed/pending items for a booking.
 - [ ] Guide recommendations return only available guides and show suitability reasons/scores.
 - [ ] Guide recommendations respond correctly to language, specialty and location inputs.
+- [ ] Vehicle recommendations match passenger capacity and available status.
+- [ ] Vehicle recommendations use luggage, driver-service, location and optional budget signals.
+- [ ] Accommodation recommendations match destination, traveller count, budget and stay type.
+- [ ] Accommodation recommendations use requested amenities/preferences and rating signals.
+- [ ] Booking creation displays recommendation fit scores and reasons for vehicles and accommodations.
 - [ ] Destinations without matching categories show the fallback “Flexible travel” signal.
 - [ ] Existing booking/login navigation remains functional.
 - [ ] Package detail pages and package routes remain functional.
