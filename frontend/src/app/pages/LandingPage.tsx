@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import type { ReactNode } from "react";
-import { motion, useScroll, useTransform } from "motion/react";
+import { useEffect, useState } from "react";
+import { motion } from "motion/react";
 import { Navbar } from "../components/Navbar";
 import { Hero } from "../components/Hero";
 import { DestinationCard } from "../components/DestinationCard";
@@ -9,7 +8,6 @@ import { ReviewSection } from "../components/ReviewSection";
 import { WhyUs } from "../components/WhyUs";
 import { Footer } from "../components/Footer";
 import { VoyAI } from "../components/VoyAI";
-import { DestinationShowcase } from "../components/DestinationShowcase";
 import { useAuth } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router";
 import { Search, X, Globe2, Star, Users, MapPinned, ArrowUpRight, BedDouble, Car, Fuel, SlidersHorizontal } from "lucide-react";
@@ -91,6 +89,11 @@ export default function LandingPage() {
       ...item,
       tags: [item.type, item.brand, item.model, item.transmission, item.fuel, item.location, ...(item.features || [])].filter(Boolean),
     }));
+
+  const popular = localDestinations
+    .slice()
+    .slice(0, 6)
+    .map((d) => ({ name: d.name, country: d.country, img: d.image }));
 
   const handleSearch = (q: string) => {
     setSearchQuery(q);
@@ -181,10 +184,31 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
-      <CinematicJourney>
-        <Hero onSearch={handleSearch} onClear={clearFilters} hasActiveFilter={isFiltered} onCategoryChange={handleCategoryChange} />
-        <CinematicIntroSection />
-      </CinematicJourney>
+      <Hero onSearch={handleSearch} onClear={clearFilters} hasActiveFilter={isFiltered} onCategoryChange={handleCategoryChange} />
+
+      {/* C2: editorial introduction */}
+      <section className="relative overflow-hidden bg-[#f7f5ef] px-4 py-20 md:py-28">
+        <div className="mx-auto grid max-w-7xl items-end gap-10 md:grid-cols-[1.15fr_0.85fr]">
+          <motion.div initial={{ opacity: 0, y: 32 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.7 }}>
+            <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-emerald-700">A different way to explore</p>
+            <h2 className="max-w-4xl text-4xl font-semibold leading-[1.02] tracking-[-0.04em] text-slate-950 md:text-6xl">
+              Sri Lanka is not a checklist.
+              <span className="block text-slate-400">It is a journey.</span>
+            </h2>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.7, delay: 0.1 }} className="max-w-xl md:justify-self-end">
+            <p className="text-base leading-7 text-slate-600 md:text-lg">
+              Discover destinations, tours, places to stay and transport through one connected experience. Start with a place that catches your eye, then build the rest of your trip around it.
+            </p>
+            <div className="mt-7 flex flex-wrap gap-3 text-sm font-semibold text-slate-700">
+              <span className="rounded-full border border-slate-200 bg-white px-4 py-2">Discover</span>
+              <span className="rounded-full border border-slate-200 bg-white px-4 py-2">Choose</span>
+              <span className="rounded-full border border-slate-200 bg-white px-4 py-2">Plan</span>
+              <span className="rounded-full border border-slate-200 bg-white px-4 py-2">Go</span>
+            </div>
+          </motion.div>
+        </div>
+      </section>
 
       {/* Active filter banner */}
       {isFiltered && (
@@ -297,8 +321,39 @@ export default function LandingPage() {
         )}
       </section>
 
-      {/* C2: cinematic destination discovery */}
-      <DestinationShowcase destinations={localDestinations} onExplore={viewDestination} />
+      {/* C2: destination discovery */}
+      <section id="transport-section" className="overflow-hidden bg-slate-950 py-20 text-white md:py-28">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.6 }} className="mb-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="mb-3 text-xs font-bold uppercase tracking-[0.28em] text-emerald-300">Explore the island</p>
+              <h2 className="text-4xl font-semibold tracking-[-0.035em] md:text-5xl">Where will you go first?</h2>
+            </div>
+            <p className="max-w-md text-sm leading-6 text-slate-400 md:text-right">Browse real destinations from the platform and open any place to see its experiences and routes.</p>
+          </motion.div>
+          <div className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {popular.map((d, index) => (
+              <motion.button key={d.name} type="button"
+                onClick={() => { handleSearch(d.name); const section=document.getElementById("listings-section"); if(section) section.scrollIntoView({behavior:"smooth"}); }}
+                initial={{ opacity: 0, x: 35 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.55, delay: index * 0.06 }}
+                className="group relative min-w-[76vw] snap-start overflow-hidden rounded-[2rem] text-left sm:min-w-[48vw] lg:min-w-[31vw]">
+                <div className="aspect-[4/5] overflow-hidden"><img src={d.img} alt={d.name} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" /></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+                <div className="absolute left-5 right-5 top-5 flex items-center justify-between">
+                  <span className="rounded-full border border-white/25 bg-black/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md">0{index + 1}</span>
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-900 opacity-0 transition-all duration-300 group-hover:opacity-100"><ArrowUpRight className="h-4 w-4" /></span>
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/60">{d.country}</p>
+                  <h3 className="mt-1 text-2xl font-semibold tracking-tight">{d.name}</h3>
+                  <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-white/80">Explore destination <ArrowUpRight className="h-4 w-4" /></span>
+                </div>
+              </motion.button>
+            ))}
+          </div>
+        </div>
+      </section>
 
       <section id="stays-section" className="py-16 px-4 max-w-7xl mx-auto">
         <div className="flex items-end justify-between mb-8">
@@ -505,91 +560,5 @@ export default function LandingPage() {
       <Footer />
       {isAuthenticated && <VoyAI />}
     </div>
-  );
-}
-
-function CinematicJourney({ children }: { children: ReactNode }) {
-  const journeyRef = useRef<HTMLDivElement | null>(null);
-  const { scrollYProgress } = useScroll({
-    target: journeyRef,
-    offset: ["start start", "end start"],
-  });
-
-  // One image stays behind both the Hero and the intro. The scroll progress
-  // controls a single continuous camera push-in instead of swapping images.
-  const imageScale = useTransform(scrollYProgress, [0, 0.42, 0.78, 1], [1.02, 1.10, 1.24, 1.34]);
-  const imageY = useTransform(scrollYProgress, [0, 1], ["0%", "-5%"]);
-
-  return (
-    <div ref={journeyRef} className="relative bg-slate-950">
-      <div className="pointer-events-none sticky top-0 z-0 h-screen overflow-hidden">
-        <motion.img
-          src="https://unsplash.com/photos/rFDfjk_pfLw/download?force=true&w=2400"
-          alt="Sigiriya Rock rising above the Sri Lankan forest"
-          className="absolute inset-0 h-full w-full object-cover will-change-transform"
-          style={{ scale: imageScale, y: imageY, transformOrigin: "center center" }}
-        />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_55%_40%,rgba(255,255,255,0.12),transparent_34%)]" />
-      </div>
-
-      <div className="relative z-10 -mt-[100vh]">
-        {children}
-      </div>
-
-      <div className="pointer-events-none absolute bottom-2 right-5 z-30 text-[7px] text-white/35 sm:right-8 lg:right-16">
-        Photo: Sander Traa / Unsplash
-      </div>
-    </div>
-  );
-}
-
-function CinematicIntroSection() {
-  return (
-    <section className="relative h-[135vh] overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/5 to-black/65" />
-      <div className="relative z-10 flex h-screen items-center">
-        <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-16">
-          <div className="max-w-5xl text-white">
-            <p className="mb-5 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.32em] text-emerald-200">
-              <span className="h-px w-10 bg-emerald-200/70" />
-              A different way to explore
-            </p>
-
-            <h2 className="max-w-5xl text-5xl font-semibold leading-[0.92] tracking-[-0.055em] sm:text-6xl md:text-8xl lg:text-[7.5rem]">
-              Sri Lanka is not
-              <span className="block text-white/55">a checklist.</span>
-            </h2>
-
-            <p className="mt-5 max-w-3xl text-2xl font-light tracking-[-0.025em] text-white/90 sm:text-3xl md:text-5xl">
-              It is a journey.
-            </p>
-
-            <div className="mt-9 flex flex-wrap gap-3">
-              {["Discover", "Choose", "Plan", "Go"].map((item) => (
-                <span
-                  key={item}
-                  className="rounded-full border border-white/25 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-md"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
-
-            <p className="mt-7 max-w-xl text-sm leading-7 text-white/70 md:text-base">
-              Start with a place that catches your eye, then build the rest of your trip around it — stays, transport, guides and experiences included.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="absolute bottom-7 left-5 right-5 z-10 flex items-end justify-between sm:left-8 sm:right-8 lg:left-16 lg:right-16">
-        <p className="text-[9px] font-semibold uppercase tracking-[0.25em] text-white/55">
-          Sigiriya · Sri Lanka
-        </p>
-        <p className="max-w-xs text-right text-[9px] font-semibold uppercase tracking-[0.18em] text-white/50">
-          Scroll to reveal the journey
-        </p>
-      </div>
-    </section>
   );
 }
