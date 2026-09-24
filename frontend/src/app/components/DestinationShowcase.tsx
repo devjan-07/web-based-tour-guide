@@ -37,7 +37,9 @@ export function DestinationShowcase({ destinations, onExplore }: DestinationShow
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (items.length < 2) return;
-      if (event.key === "ArrowRight") {
+      const target = event.target as HTMLElement | null;
+      if (target?.matches("input, textarea, select, [contenteditable='true']")) return;
+      if (event.key === "ArrowRight")
         event.preventDefault();
         setDirection(1);
         setActiveIndex((current) => (current + 1) % items.length);
@@ -82,8 +84,6 @@ export function DestinationShowcase({ destinations, onExplore }: DestinationShow
     <section
       id="destination-showcase"
       className="relative overflow-hidden bg-[#07110e] text-white"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
     >
       <div className="mx-auto max-w-[1600px] px-4 py-16 sm:px-6 md:py-24 lg:px-10 lg:py-28">
         <div className="mb-8 flex flex-col gap-6 sm:mb-10 md:flex-row md:items-end md:justify-between">
@@ -227,9 +227,11 @@ export function DestinationShowcase({ destinations, onExplore }: DestinationShow
             </span>
             <div className="h-px w-16 bg-white/15">
               <motion.div
+                key={active.id + "-" + paused}
                 className="h-full bg-emerald-300"
-                animate={{ width: ((activeIndex + 1) / items.length) * 100 + "%" }}
-                transition={{ duration: 0.45 }}
+                initial={{ width: "0%" }}
+                animate={{ width: paused ? "0%" : "100%" }}
+                transition={{ duration: paused ? 0.2 : 6.5, ease: "linear" }}
               />
             </div>
           </div>
