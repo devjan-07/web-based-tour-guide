@@ -172,7 +172,7 @@ export function Navbar() {
                       )}
                       {isTourist && (
                         <>
-                          <Link to="/" className="flex items-center gap-3 px-5 py-3.5 text-sm font-semibold text-slate-800 hover:bg-slate-50">
+                          <Link to="/explore" className="flex items-center gap-3 px-5 py-3.5 text-sm font-semibold text-slate-800 hover:bg-slate-50">
                             <Compass className="w-4 h-4 text-emerald-700" /> Explore trips
                           </Link>
                           <Link to="/tourist/dashboard" className="flex items-center gap-3 px-5 py-3.5 text-sm font-semibold text-slate-800 hover:bg-slate-50">
