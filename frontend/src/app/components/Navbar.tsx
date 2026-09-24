@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-import { Menu, User, LogIn, UserPlus, LayoutDashboard, LogOut, HelpCircle, Search } from "lucide-react";
+import { Menu, User, LogIn, UserPlus, LayoutDashboard, LogOut, HelpCircle, Search, Compass, MapPinned, CalendarHeart } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { NotificationBell } from "./NotificationBell";
 import logoImg from "../../imports/c8f8ad87-0b32-4268-ba96-7d4a61b80241.png";
@@ -39,7 +39,15 @@ export function Navbar() {
             <img src={logoImg} alt="Voyara" className="h-12 w-auto object-contain" />
           </Link>
 
-          {/* Right — globe + profile button only */}
+          {/* Main travel navigation */}
+          <div className="hidden items-center gap-1 md:flex">
+            <Link to="/explore" className="rounded-full px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50">Explore</Link>
+            <Link to="/guides" className="rounded-full px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50">Local Guides</Link>
+            <Link to="/tourist/plan" className="rounded-full px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50">Plan a Trip</Link>
+          </div>
+
+          {/* Account actions */}
+}
           <div className="flex items-center gap-2">
             {isAuthenticated && <NotificationBell />}
             <div className="relative" ref={dropdownRef}>
