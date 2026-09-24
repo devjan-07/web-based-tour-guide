@@ -212,6 +212,11 @@ public class BookingService {
         return buildTripReadiness(booking);
     }
 
+    @Transactional(readOnly = true)
+    public TripReadiness getTripReadinessById(String id) {
+        return buildTripReadiness(findById(id));
+    }
+
     private TripReadiness buildTripReadiness(Booking booking) {
         List<String> completed = new java.util.ArrayList<>();
         List<String> pending = new java.util.ArrayList<>();
