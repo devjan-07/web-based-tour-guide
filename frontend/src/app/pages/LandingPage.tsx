@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { motion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+import { motion, useScroll, useTransform } from "motion/react";
 import { Navbar } from "../components/Navbar";
 import { Hero } from "../components/Hero";
 import { DestinationCard } from "../components/DestinationCard";
@@ -186,29 +186,7 @@ export default function LandingPage() {
       <Navbar />
       <Hero onSearch={handleSearch} onClear={clearFilters} hasActiveFilter={isFiltered} onCategoryChange={handleCategoryChange} />
 
-      {/* C2: editorial introduction */}
-      <section className="relative overflow-hidden bg-[#f7f5ef] px-4 py-20 md:py-28">
-        <div className="mx-auto grid max-w-7xl items-end gap-10 md:grid-cols-[1.15fr_0.85fr]">
-          <motion.div initial={{ opacity: 0, y: 32 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.7 }}>
-            <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-emerald-700">A different way to explore</p>
-            <h2 className="max-w-4xl text-4xl font-semibold leading-[1.02] tracking-[-0.04em] text-slate-950 md:text-6xl">
-              Sri Lanka is not a checklist.
-              <span className="block text-slate-400">It is a journey.</span>
-            </h2>
-          </motion.div>
-          <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.7, delay: 0.1 }} className="max-w-xl md:justify-self-end">
-            <p className="text-base leading-7 text-slate-600 md:text-lg">
-              Discover destinations, tours, places to stay and transport through one connected experience. Start with a place that catches your eye, then build the rest of your trip around it.
-            </p>
-            <div className="mt-7 flex flex-wrap gap-3 text-sm font-semibold text-slate-700">
-              <span className="rounded-full border border-slate-200 bg-white px-4 py-2">Discover</span>
-              <span className="rounded-full border border-slate-200 bg-white px-4 py-2">Choose</span>
-              <span className="rounded-full border border-slate-200 bg-white px-4 py-2">Plan</span>
-              <span className="rounded-full border border-slate-200 bg-white px-4 py-2">Go</span>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+      <CinematicIntroSection />
 
       {/* Active filter banner */}
       {isFiltered && (
@@ -560,5 +538,75 @@ export default function LandingPage() {
       <Footer />
       {isAuthenticated && <VoyAI />}
     </div>
+  );
+}
+
+function CinematicIntroSection() {
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+  const imageScale = useTransform(scrollYProgress, [0, 0.5, 1], [1.08, 1.22, 1.08]);
+  const imageY = useTransform(scrollYProgress, [0, 1], ["-3%", "3%"]);
+  const textY = useTransform(scrollYProgress, [0, 1], ["10%", "-10%"]);
+
+  return (
+    <section ref={sectionRef} className="relative h-[135vh] overflow-hidden bg-slate-950">
+      <div className="sticky top-0 h-screen overflow-hidden">
+        <motion.img
+          src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Sigiriya%20L%C3%B6wenfelsen%20Sri%20Lanka%20%2829959786832%29.jpg"
+          alt="Aerial view of Sigiriya Rock Fortress surrounded by the Sri Lankan forest"
+          className="absolute inset-0 h-full w-full object-cover will-change-transform"
+          style={{ scale: imageScale, y: imageY }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/75" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_55%_42%,rgba(255,255,255,0.10),transparent_34%)]" />
+
+        <motion.div
+          style={{ y: textY }}
+          className="relative z-10 mx-auto flex h-full max-w-7xl items-center px-5 sm:px-8 lg:px-16"
+        >
+          <div className="max-w-5xl text-white">
+            <p className="mb-5 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.32em] text-emerald-200">
+              <span className="h-px w-10 bg-emerald-200/70" />
+              A different way to explore
+            </p>
+            <h2 className="max-w-5xl text-5xl font-semibold leading-[0.92] tracking-[-0.055em] sm:text-6xl md:text-8xl lg:text-[7.5rem]">
+              Sri Lanka is not
+              <span className="block text-white/55">a checklist.</span>
+            </h2>
+            <p className="mt-5 max-w-3xl text-2xl font-light tracking-[-0.025em] text-white/90 sm:text-3xl md:text-5xl">
+              It is a journey.
+            </p>
+
+            <div className="mt-9 flex flex-wrap gap-3">
+              {["Discover", "Choose", "Plan", "Go"].map((item) => (
+                <span key={item} className="rounded-full border border-white/25 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-md">
+                  {item}
+                </span>
+              ))}
+            </div>
+
+            <p className="mt-7 max-w-xl text-sm leading-7 text-white/70 md:text-base">
+              Start with a place that catches your eye, then build the rest of your trip around it — stays, transport, guides and experiences included.
+            </p>
+          </div>
+        </motion.div>
+
+        <div className="absolute bottom-7 left-5 right-5 z-10 flex items-end justify-between sm:left-8 sm:right-8 lg:left-16 lg:right-16">
+          <p className="text-[9px] font-semibold uppercase tracking-[0.25em] text-white/55">
+            Sigiriya · Sri Lanka
+          </p>
+          <p className="max-w-xs text-right text-[9px] font-semibold uppercase tracking-[0.18em] text-white/50">
+            Scroll to reveal the journey
+          </p>
+        </div>
+
+        <p className="absolute bottom-2 right-5 z-10 text-[7px] text-white/35 sm:right-8 lg:right-16">
+          Photo: dronepicr / Wikimedia Commons · CC BY-SA 4.0
+        </p>
+      </div>
+    </section>
   );
 }
