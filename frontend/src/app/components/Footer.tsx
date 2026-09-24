@@ -1,4 +1,4 @@
-import { Globe } from "lucide-react";
+import { Globe, ArrowUpRight } from "lucide-react";\nimport { Link } from "react-router";
 import logoImg from "../../imports/c8f8ad87-0b32-4268-ba96-7d4a61b80241.png";
 
 const footerLinks = {
