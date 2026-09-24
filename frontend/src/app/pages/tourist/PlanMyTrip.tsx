@@ -130,7 +130,7 @@ export default function PlanMyTrip() {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-        <section className="overflow-hidden rounded-3xl bg-gradient-to-br from-[#003580] to-[#0057B8] text-white shadow-lg">
+        <section className="overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#003580] to-[#0057B8] text-white shadow-lg">
           <div className="p-7 md:p-10">
             <div className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-[0.18em] text-white/70">
               <Sparkles className="h-4 w-4" /> Voyara trip planner
@@ -146,7 +146,7 @@ export default function PlanMyTrip() {
           <div className="mt-6 rounded-3xl border border-gray-200 bg-white p-8 text-sm text-gray-500">Loading destinations and tour packages...</div>
         ) : (
           <>
-            <section className="mt-6 rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+            <section className="mt-6 rounded-[2rem] border border-gray-200 bg-white p-5 shadow-sm md:p-6">
               <div className="mb-5 flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-rose-50 text-rose-500"><Compass className="h-5 w-5" /></div>
                 <div>
@@ -206,7 +206,7 @@ export default function PlanMyTrip() {
                 </PlannerField>
               </div>
 
-              <div className="mt-5 flex flex-col gap-3 rounded-2xl bg-gray-50 p-4 md:flex-row md:items-center md:justify-between">
+              <div className="mt-5 flex flex-col gap-4 rounded-2xl border border-gray-100 bg-gray-50 p-4 md:flex-row md:items-center md:justify-between">
                 <div>
                   <p className="text-sm font-bold text-gray-900">{selectedDestination?.name || "Choose a destination"} · {duration} day{duration === 1 ? "" : "s"}</p>
                   <p className="mt-1 text-xs text-gray-500">{travellers} traveller{travellers === 1 ? "" : "s"} · {driverRequired ? "Driver requested" : "Self drive"} · {luggage} luggage item{luggage === 1 ? "" : "s"}</p>
@@ -254,7 +254,7 @@ export default function PlanMyTrip() {
               </RecommendationCard>
             </section>
 
-            <section className="mt-5 rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+            <section className="mt-5 rounded-[2rem] border border-gray-200 bg-white p-5 shadow-sm md:p-6">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-50 text-orange-600"><Car className="h-5 w-5" /></div>
                 <div><h2 className="font-extrabold text-gray-900">Transport matches</h2><p className="text-xs text-gray-400">Vehicles are matched using group size, luggage, driver preference and destination.</p></div>
@@ -280,7 +280,7 @@ export default function PlanMyTrip() {
                 <div className="flex items-center gap-2 text-sm font-bold"><CheckCircle className="h-4 w-4 text-emerald-400" /> Ready to turn the plan into a booking?</div>
                 <p className="mt-2 max-w-2xl text-sm text-white/60">Start a custom trip with the destination and dates already carried into the booking form. You can review every resource before submitting.</p>
               </div>
-              <Link to={customBookingLink} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#FF385C] px-5 py-3 text-sm font-bold text-white">Continue to booking <ArrowRight className="h-4 w-4" /></Link>
+              <Link to={customBookingLink} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#FF385C] px-5 py-3.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60">Continue to booking <ArrowRight className="h-4 w-4" /></Link>
             </section>
           </>
         )}
@@ -302,8 +302,13 @@ function PlannerField({ icon: Icon, label, children }: { icon: ComponentType<{ c
 function RecommendationCard({ title, icon: Icon, empty, children }: { title: string; icon: ComponentType<{ className?: string }>; empty: string; children: ReactNode }) {
   const hasChildren = Array.isArray(children) ? children.length > 0 : !!children;
   return (
-    <section className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
-      <div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gray-50 text-gray-600"><Icon className="h-5 w-5" /></div><h2 className="font-extrabold text-gray-900">{title}</h2></div>
+    <section className="rounded-[2rem] border border-gray-200 bg-white p-5 shadow-sm md:p-6">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gray-50 text-gray-600"><Icon className="h-5 w-5" /></div>
+          <div><h2 className="font-extrabold text-gray-900">{title}</h2><p className="mt-0.5 text-xs text-gray-400">Matched from your trip preferences</p></div>
+        </div>
+      </div>
       <div className="mt-4 space-y-3">{hasChildren ? children : <div className="rounded-2xl border border-dashed border-gray-200 p-5 text-sm text-gray-400">{empty}</div>}</div>
     </section>
   );
