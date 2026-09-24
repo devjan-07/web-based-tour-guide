@@ -12,6 +12,7 @@ import TouristBookingDetail from "./pages/tourist/TouristBookingDetail";
 import TouristBookingCreate from "./pages/tourist/TouristBookingCreate";
 import TouristAccommodationBooking from "./pages/tourist/TouristAccommodationBooking";
 import TouristVehicleBooking from "./pages/tourist/TouristVehicleBooking";
+import PlanMyTrip from "./pages/tourist/PlanMyTrip";
 import { DashboardLayout } from "./pages/dashboard/DashboardLayout";
 import { DashboardHome } from "./pages/dashboard/DashboardHome";
 import { AccommodationManagement } from "./pages/dashboard/AccommodationManagement";
@@ -42,6 +43,7 @@ export const router = createBrowserRouter([
         Component: TouristRoute,
         children: [
           { path: "/tourist/dashboard", Component: TouristDashboard },
+          { path: "/tourist/plan", Component: PlanMyTrip },
           { path: "/tourist/bookings/new", Component: TouristBookingCreate },
           { path: "/tourist/bookings/:id", Component: TouristBookingDetail },
           { path: "/tourist/accommodations/:id/book", Component: TouristAccommodationBooking },
