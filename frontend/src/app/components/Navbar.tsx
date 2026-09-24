@@ -47,7 +47,6 @@ export function Navbar() {
           </div>
 
           {/* Account actions */}
-}
           <div className="flex items-center gap-2">
             {isAuthenticated && <NotificationBell />}
             <div className="relative" ref={dropdownRef}>
