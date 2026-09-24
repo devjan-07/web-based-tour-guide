@@ -14,7 +14,7 @@ export function Hero({ onSearch, onClear, hasActiveFilter = false, onCategoryCha
 
   const handleSearch = () => {
     if (onSearch) onSearch(query.trim());
-    const section = document.getElementById("listings-section");
+    const section = document.getElementById("discovery");
     if (section) section.scrollIntoView({ behavior: "smooth" });
   };
 
