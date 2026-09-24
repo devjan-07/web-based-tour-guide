@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { ArrowRight, Search, Sparkles, Star } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import { Navbar } from "../components/Navbar";
@@ -125,11 +125,11 @@ export default function LandingPage() {
   );
 }
 
-function SectionHeading({ eyebrow, title, description, action }: { eyebrow: string; title: string; description: string; action?: React.ReactNode }) {
+function SectionHeading({ eyebrow, title, description, action }: { eyebrow: string; title: string; description: string; action?: ReactNode }) {
   return <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.2em] text-rose-500">{eyebrow}</p><h2 className="mt-2 text-2xl font-extrabold tracking-tight text-gray-900 md:text-3xl">{title}</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-gray-500">{description}</p></div>{action}</div>;
 }
 
-function DiscoveryGroup({ title, actionLabel, onAction, children }: { title: string; actionLabel?: string; onAction?: () => void; children: React.ReactNode }) {
+function DiscoveryGroup({ title, actionLabel, onAction, children }: { title: string; actionLabel?: string; onAction?: () => void; children: ReactNode }) {
   return <section><div className="mb-5 flex items-center justify-between gap-3"><h3 className="text-lg font-extrabold text-gray-900">{title}</h3>{actionLabel && onAction && <button type="button" onClick={onAction} className="text-sm font-bold text-gray-600 hover:text-rose-500">{actionLabel}</button>}</div>{children}</section>;
 }
 
