@@ -1,52 +1,5 @@
-import { Globe } from "lucide-react";
+import { Globe, ArrowUpRight } from "lucide-react";
+import { Link } from "react-router";
 import logoImg from "../../imports/c8f8ad87-0b32-4268-ba96-7d4a61b80241.png";
-
-const footerLinks = {
-  Support: ["Help Center", "Safety information", "Cancellation options", "Report a concern"],
-  Destinations: ["Sigiriya", "Ella", "Mirissa", "Kandy", "Galle", "Nuwara Eliya"],
-  "For Guides": ["Become a guide", "Guide resources", "Community forum", "Responsible hosting"],
-};
-
-export function Footer() {
-  return (
-    <footer style={{ borderTop: "1px solid #e5e7eb", background: "#fff" }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-8 mb-10">
-          {Object.entries(footerLinks).map(([section, links]) => (
-            <div key={section}>
-              <h4 className="text-gray-900 mb-4" style={{ fontWeight: 700, fontSize: "0.875rem" }}>{section}</h4>
-              <ul className="space-y-2">
-                {links.map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-sm text-gray-500 hover:text-gray-800 hover:underline transition-colors">
-                      {link}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-8" style={{ borderTop: "1px solid #e5e7eb" }}>
-          <div className="flex items-center gap-3">
-            <img src={logoImg} alt="Voyara" className="h-10 w-auto object-contain" />
-            <span className="text-sm text-gray-400">© 2026 All rights reserved.</span>
-          </div>
-
-          <div className="flex items-center gap-5">
-            {["Privacy", "Terms", "Sitemap", "Cookie settings"].map((item) => (
-              <a key={item} href="#" className="text-sm text-gray-500 hover:text-gray-800 hover:underline transition-colors">
-                {item}
-              </a>
-            ))}
-            <button className="flex items-center gap-1.5 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
-              <Globe className="w-4 h-4" />
-              EN
-            </button>
-          </div>
-        </div>
-      </div>
-    </footer>
-  );
-}
+const footerLinks={Explore:["/explore","Explore Sri Lanka"],Guidance:["/help","Help Center"]};
+export function Footer(){return <footer className="bg-[#0b211c] text-white"><div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 md:py-20"><div className="grid gap-12 md:grid-cols-[1.5fr_1fr_1fr]"><div><img src={logoImg} alt="Voyara" className="h-10 w-auto brightness-0 invert"/><p className="mt-5 max-w-md text-sm leading-7 text-white/50">A connected way to discover Sri Lanka, shape a journey and keep your travel plans together.</p><Link to="/explore" className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#d9b77a] px-5 py-3 text-sm font-bold text-[#17201d] transition hover:bg-[#e6ca96]">Start exploring <ArrowUpRight className="h-4 w-4"/></Link></div>{Object.entries(footerLinks).map(([title,[href,label]])=><div key={title}><p className="text-xs font-bold uppercase tracking-[.22em] text-[#d9b77a]">{title}</p><Link to={href} className="mt-5 inline-flex items-center gap-2 text-sm text-white/65 transition hover:text-white">{label}<ArrowUpRight className="h-3.5 w-3.5"/></Link></div>)}</div><div className="mt-16 flex flex-col gap-4 border-t border-white/10 pt-6 text-xs text-white/35 md:flex-row md:items-center md:justify-between"><span>© 2026 Voyara</span><span className="flex items-center gap-2"><Globe className="h-3.5 w-3.5"/> Sri Lanka · English</span></div></div></footer>}
