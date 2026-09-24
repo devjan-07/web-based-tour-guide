@@ -420,59 +420,6 @@ export default function LandingPage() {
         )}
       </section>
 
-      <section className="py-16" style={{ background: "#f9fafb" }}>
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-end justify-between mb-8">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="w-6 h-0.5 rounded-full" style={{ background: "#ea580c" }} />
-                <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#ea580c" }}>Transport</p>
-              </div>
-              <h2 style={{ fontWeight: 800, fontSize: "1.9rem" }}>Available Vehicles</h2>
-            </div>
-            {isFiltered && filteredVehicles.length === 0 && (
-              <span className="text-sm text-gray-400">No vehicles match this filter</span>
-            )}
-          </div>
-          {displayedVehicles.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {displayedVehicles.map((item) => (
-                <article key={item.id} className="rounded-2xl overflow-hidden bg-white border border-gray-200 shadow-sm hover:shadow-xl transition-all">
-                  <div className="relative h-44">
-                    <img src={item.image} alt={item.name} className="h-full w-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1549924231-f129b911e442?auto=format&fit=crop&w=900&q=80"; }} />
-                    <span className="absolute left-3 top-3 rounded-full bg-white/95 px-2.5 py-1 text-xs font-bold text-gray-800">{item.type}</span>
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-bold text-gray-900 truncate">{item.name}</h3>
-                    <p className="mt-1 text-xs text-gray-500">{[item.brand, item.model, item.location].filter(Boolean).join(" · ")}</p>
-                    <div className="mt-3 flex items-center justify-between gap-3">
-                      <span className="font-extrabold text-gray-900">{formatLkr(item.pricePerDay)} <span className="text-xs font-medium text-gray-400">/day</span></span>
-                      <span className="inline-flex items-center gap-1 text-sm font-semibold text-gray-700"><Users className="h-3.5 w-3.5" />{item.capacity}</span>
-                    </div>
-                    <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-gray-500">
-                      <span className="inline-flex items-center gap-1"><Fuel className="h-3.5 w-3.5" />{item.fuel}</span>
-                      <span>{item.transmission}</span>
-                    </div>
-                    <p className="mt-3 text-xs text-gray-400 truncate">{(item.features || []).slice(0, 3).join(" · ")}</p>
-                    <Link
-                      to={bookingLink(`/tourist/vehicles/${item.id}/book`)}
-                      className="mt-4 inline-flex w-full items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold text-white"
-                      style={{ background: "#FF385C" }}
-                    >
-                      Book vehicle
-                    </Link>
-                  </div>
-                </article>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-10">
-              <p className="text-gray-400 text-sm">No vehicles found.</p>
-            </div>
-          )}
-        </div>
-      </section>
-
       <section className="py-16 px-4 max-w-7xl mx-auto">
         <div className="flex items-end justify-between mb-8">
           <div>
