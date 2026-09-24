@@ -117,6 +117,11 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 | 2026-09-24 | `3c6ec0551056b8ecea3f1c90d9212b47249395e3` | Refine homepage travel discovery language | Implemented; browser verification pending |
 | 2026-09-24 | `92f69bd46b20c5398c23f1c90dd5e72bfffd285c` | Make package comparison publicly accessible | Implemented; browser verification pending |
 | 2026-09-24 | `d8253e076ba069407dda07e5cdd6fa4371b6b6be` | Update public package comparison link | Implemented; browser verification pending |
+| 2026-09-24 | `d3f692499733cd3e5952860703d51e1c382bb399` | Redesign homepage around a focused traveller discovery journey | Implemented; browser verification pending |
+| 2026-09-24 | `1e01a60d3bfe7a2423ff21d02b2196043ebc0535` | Use explicit React node typing in redesigned landing page | Implemented; browser verification pending |
+| 2026-09-24 | `4189d9dbf28ff3c4cfda1d00ac12958d5a6d1fbc` | Complete responsive tourism navigation and mobile menu | Implemented; browser verification pending |
+| 2026-09-24 | `4fcc7359047bef9fd42cb404d8357a1507ef227f` | Restrict package customization CTA to package details | Implemented; browser verification pending |
+| 2026-09-24 | `f3b5d9a1` | Align hero search scrolling with the homepage discovery section | Implemented; browser verification pending |
 
 | Date | Commit | Improvement | Status |
 |---|---|---|---|
@@ -193,6 +198,9 @@ Run after the enhancement batch is complete:
 - [x] Plan My Trip package, guide, accommodation and vehicle matches are consistent with the existing recommendation APIs.
 - [x] Cross-module flows are checked after all enhancements are integrated.
 - [ ] Frontend production build completes successfully.\n- [ ] Public Explore page browser verification completes.\n- [ ] Public guide discovery browser verification completes.\n- [ ] Public package comparison browser verification completes.
+- [ ] Homepage search/category interactions scroll to the redesigned discovery results.
+- [ ] Homepage no longer presents unsupported static review, guarantee, certification or support claims.
+- [ ] Mobile navigation exposes Explore, Local Guides, Plan a Trip and Compare packages.
 - [ ] Package detail page opens “Customize this package” for active packages.
 - [ ] Package customization loads the selected package and its existing destinations/duration/price.
 - [ ] Changing guests, dates, language, luggage or driver requirement refreshes guide/accommodation/vehicle recommendations.
