@@ -559,8 +559,8 @@ function CinematicJourney({ children }: { children: ReactNode }) {
     <div ref={journeyRef} className="relative bg-slate-950">
       <div className="pointer-events-none sticky top-0 z-0 h-screen overflow-hidden">
         <motion.img
-          src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Sigiriya%20L%C3%B6wenfelsen%20Sri%20Lanka%20%2829959786832%29.jpg"
-          alt="Aerial view of Sigiriya Rock Fortress surrounded by Sri Lankan forest"
+          src="https://unsplash.com/photos/rFDfjk_pfLw/download?force=true&w=2400"
+          alt="Sigiriya Rock rising above the Sri Lankan forest"
           className="absolute inset-0 h-full w-full object-cover will-change-transform"
           style={{ scale: imageScale, y: imageY, transformOrigin: "center center" }}
         />
@@ -572,7 +572,7 @@ function CinematicJourney({ children }: { children: ReactNode }) {
       </div>
 
       <div className="pointer-events-none absolute bottom-2 right-5 z-30 text-[7px] text-white/35 sm:right-8 lg:right-16">
-        Photo: dronepicr / Wikimedia Commons · CC BY 2.0
+        Photo: Sander Traa / Unsplash
       </div>
     </div>
   );
