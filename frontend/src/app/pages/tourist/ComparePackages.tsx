@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
-import { ArrowLeft, Check, Clock, Users, Star, MapPin, X } from "lucide-react";
+import { ArrowLeft, Check, Clock, Star } from "lucide-react";
 import { Navbar } from "../../components/Navbar";
 import { Footer } from "../../components/Footer";
 import { packagesApi, type TourPackage } from "../../lib/api";
