@@ -44,9 +44,6 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 - [ ] Destination discovery/recommendations
 - [ ] Nearby experiences
 - [ ] Add destination/activity to trip
-- [ ] Destination discovery/recommendations
-- [ ] Nearby experiences
-- [ ] Add destination/activity to trip
 
 ### 2. Tour Package Management
 - [ ] Preserve existing CRUD
@@ -70,24 +67,24 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 - [x] Guide suitability score
 
 ### 5. Vehicle Management
-- [ ] Preserve existing CRUD
-- [ ] Smart vehicle recommendation
-- [ ] Passenger/luggage suitability
-- [ ] Availability-aware selection
-- [ ] Driver requirement matching
+- [x] Preserve existing CRUD
+- [x] Smart vehicle recommendation
+- [x] Passenger/luggage suitability
+- [x] Availability-aware selection
+- [x] Driver requirement matching
 
 ### 6. Accommodation Management
-- [ ] Preserve existing CRUD
-- [ ] Accommodation matching
-- [ ] Budget-aware recommendations
-- [ ] Preference-based filtering
-- [ ] Location/trip suitability
+- [x] Preserve existing CRUD
+- [x] Accommodation matching
+- [x] Budget-aware recommendations
+- [x] Preference-based filtering
+- [x] Location/trip suitability
 
 ### 7. Cross-Module Travel Experience
 - [ ] Add-to-trip workflow
 - [ ] Itinerary planning
-- [ ] Connect destination, package, guide, vehicle and accommodation
-- [ ] Plan My Trip experience
+- [x] Connect destination, package, guide, vehicle and accommodation
+- [x] Plan My Trip experience
 
 ## Commit Log
 
@@ -115,6 +112,10 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 | 2026-09-24 | `edac6b7f409f47de08f89f3549263a67a74d1be6` | Vehicle/accommodation frontend recommendation APIs | Implemented; final verification pending |
 | 2026-09-24 | `b130ef377f4e8aba16d7972175232d5065b7a0b7` | Smart matching integrated into booking flow | Implemented; final verification pending |
 | 2026-09-24 | `2fdd50b56d6041269da102078e918b8ffc56ed16` | Driver-service feature matching refinement | Implemented; final verification pending |
+| 2026-09-24 | `217b468f361541034699363e05f788c71aa8f64c` | Cross-module Plan My Trip page | Implemented; final verification pending |
+| 2026-09-24 | `c111822c301096e808c12e5aecd34ad753edd497` | Trip planner component typing fix | Implemented; final verification pending |
+| 2026-09-24 | `6f56d26ad5265dd1e89eb9a3843289e0648e106e` | Expose Plan My Trip tourist route | Implemented; final verification pending |
+| 2026-09-24 | `3664e340e25e3d4c2164761649f1ee8e0b113112` | Add Plan My Trip landing-page entry point | Implemented; final verification pending |
 
 ## Final Verification Checklist
 
@@ -137,6 +138,9 @@ Run after the enhancement batch is complete:
 - [ ] Destinations without matching categories show the fallback “Flexible travel” signal.
 - [ ] Existing booking/login navigation remains functional.
 - [ ] Package detail pages and package routes remain functional.
+- [ ] Plan My Trip loads destination/package data and builds cross-module matches.
+- [ ] Plan My Trip carries the selected destination into the booking flow.
+- [ ] Plan My Trip package, guide, accommodation and vehicle matches are consistent with the existing recommendation APIs.
 - [ ] Cross-module flows are checked after all enhancements are integrated.
 - [ ] Frontend production build completes successfully.
 - [ ] Backend tests/build complete successfully.
