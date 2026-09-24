@@ -4,7 +4,7 @@ import { ArrowLeft, CalendarDays, CheckCircle, Clock, CreditCard, HelpCircle, Ma
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
-import { destinationsApi, packagesApi, type Destination, type TourPackage, type Route } from "../lib/api";
+import { destinationsApi, guidesApi, packagesApi, type Destination, type GuideRecommendation, type TourPackage, type Route } from "../lib/api";
 
 type DetailMode = "destination" | "package";
 
@@ -29,6 +29,7 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
   const [error, setError] = useState("");
   const [packageRoutes, setPackageRoutes] = useState<Route[]>([]);
   const [routesLoading, setRoutesLoading] = useState(false);
+  const [guideRecommendations, setGuideRecommendations] = useState<GuideRecommendation[]>([]);
   const isTourist = isAuthenticated && user?.roles.includes("TOURIST");
 
   useEffect(() => {
@@ -43,6 +44,7 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
     setLoading(true);
     setError("");
     setPackageRoutes([]);
+    setGuideRecommendations([]);
 
     const request = mode === "destination"
       ? destinationsApi.get(numericId).then((data) => ({ mode: "destination" as const, data }))
@@ -50,6 +52,13 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
 
     request
       .then((data) => {
+        if (data.mode === "destination") {
+          const destination = data.data;
+          guidesApi.recommendations({
+            location: destination.country,
+            specialty: destination.categories?.[0],
+          }).then((guides) => { if (!cancelled) setGuideRecommendations(guides); }).catch(() => { if (!cancelled) setGuideRecommendations([]); });
+        }
         if (data.mode === "package") {
           setRoutesLoading(true);
           packagesApi.routes(data.data.id)
@@ -154,6 +163,35 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
                           ))}
                         </div>
                       </div>
+                    </div>
+                  </div>
+                )}
+
+                {item?.mode === "destination" && guideRecommendations.length > 0 && (
+                  <div className="mt-8 rounded-2xl border border-gray-200 bg-gray-50 p-5">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <h2 className="text-xl font-bold text-gray-900">Guides that may suit this trip</h2>
+                        <p className="mt-1 text-sm text-gray-500">Availability-aware matches based on this destination and its categories.</p>
+                      </div>
+                    </div>
+                    <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      {guideRecommendations.slice(0, 4).map(({ guide, suitabilityScore, reasons }) => (
+                        <div key={guide.id} className="rounded-xl bg-white p-4">
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="font-semibold text-gray-900">{guide.name}</p>
+                              <p className="mt-1 text-xs text-gray-500">{guide.location}{guide.country ? `, ${guide.country}` : ""}</p>
+                            </div>
+                            <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">{suitabilityScore}% fit</span>
+                          </div>
+                          <div className="mt-3 flex flex-wrap gap-1.5">
+                            {reasons.slice(0, 3).map((reason) => (
+                              <span key={reason} className="rounded-full bg-gray-100 px-2 py-1 text-[11px] font-semibold text-gray-600">{reason}</span>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
