@@ -9,6 +9,7 @@ import com.voyara.tourguide.users.AppUserRepository;
 import com.voyara.tourguide.users.Role;
 import com.voyara.tourguide.users.RoleRepository;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -45,6 +46,55 @@ public class TourGuideService {
         List<TourGuide> guides = repository.findAll();
         guides.forEach(this::initializeCollections);
         return guides;
+    }
+
+    @Transactional(readOnly = true)
+    public List<GuideRecommendation> recommend(String language, String specialty, String location) {
+        String requestedLanguage = language == null ? "" : language.trim().toLowerCase(Locale.ROOT);
+        String requestedSpecialty = specialty == null ? "" : specialty.trim().toLowerCase(Locale.ROOT);
+        String requestedLocation = location == null ? "" : location.trim().toLowerCase(Locale.ROOT);
+
+        return repository.findAll().stream()
+                .filter(guide -> "Available".equalsIgnoreCase(guide.getStatus()))
+                .map(guide -> {
+                    int score = 40;
+                    List<String> reasons = new ArrayList<>();
+
+                    if (!requestedLanguage.isBlank() && containsIgnoreCase(guide.getLanguages(), requestedLanguage)) {
+                        score += 25;
+                        reasons.add("Language match");
+                    }
+                    if (!requestedSpecialty.isBlank() && containsIgnoreCase(guide.getSpecialties(), requestedSpecialty)) {
+                        score += 25;
+                        reasons.add("Interest match");
+                    }
+                    if (!requestedLocation.isBlank()
+                            && ((guide.getLocation() != null && guide.getLocation().toLowerCase(Locale.ROOT).contains(requestedLocation))
+                            || (guide.getCountry() != null && guide.getCountry().toLowerCase(Locale.ROOT).contains(requestedLocation)))) {
+                        score += 10;
+                        reasons.add("Location match");
+                    }
+                    if (guide.getRating() >= 4.5) {
+                        score += 5;
+                        reasons.add("Highly rated");
+                    }
+                    if (guide.getExperience() >= 5) {
+                        score += 5;
+                        reasons.add("Experienced guide");
+                    }
+
+                    if (reasons.isEmpty()) reasons.add("Available for your trip");
+                    return new GuideRecommendation(guide, Math.min(score, 100), reasons);
+                })
+                .sorted(Comparator.comparingInt(GuideRecommendation::suitabilityScore).reversed()
+                        .thenComparing(g -> g.guide().getRating(), Comparator.reverseOrder()))
+                .limit(5)
+                .toList();
+    }
+
+    private boolean containsIgnoreCase(List<String> values, String requested) {
+        return values != null && values.stream()
+                .anyMatch(value -> value != null && value.toLowerCase(Locale.ROOT).contains(requested));
     }
 
     @Transactional(readOnly = true)
