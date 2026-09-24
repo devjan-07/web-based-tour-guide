@@ -18,7 +18,7 @@ import { NotificationBell } from "./NotificationBell";
 import logoImg from "../../imports/c8f8ad87-0b32-4268-ba96-7d4a61b80241.png";
 
 const navItems = [
-  { label: "Explore", href: "#top" },
+  { label: "Explore", href: "/explore" },
   { label: "Journeys", href: "#listings-section" },
   { label: "Stays", href: "#stays-section" },
   { label: "Transport", href: "#transport-section" },
@@ -64,6 +64,11 @@ export function Navbar() {
   };
 
   const goToAnchor = (href: string) => {
+    if (href.startsWith("/")) {
+      navigate(href);
+      return;
+    }
+
     if (href === "#top") {
       if (isHome) window.scrollTo({ top: 0, behavior: "smooth" });
       else navigate("/");
@@ -117,7 +122,7 @@ export function Navbar() {
 
           <div className="flex items-center gap-1.5 sm:gap-2">
             <Link
-              to={isTourist ? "/tourist/dashboard" : "/login"}
+              to={isTourist ? "/tourist/dashboard" : "/explore"}
               className={`hidden sm:inline-flex items-center gap-2 rounded-full px-4 lg:px-5 py-2.5 text-[13px] font-semibold transition-all duration-300 hover:-translate-y-0.5 ${overHero
                 ? "bg-white text-slate-900 hover:bg-white/90 shadow-lg"
                 : "bg-emerald-800 text-white hover:bg-emerald-700 shadow-md"
