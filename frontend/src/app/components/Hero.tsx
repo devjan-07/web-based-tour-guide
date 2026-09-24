@@ -106,7 +106,7 @@ export function Hero({ onSearch, onClear, hasActiveFilter = false, onCategoryCha
           <div className={`mt-8 max-w-4xl transition-all duration-[1200ms] delay-300 ${visible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}>
             <div className="rounded-[26px] border border-white/35 bg-white/95 p-2 shadow-[0_24px_80px_rgba(0,0,0,0.30)] backdrop-blur-xl sm:rounded-full">
               <div className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-800">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef2ed] text-[#12372f]">
                   <Search className="h-5 w-5" />
                 </span>
                 <input
@@ -130,7 +130,7 @@ export function Hero({ onSearch, onClear, hasActiveFilter = false, onCategoryCha
                 <button
                   type="button"
                   onClick={handleSearch}
-                  className="group shrink-0 rounded-full bg-emerald-800 px-5 py-3 text-sm font-bold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-700 hover:shadow-xl active:translate-y-0"
+                  className="group shrink-0 rounded-full bg-[#12372f] px-5 py-3 text-sm font-bold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#19483d] hover:shadow-xl active:translate-y-0"
                 >
                   <span className="hidden sm:inline">Explore</span>
                   <ArrowUpRight className="h-4 w-4 sm:hidden" />
@@ -171,7 +171,7 @@ export function Hero({ onSearch, onClear, hasActiveFilter = false, onCategoryCha
         </div>
 
         <div className="absolute bottom-8 left-5 hidden items-center gap-2 sm:flex lg:left-16" style={{ opacity: scrollFade }}>
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_14px_rgba(110,231,183,0.8)]" />
+          <span className="h-1.5 w-1.5 rounded-full bg-[#d9b77a] shadow-[0_0_14px_rgba(110,231,183,0.8)]" />
           <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/55">Curated in Sri Lanka</span>
         </div>
       </div>
