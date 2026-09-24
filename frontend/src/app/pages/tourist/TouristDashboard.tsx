@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "motion/react";
 import { Link } from "react-router";
-import { ArrowRight, BedDouble, CalendarCheck, Car, Clock, CreditCard, MapPin, Package, Plane, Search, UserRoundCheck, XCircle, Compass, WalletCards } from "lucide-react";
+import { ArrowRight, BedDouble, CalendarCheck, Car, Clock, CreditCard, MapPin, Package, Plane, Search, UserRoundCheck, XCircle, Compass } from "lucide-react";
 import { Navbar } from "../../components/Navbar";
 import { Footer } from "../../components/Footer";
 import { useAuth } from "../../context/AuthContext";
