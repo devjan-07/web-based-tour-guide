@@ -591,6 +591,7 @@ export default function TouristBookingCreate() {
                   <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={4} className="w-full bg-transparent text-sm text-gray-700 outline-none resize-none" placeholder="Pickup location, dietary needs, preferred guide language, or anything staff should know..." />
                 </div>
               )}
+            </section>
 
             <aside className="bg-white rounded-3xl border border-gray-200 p-6 h-fit">
               <h2 className="font-bold text-gray-900 mb-5">Booking summary</h2>
