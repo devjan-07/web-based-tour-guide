@@ -44,6 +44,14 @@ public class TouristBookingController {
         return bookingService.findTouristBooking(currentEmail(principal), id);
     }
 
+    @GetMapping("/{id}/readiness")
+    public TripReadiness readiness(@PathVariable String id, Principal principal) {
+        if (!securityEnabled && !hasPrincipal(principal)) {
+            return bookingService.getTripReadiness("anonymous", id);
+        }
+        return bookingService.getTripReadiness(currentEmail(principal), id);
+    }
+
     @PostMapping
     public Booking create(@Valid @RequestBody TouristBookingRequest request, Principal principal) {
         if (!securityEnabled && !hasPrincipal(principal)) {
