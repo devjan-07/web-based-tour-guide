@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
-import { ArrowLeft, CalendarDays, CheckCircle, Clock, CreditCard, HelpCircle, MapPin, ShieldCheck, Tag, Users, Star, Sparkles } from "lucide-react";
+import { ArrowLeft, CalendarDays, CheckCircle, Clock, CreditCard, HelpCircle, MapPin, ShieldCheck, Tag, Users, Star, Sparkles, SlidersHorizontal } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
@@ -151,6 +151,23 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
                             <span key={signal} className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm">
                               {signal}
                             </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {item?.mode === "package" && (
+                  <div className="mb-8 rounded-2xl border border-blue-100 bg-blue-50/60 p-5">
+                    <div className="flex items-start gap-3">
+                      <SlidersHorizontal className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
+                      <div>
+                        <h2 className="text-lg font-bold text-gray-900">Package fit</h2>
+                        <p className="mt-1 text-sm text-gray-600">A quick guide to who this package may suit, using its existing package information.</p>
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          {getPackageSignals(item.data).map((signal) => (
+                            <span key={signal} className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm">{signal}</span>
                           ))}
                         </div>
                       </div>
@@ -314,6 +331,23 @@ function toDetail(item: DetailItem) {
       { icon: CalendarDays, label: "Difficulty", value: data.difficulty || "Easy" },
     ],
   };
+}
+
+function getPackageSignals(pkg: TourPackage) {
+  const signals: string[] = [];
+  const category = (pkg.category || "").toLowerCase();
+  const difficulty = (pkg.difficulty || "").toLowerCase();
+
+  if (category.includes("family")) signals.push("Family-friendly");
+  if (category.includes("adventure") || difficulty === "challenging") signals.push("Adventure seekers");
+  if (category.includes("culture") || category.includes("heritage")) signals.push("Culture & heritage");
+  if (category.includes("nature") || category.includes("wildlife")) signals.push("Nature lovers");
+  if (difficulty === "easy") signals.push("Relaxed pace");
+  if (Number(pkg.maxGroup) >= 6) signals.push("Suitable for groups");
+  else if (Number(pkg.maxGroup) > 0 && Number(pkg.maxGroup) <= 2) signals.push("Small-group experience");
+
+  if (signals.length === 0) signals.push("Flexible travel");
+  return Array.from(new Set(signals)).slice(0, 4);
 }
 
 function getTravelSignals(destination: Destination) {
