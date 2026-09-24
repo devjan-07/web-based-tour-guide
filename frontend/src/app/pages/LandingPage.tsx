@@ -556,13 +556,13 @@ function CinematicJourney({ children }: { children: ReactNode }) {
   const imageY = useTransform(scrollYProgress, [0, 1], ["0%", "-5%"]);
 
   return (
-    <div ref={journeyRef} className="relative overflow-hidden bg-slate-950">
+    <div ref={journeyRef} className="relative bg-slate-950">
       <div className="pointer-events-none sticky top-0 z-0 h-screen overflow-hidden">
         <motion.img
           src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Sigiriya%20L%C3%B6wenfelsen%20Sri%20Lanka%20%2829959786832%29.jpg"
           alt="Aerial view of Sigiriya Rock Fortress surrounded by Sri Lankan forest"
           className="absolute inset-0 h-full w-full object-cover will-change-transform"
-          style={{ scale: imageScale, y: imageY }}
+          style={{ scale: imageScale, y: imageY, transformOrigin: "center center" }}
         />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_55%_40%,rgba(255,255,255,0.12),transparent_34%)]" />
       </div>
