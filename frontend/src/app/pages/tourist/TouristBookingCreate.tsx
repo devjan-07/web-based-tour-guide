@@ -313,14 +313,14 @@ export default function TouristBookingCreate() {
           <div className="mb-5 overflow-x-auto"><div className="mx-auto flex min-w-[620px] max-w-4xl items-center justify-between rounded-3xl border border-slate-200 bg-white p-3 shadow-sm">
             {steps.map((step, index) => <div key={step.number} className="flex flex-1 items-center">
               <button type="button" onClick={() => step.number <= currentStep && setCurrentStep(step.number)} className="flex items-center gap-3 text-left">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold" style={{ background: step.number <= currentStep ? "#0f172a" : "#f1f5f9", color: step.number <= currentStep ? "white" : "#94a3b8" }}>{step.number}</span>
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold" style={{ background: step.number <= currentStep ? "#12372f" : "#f1f5f9", color: step.number <= currentStep ? "white" : "#94a3b8" }}>{step.number}</span>
                 <span><span className="block text-sm font-bold text-slate-900">{step.label}</span><span className="block text-[11px] text-slate-400">{step.caption}</span></span>
               </button>{index < steps.length - 1 && <span className="mx-3 h-px flex-1 bg-slate-200" />}
             </div>)}
           </div></div>
 
           <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-            <section className="lg:col-span-2 bg-white rounded-3xl border border-gray-200 p-6">
+            <section className="lg:col-span-2 bg-white rounded-[2rem] border border-[#12372f]/10 p-6 shadow-[0_18px_50px_rgba(18,55,47,.06)]">
               <h2 className="font-bold text-gray-900 mb-5">Travel details</h2>
 
               {error && (
@@ -412,7 +412,7 @@ export default function TouristBookingCreate() {
                           key={guide.id}
                           onClick={() => setSelectedGuideId(guide.id)}
                           className="group overflow-hidden rounded-[1.25rem] border text-left transition-all hover:-translate-y-0.5 hover:shadow-lg"
-                          style={{ borderColor: selected ? "#0f172a" : "#e5e7eb", background: selected ? "#f8fafc" : "#fff" }}
+                          style={{ borderColor: selected ? "#12372f" : "#e5e7eb", background: selected ? "#f3f7f4" : "#fff" }}
                         >
                           <div className="h-32 overflow-hidden bg-slate-100">
                             {guide.profilePhoto ? (
@@ -461,7 +461,7 @@ export default function TouristBookingCreate() {
                           key={accommodation.id}
                           onClick={() => setSelectedAccommodationId(accommodation.id)}
                           className="group overflow-hidden rounded-[1.25rem] border text-left transition-all hover:-translate-y-0.5 hover:shadow-lg"
-                          style={{ borderColor: selected ? "#0f172a" : "#e5e7eb", background: selected ? "#f8fafc" : "#fff" }}
+                          style={{ borderColor: selected ? "#12372f" : "#e5e7eb", background: selected ? "#f3f7f4" : "#fff" }}
                         >
                           <div className="h-32 overflow-hidden bg-slate-100">
                             {accommodation.image ? (
@@ -534,7 +534,7 @@ export default function TouristBookingCreate() {
                             key={vehicle.id}
                             onClick={() => setSelectedVehicleId(vehicle.id)}
                             className="group overflow-hidden rounded-[1.25rem] border text-left transition-all hover:-translate-y-0.5 hover:shadow-lg"
-                            style={{ borderColor: selected ? "#0f172a" : "#e5e7eb", background: selected ? "#f8fafc" : "#fff" }}
+                            style={{ borderColor: selected ? "#12372f" : "#e5e7eb", background: selected ? "#f3f7f4" : "#fff" }}
                           >
                             <div className="h-32 overflow-hidden bg-slate-100">
                               {vehicle.image ? (
@@ -593,7 +593,7 @@ export default function TouristBookingCreate() {
               )}
             </section>
 
-            <aside className="bg-white rounded-3xl border border-gray-200 p-6 h-fit">
+            <aside className="sticky top-24 h-fit rounded-[2rem] border border-[#12372f]/10 bg-[#12372f] p-6 text-white shadow-[0_24px_60px_rgba(18,55,47,.18)]">
               <h2 className="font-bold text-gray-900 mb-5">Booking summary</h2>
               <div className="space-y-3 text-sm">
                 <SummaryRow label="Tourist" value={user?.fullName || "Current user"} />
@@ -612,7 +612,7 @@ export default function TouristBookingCreate() {
                 <SummaryRow label="Payment" value="Pending" />
               </div>
 
-              <div className="mt-5 rounded-2xl bg-rose-50 p-4 text-sm text-rose-700">
+              <div className="mt-5 rounded-2xl bg-[#eef2ed] p-4 text-sm text-[#12372f]">
                 <div className="flex items-start gap-2">
                   <CheckCircle className="w-4 h-4 shrink-0 mt-0.5" />
                   <p>Your booking will be saved in the database and visible in My Bookings immediately.</p>
