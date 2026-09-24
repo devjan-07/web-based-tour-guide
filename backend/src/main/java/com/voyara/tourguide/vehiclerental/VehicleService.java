@@ -56,8 +56,17 @@ public class VehicleService {
                     }
 
                     if (needsDriver) {
-                        score += 10;
-                        reasons.add("Driver can be requested");
+                        boolean driverFeature = vehicle.getFeatures() != null && vehicle.getFeatures().stream()
+                                .anyMatch(feature -> feature != null && (
+                                        feature.toLowerCase(Locale.ROOT).contains("driver")
+                                                || feature.toLowerCase(Locale.ROOT).contains("chauffeur")));
+                        if (driverFeature) {
+                            score += 15;
+                            reasons.add("Driver/chauffeur service listed");
+                        } else {
+                            score -= 5;
+                            reasons.add("Driver service not listed");
+                        }
                     }
 
                     if (location != null && !location.isBlank()
