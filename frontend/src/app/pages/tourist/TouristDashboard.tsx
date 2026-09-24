@@ -160,7 +160,7 @@ export default function TouristDashboard() {
   };
 
   const cards = [
-    { label: "Total Bookings", value: bookings.length, detail: `${summary.upcoming.length} upcoming`, icon: CalendarCheck, color: "#FF385C", bg: "#fff0f3" },
+    { label: "Total Bookings", value: bookings.length, detail: `${summary.upcoming.length} upcoming`, icon: CalendarCheck, color: "#12372f", bg: "#e8eee9" },
     { label: "Pending", value: summary.pending.length, detail: "ready for payment", icon: Clock, color: "#d97706", bg: "#fffbeb" },
     { label: "Completed", value: summary.completed.length, detail: "finished trips", icon: UserRoundCheck, color: "#0284c7", bg: "#f0f9ff" },
     { label: "Total Spent", value: `රු${summary.totalSpent.toLocaleString()}`, detail: "confirmed/paid", icon: CreditCard, color: "#16a34a", bg: "#f0fdf4" },
@@ -183,7 +183,7 @@ export default function TouristDashboard() {
           </div>
         </section>
 
-        <section className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <section className="mb-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           {cards.map(({ label, value, detail, icon: Icon, color, bg }, index) => (
             <motion.div key={label} initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .45, delay: index * .06 }} className="rounded-2xl border border-slate-200 bg-white p-5">
               <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: bg }}><Icon className="h-5 w-5" style={{ color }} /></div>
@@ -198,7 +198,7 @@ export default function TouristDashboard() {
               <p className="text-xs font-bold uppercase tracking-[.22em] text-emerald-700">Your travel plans</p><h2 className="mt-2 text-3xl font-semibold tracking-[-.03em] text-slate-950">Trips & bookings</h2>
               <p className="mt-1 text-sm text-slate-500">Keep an eye on upcoming journeys, payments and completed adventures.</p>
             </div>
-            <Link to="/" className="inline-flex items-center gap-2 text-sm font-semibold" style={{ color: "#FF385C" }}>
+            <Link to="/" className="inline-flex items-center gap-2 text-sm font-semibold" style={{ color: "#12372f" }}>
               <Search className="w-4 h-4" /> Explore tours
             </Link>
           </div>
@@ -213,7 +213,7 @@ export default function TouristDashboard() {
                   onClick={() => setActiveTab(tab)}
                   className="px-3 py-1.5 rounded-full text-xs font-semibold transition-colors"
                   style={{
-                    background: activeTab === tab ? "#FF385C" : "#f3f4f6",
+                    background: activeTab === tab ? "#12372f" : "#f3f4f6",
                     color: activeTab === tab ? "white" : "#4b5563",
                   }}
                 >
@@ -228,7 +228,7 @@ export default function TouristDashboard() {
               <Package className="w-10 h-10 mx-auto mb-3 text-gray-300" />
               <p className="font-semibold text-gray-900">{bookings.length ? `No ${activeTab.toLowerCase()} bookings found.` : "You do not have any bookings yet."}</p>
               <p className="text-sm text-gray-400 mt-1">{bookings.length ? "Try another booking category." : "Plan the first Sri Lanka adventure."}</p>
-              <Link to="/" className="inline-flex mt-4 px-4 py-2 rounded-xl text-white text-sm font-semibold" style={{ background: "#FF385C" }}>
+              <Link to="/" className="inline-flex mt-4 px-4 py-2 rounded-xl text-white text-sm font-semibold" style={{ background: "#12372f" }}>
                 Explore tours
               </Link>
             </div>
@@ -265,7 +265,7 @@ export default function TouristDashboard() {
                         <Link
                           to={`/tourist/bookings/${booking.id}`}
                           className="inline-flex items-center gap-1.5 mt-2 text-xs font-semibold"
-                          style={{ color: "#FF385C" }}
+                          style={{ color: "#12372f" }}
                         >
                           {(booking.status === "Pending" || booking.status === "Confirmed") && booking.payment !== "Paid" ? "Proceed to payment" : "View details"} <ArrowRight className="w-3.5 h-3.5" />
                         </Link>
