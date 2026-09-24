@@ -74,6 +74,7 @@ export default function LandingPage() {
     maxGroup: t.maxGroup,
     badge: t.status === "Active" ? undefined : t.status,
     category: t.category,
+    rating: t.rating || 0,
   }));
 
   const allAccommodations = accommodations
@@ -170,7 +171,7 @@ export default function LandingPage() {
 
   const filteredDestinations = filterDestinations();
   const displayedDestinations = showAll ? filteredDestinations : filteredDestinations.slice(0, 4);
-  const filteredTours = filterTours().slice().sort((a, b) => packageSort === "price" ? a.price - b.price : packageSort === "duration" ? parseInt(a.duration) - parseInt(b.duration) : b.category.localeCompare(a.category) || 0);
+  const filteredTours = filterTours().slice().sort((a, b) => packageSort === "price" ? a.price - b.price : packageSort === "duration" ? parseInt(a.duration) - parseInt(b.duration) : b.rating - a.rating);
   const filteredAccommodations = filterAccommodations();
   const displayedAccommodations = filteredAccommodations.slice(0, 4);
   const filteredVehicles = filterVehicles();
@@ -321,6 +322,21 @@ export default function LandingPage() {
             <button onClick={clearFilters} className="mt-3 text-sm font-semibold underline" style={{ color: "#FF385C" }}>Clear filters</button>
           </div>
         )}
+      </section>
+
+      <section className="py-12 px-4 max-w-7xl mx-auto">
+        <div className="mb-6">
+          <p className="text-sm font-semibold uppercase tracking-widest text-rose-500">Discover your style</p>
+          <h2 className="mt-2 text-2xl font-extrabold text-gray-900">Find destinations by travel style</h2>
+          <p className="mt-1 text-sm text-gray-500">Explore destinations using the categories already maintained in Voyara.</p>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          {Array.from(new Set(localDestinations.flatMap((item) => item.categories || []))).slice(0, 12).map((category) => (
+            <button key={category} type="button" onClick={() => { handleCategoryChange(category); document.getElementById("listings-section")?.scrollIntoView({ behavior: "smooth" }); }} className="rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:border-rose-300 hover:text-rose-600">
+              {category}
+            </button>
+          ))}
+        </div>
       </section>
 
       <section className="py-16" style={{ background: "#f9fafb" }}>
