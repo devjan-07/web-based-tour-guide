@@ -314,7 +314,8 @@ export default function TouristBookingCreate() {
                 </div>
               )}
 
-              {currentStep === 1 && (\n              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {currentStep === 1 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Field icon={MapPin} label="Destination">
                   <input
                     value={destination}
@@ -377,7 +378,9 @@ export default function TouristBookingCreate() {
                 </Field>
               </div>
 
-              )}\n\n              {currentStep === 2 && (
+              )}
+
+              {currentStep === 2 && (
                 <div className="space-y-8">
                   <OptionSection
                     title="Choose your guide"
@@ -606,7 +609,8 @@ export default function TouristBookingCreate() {
                 <button type="button" onClick={goNext} className="mt-5 w-full rounded-full bg-slate-950 px-4 py-3.5 text-sm font-bold text-white">Continue to {steps[currentStep].label}</button>
               )}
             </aside>
-          {currentStep > 1 && <button type="button" onClick={goBack} className="mt-4 text-sm font-semibold text-slate-500 hover:text-slate-900">← Back to {steps[currentStep - 2].label}</button>}\n          </form>
+          {currentStep > 1 && <button type="button" onClick={goBack} className="mt-4 text-sm font-semibold text-slate-500 hover:text-slate-900">← Back to {steps[currentStep - 2].label}</button>}
+          </form>
         )}
       </main>
       <Footer />
