@@ -136,7 +136,7 @@ export default function MyTrip() {
             <p className="font-extrabold">Ready to turn the plan into a booking?</p>
             <p className="mt-1 text-sm text-white/60">Your saved itinerary is a planning aid. Review availability and dates during the booking process.</p>
           </div>
-          <Link to="/tourist/bookings/new" className="rounded-xl bg-[#FF385C] px-5 py-3 text-sm font-bold text-white">Continue to booking</Link>
+          {items.some((item) => item.type === "package") ? (() => { const packageItem = items.find((item) => item.type === "package")!; return <Link to={`/tourist/packages/${packageItem.id}/customize`} className="rounded-xl bg-[#FF385C] px-5 py-3 text-sm font-bold text-white">Customize package & book</Link>; })() : <Link to="/tourist/bookings/new" className="rounded-xl bg-[#FF385C] px-5 py-3 text-sm font-bold text-white">Continue to booking</Link>}
         </section>
       </main>
       <Footer />
