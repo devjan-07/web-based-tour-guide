@@ -88,10 +88,18 @@ export function Navbar() {
                       )}
                       {isTourist && (
                         <>
-                          <Link to="/" onClick={() => setMenuOpen(false)}
+                          <Link to="/explore" onClick={() => setMenuOpen(false)}
                             className="flex items-center gap-3 px-4 py-3 text-sm font-semibold hover:bg-gray-50 transition-colors"
                             style={{ color: "#FF385C" }}>
-                            <Search className="w-4 h-4" /> Explore trips
+                            <Compass className="w-4 h-4" /> Explore
+                          </Link>
+                          <Link to="/guides" onClick={() => setMenuOpen(false)}
+                            className="flex items-center gap-3 px-4 py-3 text-sm font-semibold hover:bg-gray-50 transition-colors">
+                            <MapPinned className="w-4 h-4 text-gray-500" /> Local Guides
+                          </Link>
+                          <Link to="/tourist/plan" onClick={() => setMenuOpen(false)}
+                            className="flex items-center gap-3 px-4 py-3 text-sm font-semibold hover:bg-gray-50 transition-colors">
+                            <CalendarHeart className="w-4 h-4 text-gray-500" /> Plan a Trip
                           </Link>
                           <Link to="/tourist/dashboard" onClick={() => setMenuOpen(false)}
                             className="flex items-center gap-3 px-4 py-3 text-sm font-semibold hover:bg-gray-50 transition-colors"
