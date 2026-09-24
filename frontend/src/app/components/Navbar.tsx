@@ -19,9 +19,9 @@ import logoImg from "../../imports/c8f8ad87-0b32-4268-ba96-7d4a61b80241.png";
 
 const navItems = [
   { label: "Explore", href: "/explore" },
-  { label: "Journeys", href: "#listings-section" },
+  { label: "Destinations", href: "#listings-section" },
+  { label: "Journeys", href: "#journeys-section" },
   { label: "Stays", href: "#stays-section" },
-  { label: "Transport", href: "#transport-section" },
 ];
 
 export function Navbar() {
@@ -113,7 +113,7 @@ export function Navbar() {
               >
                 <span className="relative z-10">{item.label}</span>
                 <span
-                  className={`absolute inset-x-3 bottom-1 h-px origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100 ${overHero ? "bg-white" : "bg-emerald-700"}`}
+                  className={`absolute inset-x-3 bottom-1 h-px origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100 ${overHero ? "bg-white" : "bg-[#12372f]"}`}
                 />
                 {index === 0 && <span className="absolute -right-0.5 top-2 h-1 w-1 rounded-full bg-emerald-400 opacity-0 group-hover:opacity-100" />}
               </button>
@@ -125,7 +125,7 @@ export function Navbar() {
               to={isTourist ? "/tourist/dashboard" : "/explore"}
               className={`hidden sm:inline-flex items-center gap-2 rounded-full px-4 lg:px-5 py-2.5 text-[13px] font-semibold transition-all duration-300 hover:-translate-y-0.5 ${overHero
                 ? "bg-white text-slate-900 hover:bg-white/90 shadow-lg"
-                : "bg-emerald-800 text-white hover:bg-emerald-700 shadow-md"
+                : "bg-[#12372f] text-white hover:bg-[#19483d] shadow-md"
               }`}
             >
               {isTourist ? "My journey" : "Start exploring"}
@@ -161,7 +161,7 @@ export function Navbar() {
                         <p className="mt-1 text-base font-semibold text-slate-900">{firstName}</p>
                         <p className="mt-0.5 truncate text-xs text-slate-500">{user?.email}</p>
                         <div className="mt-3 flex gap-2">
-                          {isAdmin && <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-700">Admin</span>}
+                          {isAdmin && <span className="rounded-full bg-[#e8eee9] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#12372f]">Admin</span>}
                           {isTourist && <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-700">Traveler</span>}
                         </div>
                       </div>
