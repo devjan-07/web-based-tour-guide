@@ -1,6 +1,5 @@
 import { createBrowserRouter } from "react-router";
 import LandingPage from "./pages/LandingPage";
-import ExplorePage from "./pages/ExplorePage";
 import LoginPage from "./pages/LoginPage";
 import HelpPage from "./pages/HelpPage";
 import ListTourPage from "./pages/ListTourPage";
@@ -30,7 +29,6 @@ import { TransportProviderBookings } from "./pages/dashboard/TransportProviderBo
 
 export const router = createBrowserRouter([
   { path: "/", Component: LandingPage },
-  { path: "/explore", Component: ExplorePage },
   { path: "/login", Component: LoginPage },
   { path: "/help", Component: HelpPage },
   { path: "/list-tour", Component: ListTourPage },

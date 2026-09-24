@@ -69,7 +69,7 @@ export default function HelpPage() {
       <Navbar />
 
       {/* Hero */}
-      <div className="py-20 px-4 text-center" style={{ background: "linear-gradient(135deg, #12372f 0%, #19483d 50%, #C13584 100%)" }}>
+      <div className="py-20 px-4 text-center" style={{ background: "linear-gradient(135deg, #FF385C 0%, #E31C5F 50%, #C13584 100%)" }}>
         <p className="text-white/70 text-sm font-medium uppercase tracking-widest mb-3">We are here to help</p>
         <h1 className="text-white mb-4" style={{ fontWeight: 800, fontSize: "clamp(2rem, 5vw, 3rem)" }}>Help Center</h1>
         <p className="text-white/80 mb-8 max-w-md mx-auto">Find answers to common questions about tours, bookings, and your account.</p>
@@ -98,12 +98,12 @@ export default function HelpPage() {
                   onClick={() => { setActiveCategory(cat.id); setOpenItems(new Set()); }}
                   className="flex flex-col items-center gap-3 p-6 rounded-2xl border-2 transition-all text-center"
                   style={{
-                    borderColor: isActive ? "#12372f" : "#e5e7eb",
+                    borderColor: isActive ? "#FF385C" : "#e5e7eb",
                     background: isActive ? "#fff5f7" : "white",
                   }}
                 >
                   <div className="w-12 h-12 rounded-xl flex items-center justify-center"
-                    style={{ background: isActive ? "#12372f" : "#f3f4f6" }}>
+                    style={{ background: isActive ? "#FF385C" : "#f3f4f6" }}>
                     <Icon className="w-6 h-6" style={{ color: isActive ? "white" : "#6b7280" }} />
                   </div>
                   <p className="font-semibold text-sm text-gray-800">{cat.label}</p>
@@ -156,12 +156,12 @@ export default function HelpPage() {
 
         {/* CTA */}
         <div className="mt-16 rounded-2xl p-8 text-center" style={{ background: "#f9fafb", border: "1px solid #e5e7eb" }}>
-          <HelpCircle className="w-10 h-10 mx-auto mb-4" style={{ color: "#12372f" }} />
+          <HelpCircle className="w-10 h-10 mx-auto mb-4" style={{ color: "#FF385C" }} />
           <h3 className="text-gray-900 font-bold text-lg mb-2">Still need help?</h3>
           <p className="text-gray-500 text-sm mb-6">Our support team is available 24/7 and typically responds within a few hours.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link to="/login" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
-              style={{ background: "linear-gradient(135deg, #12372f, #19483d)" }}>
+              style={{ background: "linear-gradient(135deg, #FF385C, #E31C5F)" }}>
               <MessageSquare className="w-4 h-4" /> Contact Support
             </Link>
             <a href="mailto:support@voyara.com" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-gray-700 border border-gray-200 hover:bg-gray-50 transition-colors">

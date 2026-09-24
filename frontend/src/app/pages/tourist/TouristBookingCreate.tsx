@@ -64,8 +64,6 @@ export default function TouristBookingCreate() {
   const [vehiclesLoading, setVehiclesLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [currentStep, setCurrentStep] = useState(1);
-  const steps = [{ number: 1, label: "Trip", caption: "Dates & travelers" }, { number: 2, label: "People & stay", caption: "Guide & accommodation" }, { number: 3, label: "Transport", caption: "Vehicle & pickup" }, { number: 4, label: "Review", caption: "Confirm request" }];
 
   useEffect(() => {
     if (!packageId) return;
@@ -217,20 +215,6 @@ export default function TouristBookingCreate() {
     [selectedVehicleId, vehicles]
   );
 
-  const goNext = () => {
-    if (currentStep === 1 && (!checkIn || !checkOut || new Date(checkOut) <= new Date(checkIn) || guests < 1)) {
-      setError("Please complete valid trip dates and traveler details before continuing.");
-      return;
-    }
-    setError("");
-    setCurrentStep((step) => Math.min(4, step + 1));
-  };
-
-  const goBack = () => {
-    setError("");
-    setCurrentStep((step) => Math.max(1, step - 1));
-  };
-
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError("");
@@ -287,7 +271,7 @@ export default function TouristBookingCreate() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f5ef]">
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <Link to="/" className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-900 mb-5">
@@ -309,18 +293,8 @@ export default function TouristBookingCreate() {
         {loading ? (
           <div className="bg-white rounded-3xl border border-gray-200 p-8 text-sm text-gray-400">Loading booking details...</div>
         ) : (
-          <>
-          <div className="mb-5 overflow-x-auto"><div className="mx-auto flex min-w-[620px] max-w-4xl items-center justify-between rounded-3xl border border-slate-200 bg-white p-3 shadow-sm">
-            {steps.map((step, index) => <div key={step.number} className="flex flex-1 items-center">
-              <button type="button" onClick={() => step.number <= currentStep && setCurrentStep(step.number)} className="flex items-center gap-3 text-left">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold" style={{ background: step.number <= currentStep ? "#12372f" : "#f1f5f9", color: step.number <= currentStep ? "white" : "#94a3b8" }}>{step.number}</span>
-                <span><span className="block text-sm font-bold text-slate-900">{step.label}</span><span className="block text-[11px] text-slate-400">{step.caption}</span></span>
-              </button>{index < steps.length - 1 && <span className="mx-3 h-px flex-1 bg-slate-200" />}
-            </div>)}
-          </div></div>
-
           <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-            <section className="lg:col-span-2 bg-white rounded-[2rem] border border-[#12372f]/10 p-6 shadow-[0_18px_50px_rgba(18,55,47,.06)]">
+            <section className="lg:col-span-2 bg-white rounded-3xl border border-gray-200 p-6">
               <h2 className="font-bold text-gray-900 mb-5">Travel details</h2>
 
               {error && (
@@ -329,7 +303,6 @@ export default function TouristBookingCreate() {
                 </div>
               )}
 
-              {currentStep === 1 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Field icon={MapPin} label="Destination">
                   <input
@@ -393,207 +366,228 @@ export default function TouristBookingCreate() {
                 </Field>
               </div>
 
-              )}
-
-              {currentStep === 2 && (
-                <div className="space-y-8">
-                  <OptionSection
-                    title="Choose your guide"
-                    description={nearbyGuides.length ? "Local guides available for your destination" : "Guides available for your trip request"}
-                    loading={guidesLoading}
-                    loadingText="Finding guides..."
-                    emptyText="No available guides are listed right now. Staff can assign a guide after reviewing your booking."
-                  >
-                    {nearbyGuides.map((guide) => {
-                      const selected = guide.id === selectedGuideId;
-                      return (
-                        <button
-                          type="button"
-                          key={guide.id}
-                          onClick={() => setSelectedGuideId(guide.id)}
-                          className="group overflow-hidden rounded-[1.25rem] border text-left transition-all hover:-translate-y-0.5 hover:shadow-lg"
-                          style={{ borderColor: selected ? "#12372f" : "#e5e7eb", background: selected ? "#f3f7f4" : "#fff" }}
-                        >
-                          <div className="h-32 overflow-hidden bg-slate-100">
-                            {guide.profilePhoto ? (
-                              <img src={guide.profilePhoto} alt="" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                            ) : (
-                              <div className="flex h-full items-center justify-center text-4xl font-bold text-slate-300">{guide.initials}</div>
-                            )}
-                          </div>
-                          <div className="p-4">
-                            <div className="flex items-start justify-between gap-3">
-                              <div>
-                                <p className="font-bold text-gray-900">{guide.name}</p>
-                                <p className="mt-0.5 text-xs text-gray-400">{guide.location || "Sri Lanka"} · {guide.experience} years experience</p>
-                              </div>
-                              <ChoiceBadge selected={selected} />
-                            </div>
-                            <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-gray-500">
-                              <RatingStars rating={Number(guide.rating || 0)} reviews={Number(guide.reviews || 0)} compact />
-                              <span className="font-semibold text-gray-800">LKR {Number(guide.pricePerDay || 0).toLocaleString()} / day</span>
-                              <span className="inline-flex items-center gap-1.5"><Languages className="h-3.5 w-3.5" /> {guide.languages?.slice(0, 2).join(", ") || "Languages pending"}</span>
-                              <span>{guide.specialties?.slice(0, 2).join(", ") || "General tours"}</span>
-                            </div>
-                            {guide.bio && <p className="mt-2 line-clamp-2 text-xs text-gray-400">{guide.bio}</p>}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </OptionSection>
-
-                  {selectedGuide && (
-                    <ResourceReviews targetType="GUIDE" targetId={selectedGuide.id} title={`${selectedGuide.name} reviews`} />
-                  )}
-
-                  <OptionSection
-                    title="Choose your stay"
-                    description={`Active stays near ${primaryDestinationName(destination) || "this destination"}`}
-                    loading={accommodationsLoading}
-                    loadingText="Finding stays..."
-                    emptyText={`No active accommodations are linked near ${primaryDestinationName(destination) || "this destination"}. Staff can assign a suitable stay after reviewing your booking.`}
-                  >
-                    {nearbyAccommodations.map((accommodation) => {
-                      const selected = accommodation.id === selectedAccommodationId;
-                      return (
-                        <button
-                          type="button"
-                          key={accommodation.id}
-                          onClick={() => setSelectedAccommodationId(accommodation.id)}
-                          className="group overflow-hidden rounded-[1.25rem] border text-left transition-all hover:-translate-y-0.5 hover:shadow-lg"
-                          style={{ borderColor: selected ? "#12372f" : "#e5e7eb", background: selected ? "#f3f7f4" : "#fff" }}
-                        >
-                          <div className="h-32 overflow-hidden bg-slate-100">
-                            {accommodation.image ? (
-                              <img src={accommodation.image} alt="" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                            ) : (
-                              <div className="flex h-full items-center justify-center"><BedDouble className="h-10 w-10 text-slate-300" /></div>
-                            )}
-                          </div>
-                          <div className="p-4">
-                            <div className="flex items-start justify-between gap-3">
-                              <div>
-                                <p className="font-bold text-gray-900">{accommodation.name}</p>
-                                <p className="mt-0.5 text-xs text-gray-400">{accommodation.type} · {accommodation.location || "Sri Lanka"}</p>
-                              </div>
-                              <ChoiceBadge selected={selected} />
-                            </div>
-                            <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-gray-500">
-                              <RatingStars rating={Number(accommodation.rating || 0)} reviews={Number(accommodation.reviews || 0)} compact />
-                              <span className="font-semibold text-gray-800">LKR {Number(accommodation.price || 0).toLocaleString()} / night</span>
-                              <span>{accommodation.rooms} rooms</span>
-                              <span>{accommodation.status}</span>
-                            </div>
-                            {accommodation.amenities?.length > 0 && <p className="mt-2 text-xs text-gray-400">{accommodation.amenities.slice(0, 4).join(" · ")}</p>}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </OptionSection>
-
-                  {selectedAccommodation && (
-                    <>
-                      <div className="rounded-2xl border border-gray-200 bg-white p-4">
-                        <h3 className="font-bold text-gray-900">Stay details</h3>
-                        <p className="mt-0.5 text-xs text-gray-400">Choose the room arrangement for this stay.</p>
-                        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-                          <Field icon={BedDouble} label="Rooms">
-                            <input type="number" min="1" value={rooms} onChange={(event) => setRooms(Number(event.target.value))} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
-                          </Field>
-                          <Field icon={BedDouble} label="Room type">
-                            <select value={roomType} onChange={(event) => setRoomType(event.target.value)} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none">
-                              {roomTypes.map((item) => <option key={item}>{item}</option>)}
-                            </select>
-                          </Field>
+              <OptionSection
+                title="Guide options"
+                description={`Available guides ${nearbyGuides.length ? "near this destination" : "for your trip request"}`}
+                loading={guidesLoading}
+                loadingText="Loading guides..."
+                emptyText="No available guides are listed right now. Staff can assign a guide after reviewing your booking."
+              >
+                {nearbyGuides.map((guide) => {
+                  const selected = guide.id === selectedGuideId;
+                  return (
+                    <button
+                      type="button"
+                      key={guide.id}
+                      onClick={() => setSelectedGuideId(guide.id)}
+                      className="text-left rounded-2xl border p-4 transition-colors"
+                      style={{
+                        borderColor: selected ? "#FF385C" : "#e5e7eb",
+                        background: selected ? "#fff5f7" : "#fff",
+                      }}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="font-bold text-gray-900">{guide.name}</p>
+                          <p className="text-xs text-gray-400 mt-0.5">{guide.location || "Sri Lanka"} · {guide.experience} years experience</p>
                         </div>
+                        <ChoiceBadge selected={selected} />
                       </div>
-                      <ResourceReviews targetType="ACCOMMODATION" targetId={selectedAccommodation.id} title={`${selectedAccommodation.name} reviews`} />
-                    </>
-                  )}
+                      <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-gray-500">
+                        <RatingStars rating={Number(guide.rating || 0)} reviews={Number(guide.reviews || 0)} compact />
+                        <span className="font-semibold text-gray-800">LKR {Number(guide.pricePerDay || 0).toLocaleString()} / day</span>
+                        <span className="inline-flex items-center gap-1.5"><Languages className="w-3.5 h-3.5" /> {guide.languages?.slice(0, 2).join(", ") || "Languages pending"}</span>
+                        <span>{guide.specialties?.slice(0, 2).join(", ") || "General tours"}</span>
+                      </div>
+                      {guide.bio && <p className="mt-2 line-clamp-2 text-xs text-gray-400">{guide.bio}</p>}
+                    </button>
+                  );
+                })}
+              </OptionSection>
+
+              {selectedGuide && (
+                <ResourceReviews
+                  targetType="GUIDE"
+                  targetId={selectedGuide.id}
+                  title={`${selectedGuide.name} reviews`}
+                />
+              )}
+
+              {selectedAccommodation && (
+                <div className="mt-5 rounded-2xl border border-gray-200 p-4">
+                  <h3 className="font-bold text-gray-900">Accommodation details</h3>
+                  <p className="mt-0.5 text-xs text-gray-400">These details are saved with the selected stay.</p>
+                  <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <Field icon={BedDouble} label="Rooms">
+                      <input type="number" value={rooms} onChange={(event) => setRooms(Number(event.target.value))} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
+                    </Field>
+                    <Field icon={BedDouble} label="Room type">
+                      <select value={roomType} onChange={(event) => setRoomType(event.target.value)} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none">
+                        {roomTypes.map((item) => <option key={item}>{item}</option>)}
+                      </select>
+                    </Field>
+                  </div>
                 </div>
               )}
 
-              {currentStep === 3 && (
-                <div className="space-y-5">
+              <OptionSection
+                title="Accommodation options"
+                description={`Active stays near ${primaryDestinationName(destination) || "this destination"}`}
+                loading={accommodationsLoading}
+                loadingText="Loading stays..."
+                emptyText={`No active accommodations are linked near ${primaryDestinationName(destination) || "this destination"}. Staff can assign a suitable stay after reviewing your booking.`}
+              >
+                {nearbyAccommodations.map((accommodation) => {
+                  const selected = accommodation.id === selectedAccommodationId;
+                  return (
+                    <button
+                      type="button"
+                      key={accommodation.id}
+                      onClick={() => setSelectedAccommodationId(accommodation.id)}
+                      className="text-left rounded-2xl border p-4 transition-colors"
+                      style={{
+                        borderColor: selected ? "#FF385C" : "#e5e7eb",
+                        background: selected ? "#fff5f7" : "#fff",
+                      }}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="font-bold text-gray-900">{accommodation.name}</p>
+                          <p className="text-xs text-gray-400 mt-0.5">{accommodation.type} · {accommodation.location || "Sri Lanka"}</p>
+                        </div>
+                        <ChoiceBadge selected={selected} />
+                      </div>
+                      <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-gray-500">
+                        <RatingStars rating={Number(accommodation.rating || 0)} reviews={Number(accommodation.reviews || 0)} compact />
+                        <span className="font-semibold text-gray-800">LKR {Number(accommodation.price || 0).toLocaleString()} / night</span>
+                        <span>{accommodation.rooms} rooms</span>
+                        <span>{accommodation.status}</span>
+                      </div>
+                      {accommodation.amenities?.length > 0 && (
+                        <p className="mt-2 text-xs text-gray-400">{accommodation.amenities.slice(0, 4).join(" · ")}</p>
+                      )}
+                    </button>
+                  );
+                })}
+              </OptionSection>
+
+              {selectedAccommodation && (
+                <ResourceReviews
+                  targetType="ACCOMMODATION"
+                  targetId={selectedAccommodation.id}
+                  title={`${selectedAccommodation.name} reviews`}
+                />
+              )}
+
+              <div className="mt-5">
+                <div className="flex items-center justify-between gap-4 mb-3">
                   <div>
-                    <h3 className="font-bold text-gray-900">Choose your transport</h3>
-                    <p className="mt-1 text-sm text-gray-500">Use your own transport or select an available Voyara vehicle.</p>
+                    <h3 className="font-bold text-gray-900">Vehicle options</h3>
+                    <p className="text-xs text-gray-400 mt-0.5">Choose the transport option for this package request</p>
                   </div>
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <OwnOptionCard selected={selectedVehicleId === null} title={OWN_VEHICLE_LABEL} description="You will use your own transport for this trip." detail="No vehicle charge" icon={Fuel} onClick={() => setSelectedVehicleId(null)} />
-                    {vehiclesLoading ? (
-                      <div className="rounded-[1.25rem] border border-slate-200 bg-white p-6 text-sm text-slate-400">Finding available vehicles...</div>
-                    ) : vehicles.length === 0 ? (
-                      <div className="rounded-[1.25rem] border border-dashed border-slate-200 p-6 text-sm text-slate-400">No available Voyara vehicles are listed right now.</div>
-                    ) : (
-                      vehicles.map((vehicle) => {
-                        const selected = vehicle.id === selectedVehicleId;
-                        return (
-                          <button
-                            type="button"
-                            key={vehicle.id}
-                            onClick={() => setSelectedVehicleId(vehicle.id)}
-                            className="group overflow-hidden rounded-[1.25rem] border text-left transition-all hover:-translate-y-0.5 hover:shadow-lg"
-                            style={{ borderColor: selected ? "#12372f" : "#e5e7eb", background: selected ? "#f3f7f4" : "#fff" }}
-                          >
-                            <div className="h-32 overflow-hidden bg-slate-100">
-                              {vehicle.image ? (
-                                <img src={vehicle.image} alt="" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                              ) : (
-                                <div className="flex h-full items-center justify-center"><Car className="h-10 w-10 text-slate-300" /></div>
-                              )}
-                            </div>
-                            <div className="p-4">
-                              <div className="flex items-start justify-between gap-3">
-                                <div>
-                                  <p className="font-bold text-gray-900">{vehicle.name}</p>
-                                  <p className="mt-0.5 text-xs text-gray-400">{vehicle.brand} {vehicle.model} · {vehicle.type}</p>
-                                </div>
-                                <ChoiceBadge selected={selected} />
-                              </div>
-                              <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-gray-500">
-                                <span className="inline-flex items-center gap-1.5"><Users className="h-3.5 w-3.5" /> {vehicle.capacity} seats</span>
-                                <span className="inline-flex items-center gap-1.5"><Fuel className="h-3.5 w-3.5" /> {vehicle.fuel}</span>
-                                <RatingStars rating={Number(vehicle.rating || 0)} reviews={Number(vehicle.reviews || 0)} compact />
-                                <span>{vehicle.transmission}</span>
-                                <span className="font-semibold text-gray-800">LKR {Number(vehicle.pricePerDay || 0).toLocaleString()} / day</span>
-                              </div>
-                              {vehicle.location && <p className="mt-2 text-xs text-gray-400">{vehicle.location}</p>}
-                            </div>
-                          </button>
-                        );
-                      })
-                    )}
-                  </div>
+                  {vehiclesLoading && <span className="text-xs text-gray-400">Loading vehicles...</span>}
+                </div>
 
-                  {selectedVehicle && (
-                    <div className="rounded-2xl border border-gray-200 bg-white p-4">
-                      <h3 className="font-bold text-gray-900">Pickup & return</h3>
-                      <p className="mt-0.5 text-xs text-gray-400">These details are saved with the selected vehicle.</p>
-                      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-                        <Field icon={MapPin} label="Pickup location"><input value={pickupLocation} onChange={(event) => setPickupLocation(event.target.value)} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" /></Field>
-                        <Field icon={CalendarDays} label="Pickup time"><input type="time" value={pickupTime} onChange={(event) => setPickupTime(event.target.value)} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" /></Field>
-                        <Field icon={MapPin} label="Return location"><input value={returnLocation} onChange={(event) => setReturnLocation(event.target.value)} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" /></Field>
-                        <Field icon={CalendarDays} label="Return time"><input type="time" value={returnTime} onChange={(event) => setReturnTime(event.target.value)} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" /></Field>
-                        <Field icon={Car} label="Driver"><select value={driverRequired ? "Yes" : "No"} onChange={(event) => setDriverRequired(event.target.value === "Yes")} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none"><option>Yes</option><option>No</option></select></Field>
-                        <Field icon={Package} label="Luggage count"><input type="number" min="0" value={luggageCount} onChange={(event) => setLuggageCount(Number(event.target.value))} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" /></Field>
-                      </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <OwnOptionCard
+                    selected={selectedVehicleId === null}
+                    title={OWN_VEHICLE_LABEL}
+                    description="You will use your own transport for this trip."
+                    detail="No vehicle charge"
+                    icon={Fuel}
+                    onClick={() => setSelectedVehicleId(null)}
+                  />
+                  {!vehiclesLoading && vehicles.length === 0 ? (
+                    <div className="rounded-2xl border border-dashed border-gray-200 p-5 text-sm text-gray-400">
+                      No available Voyara vehicles are listed right now.
                     </div>
+                  ) : (
+                    vehicles.map((vehicle) => {
+                      const selected = vehicle.id === selectedVehicleId;
+                      return (
+                        <button
+                          type="button"
+                          key={vehicle.id}
+                          onClick={() => setSelectedVehicleId(vehicle.id)}
+                          className="text-left rounded-2xl border p-4 transition-colors"
+                          style={{
+                            borderColor: selected ? "#FF385C" : "#e5e7eb",
+                            background: selected ? "#fff5f7" : "#fff",
+                          }}
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="font-bold text-gray-900">{vehicle.name}</p>
+                              <p className="text-xs text-gray-400 mt-0.5">{vehicle.brand} {vehicle.model} · {vehicle.type}</p>
+                            </div>
+                            <ChoiceBadge selected={selected} />
+                          </div>
+                          <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-gray-500">
+                            <span className="inline-flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> {vehicle.capacity} seats</span>
+                            <span className="inline-flex items-center gap-1.5"><Fuel className="w-3.5 h-3.5" /> {vehicle.fuel}</span>
+                            <RatingStars rating={Number(vehicle.rating || 0)} reviews={Number(vehicle.reviews || 0)} compact />
+                            <span>{vehicle.transmission}</span>
+                            <span className="font-semibold text-gray-800">LKR {Number(vehicle.pricePerDay || 0).toLocaleString()} / day</span>
+                          </div>
+                          {vehicle.location && <p className="mt-2 text-xs text-gray-400">{vehicle.location}</p>}
+                        </button>
+                      );
+                    })
                   )}
+                </div>
+              </div>
 
-                  {selectedVehicle && <ResourceReviews targetType="VEHICLE" targetId={selectedVehicle.id} title={`${selectedVehicle.name} reviews`} />}
+              {selectedVehicle && (
+                <div className="mt-5 rounded-2xl border border-gray-200 p-4">
+                  <h3 className="font-bold text-gray-900">Vehicle details</h3>
+                  <p className="mt-0.5 text-xs text-gray-400">These pickup and return details are saved with the selected vehicle.</p>
+                  <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <Field icon={MapPin} label="Pickup location">
+                      <input value={pickupLocation} onChange={(event) => setPickupLocation(event.target.value)} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
+                    </Field>
+                    <Field icon={CalendarDays} label="Pickup time">
+                      <input type="time" value={pickupTime} onChange={(event) => setPickupTime(event.target.value)} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
+                    </Field>
+                    <Field icon={MapPin} label="Return location">
+                      <input value={returnLocation} onChange={(event) => setReturnLocation(event.target.value)} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
+                    </Field>
+                    <Field icon={CalendarDays} label="Return time">
+                      <input type="time" value={returnTime} onChange={(event) => setReturnTime(event.target.value)} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
+                    </Field>
+                    <Field icon={Car} label="Driver">
+                      <select value={driverRequired ? "Yes" : "No"} onChange={(event) => setDriverRequired(event.target.value === "Yes")} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none">
+                        <option>Yes</option>
+                        <option>No</option>
+                      </select>
+                    </Field>
+                    <Field icon={Package} label="Luggage count">
+                      <input type="number" value={luggageCount} onChange={(event) => setLuggageCount(Number(event.target.value))} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
+                    </Field>
+                  </div>
                 </div>
               )}
 
-              {currentStep === 4 && (
-                <div className="mt-4 rounded-2xl bg-gray-50 p-4">
-                  <label className="block text-xs font-semibold uppercase tracking-wide text-gray-400 mb-2">Special requests</label>
-                  <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={4} className="w-full bg-transparent text-sm text-gray-700 outline-none resize-none" placeholder="Pickup location, dietary needs, preferred guide language, or anything staff should know..." />
-                </div>
+              {selectedVehicle && (
+                <ResourceReviews
+                  targetType="VEHICLE"
+                  targetId={selectedVehicle.id}
+                  title={`${selectedVehicle.name} reviews`}
+                />
               )}
+
+              <div className="mt-4 rounded-2xl bg-gray-50 p-4">
+                <label className="block text-xs font-semibold uppercase tracking-wide text-gray-400 mb-2">Special requests</label>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  rows={4}
+                  className="w-full bg-transparent text-sm text-gray-700 outline-none resize-none"
+                  placeholder="Pickup location, dietary needs, preferred guide language, or anything staff should know..."
+                />
+              </div>
             </section>
 
-            <aside className="sticky top-24 h-fit rounded-[2rem] border border-[#12372f]/10 bg-[#12372f] p-6 text-white shadow-[0_24px_60px_rgba(18,55,47,.18)]">
+            <aside className="bg-white rounded-3xl border border-gray-200 p-6 h-fit">
               <h2 className="font-bold text-gray-900 mb-5">Booking summary</h2>
               <div className="space-y-3 text-sm">
                 <SummaryRow label="Tourist" value={user?.fullName || "Current user"} />
@@ -612,22 +606,23 @@ export default function TouristBookingCreate() {
                 <SummaryRow label="Payment" value="Pending" />
               </div>
 
-              <div className="mt-5 rounded-2xl bg-[#eef2ed] p-4 text-sm text-[#12372f]">
+              <div className="mt-5 rounded-2xl bg-rose-50 p-4 text-sm text-rose-700">
                 <div className="flex items-start gap-2">
                   <CheckCircle className="w-4 h-4 shrink-0 mt-0.5" />
                   <p>Your booking will be saved in the database and visible in My Bookings immediately.</p>
                 </div>
               </div>
 
-              {currentStep === 4 ? (
-                <button type="submit" disabled={submitting} className="mt-5 w-full rounded-full bg-[#d9b77a] px-4 py-3.5 text-sm font-bold text-[#17201d] disabled:opacity-60">{submitting ? "Creating booking..." : "Confirm booking request"}</button>
-              ) : (
-                <button type="button" onClick={goNext} className="mt-5 w-full rounded-full bg-[#d9b77a] px-4 py-3.5 text-sm font-bold text-[#17201d]">Continue to {steps[currentStep].label}</button>
-              )}
+              <button
+                type="submit"
+                disabled={submitting}
+                className="mt-5 w-full rounded-xl px-4 py-3 text-sm font-semibold text-white disabled:opacity-60"
+                style={{ background: "linear-gradient(135deg, #FF385C, #E31C5F)" }}
+              >
+                {submitting ? "Creating booking..." : "Confirm Booking Request"}
+              </button>
             </aside>
-          {currentStep > 1 && <button type="button" onClick={goBack} className="mt-4 text-sm font-semibold text-slate-500 hover:text-slate-900">← Back to {steps[currentStep - 2].label}</button>}
           </form>
-          </>
         )}
       </main>
       <Footer />
@@ -685,7 +680,7 @@ function primaryDestinationName(destination: string) {
 
 function ChoiceBadge({ selected }: { selected: boolean }) {
   return (
-    <span className="rounded-full px-2.5 py-1 text-xs font-semibold" style={{ background: selected ? "#12372f" : "#f3f4f6", color: selected ? "white" : "#6b7280" }}>
+    <span className="rounded-full px-2.5 py-1 text-xs font-semibold" style={{ background: selected ? "#FF385C" : "#f3f4f6", color: selected ? "white" : "#6b7280" }}>
       {selected ? "Selected" : "Choose"}
     </span>
   );
@@ -712,8 +707,8 @@ function OwnOptionCard({
       onClick={onClick}
       className="text-left rounded-2xl border p-4 transition-colors"
       style={{
-        borderColor: selected ? "#12372f" : "#e5e7eb",
-        background: selected ? "#eef2ed" : "#fff",
+        borderColor: selected ? "#FF385C" : "#e5e7eb",
+        background: selected ? "#fff5f7" : "#fff",
       }}
     >
       <div className="flex items-start justify-between gap-3">
@@ -781,9 +776,9 @@ function Field({ icon: Icon, label, children }: { icon: ComponentType<{ classNam
 
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-start justify-between gap-4 border-b border-white/10 pb-3">
-      <span className="text-white/45">{label}</span>
-      <span className="font-semibold text-white text-right">{value}</span>
+    <div className="flex items-start justify-between gap-4 border-b border-gray-100 pb-3">
+      <span className="text-gray-400">{label}</span>
+      <span className="font-semibold text-gray-800 text-right">{value}</span>
     </div>
   );
 }

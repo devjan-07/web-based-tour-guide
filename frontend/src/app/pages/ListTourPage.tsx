@@ -5,11 +5,11 @@ import { RupeeIcon } from "../components/Modal";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 
-const inp = "w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-rose-400 transition-all bg-white";
+const inp = "w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-rose-200 focus:border-rose-400 transition-all bg-white";
 const lbl = "block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide";
 
 function FieldError({ msg }: { msg?: string }) {
-  return msg ? <p className="text-xs text-emerald-500 mt-1.5">{msg}</p> : null;
+  return msg ? <p className="text-xs text-rose-500 mt-1.5">{msg}</p> : null;
 }
 
 const steps = ["Basic Info", "Tour Details", "Review & Submit"];
@@ -85,7 +85,7 @@ export default function ListTourPage() {
           <p className="text-gray-400 text-xs mb-8">Submitted as: <span className="font-mono">{form.title}</span></p>
           <div className="flex gap-3">
             <Link to="/" className="px-6 py-3 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
-              style={{ background: "linear-gradient(135deg, #12372f, #19483d)" }}>
+              style={{ background: "linear-gradient(135deg, #FF385C, #E31C5F)" }}>
               Back to Home
             </Link>
             <button onClick={() => { setSubmitted(false); setStep(1); setAgreed(false); setForm({ title: "", category: "", location: "", language: "", duration: "", price: "", maxGroup: "", difficulty: "", description: "" }); }}
@@ -98,7 +98,7 @@ export default function ListTourPage() {
         <div className="max-w-2xl mx-auto px-4 py-14">
           {/* Header */}
           <div className="mb-10 text-center">
-            <p className="text-sm font-semibold uppercase tracking-widest mb-2" style={{ color: "#12372f" }}>Become a Host</p>
+            <p className="text-sm font-semibold uppercase tracking-widest mb-2" style={{ color: "#FF385C" }}>Become a Host</p>
             <h1 className="text-gray-900" style={{ fontWeight: 800, fontSize: "2rem" }}>List Your Tour</h1>
             <p className="text-gray-500 text-sm mt-2">Share your expertise with travelers from around the world.</p>
           </div>
@@ -114,16 +114,16 @@ export default function ListTourPage() {
                   <div className="flex flex-col items-center gap-1.5">
                     <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all"
                       style={{
-                        background: done ? "#12372f" : active ? "white" : "#f3f4f6",
-                        color: done ? "white" : active ? "#12372f" : "#9ca3af",
-                        border: active ? "2px solid #12372f" : done ? "2px solid #12372f" : "2px solid #e5e7eb",
+                        background: done ? "#FF385C" : active ? "white" : "#f3f4f6",
+                        color: done ? "white" : active ? "#FF385C" : "#9ca3af",
+                        border: active ? "2px solid #FF385C" : done ? "2px solid #FF385C" : "2px solid #e5e7eb",
                       }}>
                       {done ? <CheckCircle className="w-4 h-4" /> : n}
                     </div>
-                    <span className="text-xs font-medium whitespace-nowrap" style={{ color: active ? "#12372f" : done ? "#111" : "#9ca3af" }}>{label}</span>
+                    <span className="text-xs font-medium whitespace-nowrap" style={{ color: active ? "#FF385C" : done ? "#111" : "#9ca3af" }}>{label}</span>
                   </div>
                   {i < steps.length - 1 && (
-                    <div className="flex-1 h-0.5 mx-2 mb-5" style={{ background: step > n ? "#12372f" : "#e5e7eb" }} />
+                    <div className="flex-1 h-0.5 mx-2 mb-5" style={{ background: step > n ? "#FF385C" : "#e5e7eb" }} />
                   )}
                 </div>
               );
@@ -250,10 +250,10 @@ export default function ListTourPage() {
                 </div>
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input type="checkbox" checked={agreed} onChange={(e) => { setAgreed(e.target.checked); setErrs({}); }}
-                    className="mt-0.5 accent-emerald-500 w-4 h-4 rounded shrink-0" />
+                    className="mt-0.5 accent-rose-500 w-4 h-4 rounded shrink-0" />
                   <span className="text-sm text-gray-600 leading-relaxed">
                     I confirm that this tour meets{" "}
-                    <span className="font-semibold" style={{ color: "#12372f" }}>Voyara's quality guidelines</span> and that all information provided is accurate and up to date.
+                    <span className="font-semibold" style={{ color: "#FF385C" }}>Voyara's quality guidelines</span> and that all information provided is accurate and up to date.
                   </span>
                 </label>
                 <FieldError msg={errs.agreed} />
@@ -272,12 +272,12 @@ export default function ListTourPage() {
             )}
             {step < 3 ? (
               <button onClick={next} className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
-                style={{ background: "linear-gradient(135deg, #12372f, #19483d)" }}>
+                style={{ background: "linear-gradient(135deg, #FF385C, #E31C5F)" }}>
                 Next <ChevronRight className="w-4 h-4" />
               </button>
             ) : (
               <button onClick={submit} className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
-                style={{ background: "linear-gradient(135deg, #12372f, #19483d)" }}>
+                style={{ background: "linear-gradient(135deg, #FF385C, #E31C5F)" }}>
                 <CheckCircle className="w-4 h-4" /> Submit Tour
               </button>
             )}

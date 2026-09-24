@@ -4,7 +4,7 @@ import { Globe, Mail, Lock, Eye, EyeOff, AlertCircle, ArrowLeft, User, CheckCirc
 import { useAuth } from "../context/AuthContext";
 
 import bgImage from "../../imports/image-8.png";
-const inp = "w-full py-3 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-rose-400 transition-all bg-white";
+const inp = "w-full py-3 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-rose-200 focus:border-rose-400 transition-all bg-white";
 const nationalities = ["Sri Lankan", "Indian", "British", "Australian", "American", "Canadian", "German", "French", "Italian", "Japanese", "Chinese", "Singaporean", "Maldivian", "Other"];
 const countries = ["Sri Lanka", "India", "United Kingdom", "Australia", "United States", "Canada", "Germany", "France", "Italy", "Japan", "China", "Singapore", "Maldives", "Other"];
 const languageOptions = ["English", "Sinhala", "Tamil", "Hindi", "French", "German", "Spanish", "Italian", "Japanese", "Mandarin", "Arabic"];
@@ -47,7 +47,7 @@ function OtpInput({ value, onChange }: { value: string[]; onChange: (v: string[]
           onPaste={handlePaste}
           className="w-12 h-14 text-center text-xl font-bold rounded-xl border-2 outline-none transition-all"
           style={{
-            borderColor: digit ? "#12372f" : "#e5e7eb",
+            borderColor: digit ? "#FF385C" : "#e5e7eb",
             background: digit ? "#fff5f7" : "white",
             color: "#111",
           }}
@@ -170,7 +170,7 @@ export default function LoginPage() {
         <img src={bgImage} alt="Sri Lanka travel" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(15,23,42,0.75) 0%, rgba(255,56,92,0.35) 100%)" }} />
         <div className="relative flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #12372f, #19483d)" }}>
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #FF385C, #E31C5F)" }}>
             <Globe className="w-5 h-5 text-white" />
           </div>
           <span style={{ color: "white", fontWeight: 800, fontSize: "1.4rem", letterSpacing: "-0.5px" }}>Voyara</span>
@@ -194,10 +194,10 @@ export default function LoginPage() {
       {/* Right panel */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-12" style={{ background: "#f9fafb" }}>
         <div className="flex lg:hidden items-center gap-2 mb-10">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #12372f, #19483d)" }}>
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #FF385C, #E31C5F)" }}>
             <Globe className="w-4 h-4 text-white" />
           </div>
-          <span style={{ color: "#12372f", fontWeight: 800, fontSize: "1.25rem" }}>Voyara</span>
+          <span style={{ color: "#FF385C", fontWeight: 800, fontSize: "1.25rem" }}>Voyara</span>
         </div>
 
         <div className="w-full max-w-md">
@@ -213,7 +213,7 @@ export default function LoginPage() {
             <div>
               {/* Verify header */}
               <div className="text-center mb-8">
-                <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: "linear-gradient(135deg, #12372f, #19483d)" }}>
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: "linear-gradient(135deg, #FF385C, #E31C5F)" }}>
                   <ShieldCheck className="w-8 h-8 text-white" />
                 </div>
                 <h1 className="text-gray-900 mb-1" style={{ fontWeight: 800, fontSize: "1.75rem" }}>Check your email</h1>
@@ -245,7 +245,7 @@ export default function LoginPage() {
               {/* Verify button */}
               <button onClick={handleVerify} disabled={loading}
                 className="w-full py-3 rounded-xl text-white font-semibold text-sm transition-opacity hover:opacity-90 flex items-center justify-center gap-2"
-                style={{ background: loading ? "#9ca3af" : "linear-gradient(135deg, #12372f, #19483d)" }}>
+                style={{ background: loading ? "#9ca3af" : "linear-gradient(135deg, #FF385C, #E31C5F)" }}>
                 {loading ? (
                   <><svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -262,7 +262,7 @@ export default function LoginPage() {
                 </button>
                 <button onClick={handleResend} disabled={resendCooldown > 0}
                   className="inline-flex items-center gap-1.5 font-semibold transition-colors"
-                  style={{ color: resendCooldown > 0 ? "#9ca3af" : "#12372f" }}>
+                  style={{ color: resendCooldown > 0 ? "#9ca3af" : "#FF385C" }}>
                   <RotateCcw className="w-3.5 h-3.5" />
                   {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend code"}
                 </button>
@@ -337,7 +337,7 @@ export default function LoginPage() {
                       <div className="flex flex-wrap gap-2">
                         {languageOptions.map((option) => {
                           const selected = languages.includes(option);
-                          return <button key={option} type="button" aria-pressed={selected} onClick={() => setLanguages((items) => selected ? items.filter((item) => item !== option) : [...items, option])} className="rounded-full border px-3 py-2 text-xs font-semibold transition-colors" style={{ borderColor: selected ? "#12372f" : "#d1d5db", background: selected ? "#fff0f3" : "white", color: selected ? "#12372f" : "#6b7280" }}>{option}</button>;
+                          return <button key={option} type="button" aria-pressed={selected} onClick={() => setLanguages((items) => selected ? items.filter((item) => item !== option) : [...items, option])} className="rounded-full border px-3 py-2 text-xs font-semibold transition-colors" style={{ borderColor: selected ? "#FF385C" : "#d1d5db", background: selected ? "#fff0f3" : "white", color: selected ? "#FF385C" : "#6b7280" }}>{option}</button>;
                         })}
                       </div>
                     </div>
@@ -378,13 +378,13 @@ export default function LoginPage() {
                 )}
                 {mode === "signup" && (
                   <label className="flex items-start gap-2.5 text-sm text-gray-600">
-                    <input type="checkbox" checked={termsAccepted} onChange={(e) => setTermsAccepted(e.target.checked)} className="mt-0.5 h-4 w-4 accent-emerald-500" />
+                    <input type="checkbox" checked={termsAccepted} onChange={(e) => setTermsAccepted(e.target.checked)} className="mt-0.5 h-4 w-4 accent-rose-500" />
                     <span>I agree to the <Link to="/help" className="font-semibold text-gray-800 underline">Terms of Service</Link> and <Link to="/help" className="font-semibold text-gray-800 underline">Privacy Policy</Link></span>
                   </label>
                 )}
                 <button type="submit" disabled={loading}
                   className="w-full py-3 rounded-xl text-white font-semibold text-sm transition-opacity hover:opacity-90 mt-2 flex items-center justify-center gap-2"
-                  style={{ background: loading ? "#9ca3af" : "linear-gradient(135deg, #12372f, #19483d)" }}>
+                  style={{ background: loading ? "#9ca3af" : "linear-gradient(135deg, #FF385C, #E31C5F)" }}>
                   {loading ? (
                     <><svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />

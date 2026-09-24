@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { motion } from "motion/react";
 import { Navbar } from "../components/Navbar";
 import { Hero } from "../components/Hero";
 import { DestinationCard } from "../components/DestinationCard";
@@ -186,41 +185,41 @@ export default function LandingPage() {
       <Navbar />
       <Hero onSearch={handleSearch} onClear={clearFilters} hasActiveFilter={isFiltered} onCategoryChange={handleCategoryChange} />
 
-      {/* C2: editorial introduction */}
-      <section className="relative overflow-hidden bg-[#f7f5ef] px-4 py-20 md:py-28">
-        <div className="mx-auto grid max-w-7xl items-end gap-10 md:grid-cols-[1.15fr_0.85fr]">
-          <motion.div initial={{ opacity: 0, y: 32 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.7 }}>
-            <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-[#12372f]">A different way to explore</p>
-            <h2 className="max-w-4xl text-4xl font-semibold leading-[1.02] tracking-[-0.04em] text-slate-950 md:text-6xl">
-              Sri Lanka is not a checklist.
-              <span className="block text-slate-400">It is a journey.</span>
-            </h2>
-          </motion.div>
-          <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.7, delay: 0.1 }} className="max-w-xl md:justify-self-end">
-            <p className="text-base leading-7 text-slate-600 md:text-lg">
-              Discover destinations, tours, places to stay and transport through one connected experience. Start with a place that catches your eye, then build the rest of your trip around it.
-            </p>
-            <div className="mt-7 flex flex-wrap gap-3 text-sm font-semibold text-slate-700">
-              <span className="rounded-full border border-slate-200 bg-white px-4 py-2">Discover</span>
-              <span className="rounded-full border border-slate-200 bg-white px-4 py-2">Choose</span>
-              <span className="rounded-full border border-slate-200 bg-white px-4 py-2">Plan</span>
-              <span className="rounded-full border border-slate-200 bg-white px-4 py-2">Go</span>
-            </div>
-          </motion.div>
+      {/* Floating stats card overlapping the hero */}
+      <div className="relative z-10 max-w-6xl mx-auto px-4 -mt-12 md:-mt-14">
+        <div className="rounded-3xl shadow-xl overflow-hidden" style={{ background: "linear-gradient(135deg, #003580, #0057B8)" }}>
+          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-white/10">
+            {[
+              { value: `${localTourPackages.length}+`, label: "Sri Lanka Tours", icon: Globe2 },
+              { value: `${localDestinations.length}+`, label: "Local Places", icon: MapPinned },
+              { value: `${allAccommodations.length}+`, label: "Stays", icon: BedDouble },
+              { value: `${allVehicles.length}+`, label: "Vehicles", icon: Car },
+            ].map(({ value, label, icon: Icon }) => (
+              <div key={label} className="flex items-center gap-3 px-5 py-6 justify-center md:justify-start">
+                <div className="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+                  <Icon className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-white leading-none" style={{ fontWeight: 800, fontSize: "1.4rem" }}>{value}</p>
+                  <p className="text-white/70 text-xs mt-1">{label}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </section>
+      </div>
 
       {/* Active filter banner */}
       {isFiltered && (
-        <div className="bg-emerald-50 border-b border-emerald-100 py-3 px-4">
+        <div className="bg-rose-50 border-b border-rose-100 py-3 px-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm text-emerald-800">
+            <div className="flex items-center gap-2 text-sm text-rose-700">
               <Search className="w-4 h-4" />
               {searchQuery && <span>Results for <strong>"{searchQuery}"</strong></span>}
               {activeCategory && <span>Filtered by <strong>{activeCategory}</strong></span>}
-              <span className="text-emerald-500">— {filteredDestinations.length} place{filteredDestinations.length !== 1 ? "s" : ""}, {filteredTours.length} tour{filteredTours.length !== 1 ? "s" : ""}, {filteredAccommodations.length} stay{filteredAccommodations.length !== 1 ? "s" : ""}, {filteredVehicles.length} vehicle{filteredVehicles.length !== 1 ? "s" : ""}</span>
+              <span className="text-rose-400">— {filteredDestinations.length} place{filteredDestinations.length !== 1 ? "s" : ""}, {filteredTours.length} tour{filteredTours.length !== 1 ? "s" : ""}, {filteredAccommodations.length} stay{filteredAccommodations.length !== 1 ? "s" : ""}, {filteredVehicles.length} vehicle{filteredVehicles.length !== 1 ? "s" : ""}</span>
             </div>
-            <button onClick={clearFilters} className="flex items-center gap-1 text-xs font-semibold text-[#12372f] hover:text-emerald-900 transition-colors">
+            <button onClick={clearFilters} className="flex items-center gap-1 text-xs font-semibold text-rose-600 hover:text-rose-800 transition-colors">
               <X className="w-3.5 h-3.5" /> Clear
             </button>
           </div>
@@ -232,7 +231,7 @@ export default function LandingPage() {
           <div className="mx-auto max-w-7xl rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
             <div className="flex flex-wrap items-center gap-3">
               <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-                <SlidersHorizontal className="h-4 w-4 text-emerald-500" />
+                <SlidersHorizontal className="h-4 w-4 text-rose-500" />
                 Refine results
               </div>
               <select
@@ -267,9 +266,9 @@ export default function LandingPage() {
 
       {isTourist && (
         <section className="px-4 pt-8">
-          <div className="mx-auto flex max-w-7xl flex-col gap-4 rounded-3xl border border-emerald-100 bg-emerald-50 p-5 md:flex-row md:items-center md:justify-between">
+          <div className="mx-auto flex max-w-7xl flex-col gap-4 rounded-3xl border border-rose-100 bg-rose-50 p-5 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-emerald-500">Tourist tools</p>
+              <p className="text-xs font-bold uppercase tracking-widest text-rose-500">Tourist tools</p>
               <h2 className="mt-1 text-xl font-extrabold text-gray-900">Plan a trip or check your bookings</h2>
               <p className="mt-1 text-sm text-gray-500">Open a destination for details, then book when you are ready.</p>
             </div>
@@ -277,7 +276,7 @@ export default function LandingPage() {
               <a href="#listings-section" className="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-100">
                 Explore trips
               </a>
-              <Link to="/tourist/dashboard" className="rounded-xl px-4 py-2.5 text-sm font-semibold text-white" style={{ background: "#12372f" }}>
+              <Link to="/tourist/dashboard" className="rounded-xl px-4 py-2.5 text-sm font-semibold text-white" style={{ background: "#FF385C" }}>
                 My bookings
               </Link>
             </div>
@@ -289,13 +288,13 @@ export default function LandingPage() {
         <div className="flex items-end justify-between mb-8">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="w-6 h-0.5 rounded-full" style={{ background: "#12372f" }} />
-              <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#12372f" }}>
+              <span className="w-6 h-0.5 rounded-full" style={{ background: "#FF385C" }} />
+              <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#FF385C" }}>
                 {isFiltered ? "Filtered results" : "Handpicked for you"}
               </p>
             </div>
-            <h2 className="text-3xl font-semibold tracking-[-0.03em] text-slate-950 md:text-4xl">
-              {isFiltered ? `${activeCategory || "Search"} Stays & Experiences` : "Places worth building a trip around"}
+            <h2 style={{ fontWeight: 800, fontSize: "1.9rem" }}>
+              {isFiltered ? `${activeCategory || "Search"} Stays & Experiences` : "Featured Stays & Experiences"}
             </h2>
           </div>
           {filteredDestinations.length > 4 && (
@@ -305,62 +304,52 @@ export default function LandingPage() {
           )}
         </div>
         {displayedDestinations.length > 0 ? (
-          <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
-            {displayedDestinations.map((d, index) => (
-              <motion.div key={d.id} initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.55, delay: index * 0.04 }}>
-                <DestinationCard {...d} onView={viewDestination} />
-              </motion.div>
-            ))}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {displayedDestinations.map((d) => <DestinationCard key={d.id} {...d} onView={viewDestination} />)}
           </div>
         ) : (
           <div className="text-center py-16">
             <Search className="w-10 h-10 text-gray-300 mx-auto mb-3" />
             <p className="text-gray-500 font-medium">No stays match your search.</p>
-            <button onClick={clearFilters} className="mt-3 text-sm font-semibold underline" style={{ color: "#12372f" }}>Clear filters</button>
+            <button onClick={clearFilters} className="mt-3 text-sm font-semibold underline" style={{ color: "#FF385C" }}>Clear filters</button>
           </div>
         )}
       </section>
 
-      {/* C2: destination discovery */}
-      <section id="transport-section" className="overflow-hidden bg-slate-950 py-20 text-white md:py-28">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.6 }} className="mb-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="mb-3 text-xs font-bold uppercase tracking-[0.28em] text-[#d9b77a]">Explore the island</p>
-              <h2 className="text-4xl font-semibold tracking-[-0.035em] md:text-5xl">Where will you go first?</h2>
+      <section className="py-16" style={{ background: "#f9fafb" }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-6 h-0.5 rounded-full" style={{ background: "#0057B8" }} />
+              <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#0057B8" }}>Explore Sri Lanka</p>
             </div>
-            <p className="max-w-md text-sm leading-6 text-slate-400 md:text-right">Browse real destinations from the platform and open any place to see its experiences and routes.</p>
-          </motion.div>
-          <div className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {popular.map((d, index) => (
-              <motion.button key={d.name} type="button"
-                onClick={() => { handleSearch(d.name); const section=document.getElementById("listings-section"); if(section) section.scrollIntoView({behavior:"smooth"}); }}
-                initial={{ opacity: 0, x: 35 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.55, delay: index * 0.06 }}
-                className="group relative min-w-[76vw] snap-start overflow-hidden rounded-[2rem] text-left sm:min-w-[48vw] lg:min-w-[31vw]">
-                <div className="aspect-[4/5] overflow-hidden"><img src={d.img} alt={d.name} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" /></div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
-                <div className="absolute left-5 right-5 top-5 flex items-center justify-between">
-                  <span className="rounded-full border border-white/25 bg-black/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md">0{index + 1}</span>
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-900 opacity-0 transition-all duration-300 group-hover:opacity-100"><ArrowUpRight className="h-4 w-4" /></span>
+            <h2 style={{ fontWeight: 800, fontSize: "1.9rem" }}>Popular Destinations</h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {popular.map((d) => (
+              <div key={d.name} onClick={() => { handleSearch(d.name); const s = document.getElementById("listings-section"); if (s) s.scrollIntoView({ behavior: "smooth" }); }}
+                className="group relative rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300" style={{ aspectRatio: "3/4" }}>
+                <img src={d.img} alt={d.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                <div className="absolute inset-0 transition-opacity" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 62%)" }} />
+                <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center opacity-0 -translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                  <ArrowUpRight className="w-4 h-4" style={{ color: "#003580" }} />
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/60">{d.country}</p>
-                  <h3 className="mt-1 text-2xl font-semibold tracking-tight">{d.name}</h3>
-                  <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-white/80">Explore destination <ArrowUpRight className="h-4 w-4" /></span>
+                <div className="absolute bottom-0 left-0 right-0 p-3">
+                  <p className="text-white font-bold text-sm">{d.name}</p>
+                  <p className="text-white/70 text-xs">{d.country}</p>
                 </div>
-              </motion.button>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="stays-section" className="py-16 px-4 max-w-7xl mx-auto">
+      <section className="py-16 px-4 max-w-7xl mx-auto">
         <div className="flex items-end justify-between mb-8">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="w-6 h-0.5 rounded-full" style={{ background: "#12372f" }} />
-              <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#12372f" }}>Places to stay</p>
+              <span className="w-6 h-0.5 rounded-full" style={{ background: "#7c3aed" }} />
+              <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#7c3aed" }}>Places to stay</p>
             </div>
             <h2 style={{ fontWeight: 800, fontSize: "1.9rem" }}>Available Accommodations</h2>
           </div>
@@ -381,7 +370,7 @@ export default function LandingPage() {
                   <p className="mt-1 text-xs text-gray-500">{[item.location, item.country].filter(Boolean).join(", ")}</p>
                   <div className="mt-3 flex items-center justify-between gap-3">
                     <span className="font-extrabold text-gray-900">{formatLkr(item.price)} <span className="text-xs font-medium text-gray-400">/night</span></span>
-                    <span className="inline-flex items-center gap-1 text-sm font-semibold text-gray-700"><Star className="h-3.5 w-3.5" style={{ color: "#12372f", fill: "#12372f" }} />{Number(item.rating || 0).toFixed(1)}</span>
+                    <span className="inline-flex items-center gap-1 text-sm font-semibold text-gray-700"><Star className="h-3.5 w-3.5" style={{ color: "#FF385C", fill: "#FF385C" }} />{Number(item.rating || 0).toFixed(1)}</span>
                   </div>
                   <div className="mt-3 flex flex-wrap gap-1.5">
                     {(item.amenities || []).slice(0, 3).map((tag) => (
@@ -393,7 +382,7 @@ export default function LandingPage() {
                   <Link
                     to={bookingLink(`/tourist/accommodations/${item.id}/book`)}
                     className="mt-4 inline-flex w-full items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold text-white"
-                    style={{ background: "#12372f" }}
+                    style={{ background: "#FF385C" }}
                   >
                     Book stay
                   </Link>
@@ -413,8 +402,8 @@ export default function LandingPage() {
           <div className="flex items-end justify-between mb-8">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="w-6 h-0.5 rounded-full" style={{ background: "#9e8b63" }} />
-                <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#9e8b63" }}>Transport</p>
+                <span className="w-6 h-0.5 rounded-full" style={{ background: "#ea580c" }} />
+                <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#ea580c" }}>Transport</p>
               </div>
               <h2 style={{ fontWeight: 800, fontSize: "1.9rem" }}>Available Vehicles</h2>
             </div>
@@ -445,7 +434,7 @@ export default function LandingPage() {
                     <Link
                       to={bookingLink(`/tourist/vehicles/${item.id}/book`)}
                       className="mt-4 inline-flex w-full items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold text-white"
-                      style={{ background: "#12372f" }}
+                      style={{ background: "#FF385C" }}
                     >
                       Book vehicle
                     </Link>
@@ -461,98 +450,28 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* C3: tour discovery — journeys are presented as editorial travel stories */}
-      <section id="journeys-section" className="overflow-hidden bg-[#f7f5ef] px-4 py-20 md:py-28">
-        <div className="mx-auto max-w-7xl">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.6 }}
-            className="mb-12 flex flex-col gap-5 md:flex-row md:items-end md:justify-between"
-          >
-            <div>
-              <p className="mb-3 text-xs font-bold uppercase tracking-[0.28em] text-[#12372f]">
-                Curated journeys
-              </p>
-              <h2 className="max-w-3xl text-4xl font-semibold leading-tight tracking-[-0.035em] text-slate-950 md:text-5xl">
-                Don't just visit Sri Lanka.
-                <span className="block text-slate-400">Experience it.</span>
-              </h2>
+      <section className="py-16 px-4 max-w-7xl mx-auto">
+        <div className="flex items-end justify-between mb-8">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-6 h-0.5 rounded-full" style={{ background: "#00AA6C" }} />
+              <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#00AA6C" }}>Top Rated</p>
             </div>
-            <p className="max-w-md text-sm leading-6 text-slate-600 md:text-right">
-              Explore the tour packages already available on Voyara, then open a journey to see its full details and plan your booking.
-            </p>
-          </motion.div>
-
-          {filteredTours.length > 0 ? (
-            <div className="flex snap-x snap-mandatory gap-6 overflow-x-auto pb-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {filteredTours.map((tour, index) => (
-                <motion.article
-                  key={tour.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.15 }}
-                  transition={{ duration: 0.55, delay: index * 0.05 }}
-                  onClick={() => viewPackage(tour.id)}
-                  className="group relative min-w-[82vw] cursor-pointer snap-start overflow-hidden rounded-[2rem] bg-slate-900 shadow-sm sm:min-w-[62vw] lg:min-w-[43vw]"
-                >
-                  <div className="relative aspect-[16/10] overflow-hidden">
-                    <img
-                      src={tour.image}
-                      alt={tour.title}
-                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
-                    <div className="absolute left-5 right-5 top-5 flex items-center justify-between">
-                      <span className="rounded-full border border-white/25 bg-black/20 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-md">
-                        {tour.category || "Journey"}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={(event) => event.stopPropagation()}
-                        className="rounded-full bg-white/15 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-md"
-                      >
-                        {tour.duration}
-                      </button>
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
-                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
-                        {tour.location}
-                      </p>
-                      <h3 className="mt-2 max-w-2xl text-2xl font-semibold tracking-tight text-white md:text-3xl">
-                        {tour.title}
-                      </h3>
-                      <div className="mt-5 flex flex-wrap items-end justify-between gap-4">
-                        <div>
-                          <p className="text-xs text-white/60">From</p>
-                          <p className="text-xl font-bold text-white">
-                            {formatLkr(tour.price)}
-                            <span className="text-sm font-normal text-white/60"> / person</span>
-                          </p>
-                        </div>
-                        <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-slate-950 transition-transform group-hover:translate-x-1">
-                          View journey <ArrowUpRight className="h-4 w-4" />
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </motion.article>
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-[2rem] border border-slate-200 bg-white px-6 py-16 text-center">
-              <p className="text-sm text-slate-500">No journeys match this filter.</p>
-            </div>
-          )}
-
-          {filteredTours.length > 1 && (
-            <div className="mt-6 flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
-              <span>Swipe to explore</span>
-              <span>{filteredTours.length} journeys available</span>
-            </div>
+            <h2 style={{ fontWeight: 800, fontSize: "1.9rem" }}>Most Popular Tours</h2>
+          </div>
+          {isFiltered && filteredTours.length === 0 && (
+            <span className="text-sm text-gray-400">No tours match this filter</span>
           )}
         </div>
+        {filteredTours.length > 0 ? (
+          <div className="flex flex-col gap-5">
+            {filteredTours.map((t) => <TourCard key={t.id} {...t} onView={viewPackage} />)}
+          </div>
+        ) : (
+          <div className="text-center py-10">
+            <p className="text-gray-400 text-sm">No tours found for this filter.</p>
+          </div>
+        )}
       </section>
 
       <WhyUs />

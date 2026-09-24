@@ -1,4 +1,96 @@
-import { Clock, MapPin, Users, ArrowUpRight } from "lucide-react";
-import { motion } from "motion/react";
-interface TourCardProps { id:number; image:string; title:string; location:string; price:number; duration:string; maxGroup:number; badge?:string; category:string; onView?:(id:number)=>void; }
-export function TourCard({id,image,title,location,price,duration,maxGroup,badge,category,onView}:TourCardProps){return <motion.article whileHover={{y:-5}} className="group overflow-hidden rounded-[1.75rem] border border-[#12372f]/10 bg-white shadow-[0_18px_50px_rgba(18,55,47,.08)]"><button onClick={()=>onView?.(id)} className="block w-full text-left"><div className="relative aspect-[16/10] overflow-hidden bg-slate-100"><img src={image||"https://images.unsplash.com/photo-1586500036706-41963de24d8b?w=900"} alt={title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"/><div className="absolute inset-0 bg-gradient-to-t from-black/65 to-transparent"/><div className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-[10px] font-bold uppercase tracking-[.16em] text-[#12372f]">{badge||category}</div><div className="absolute bottom-4 left-4 right-4 text-white"><p className="flex items-center gap-1 text-xs text-white/70"><MapPin className="h-3 w-3"/>{location}</p><h3 className="mt-1 text-2xl font-semibold tracking-[-.03em]">{title}</h3></div></div><div className="p-5"><div className="flex flex-wrap gap-4 text-xs text-slate-500"><span className="flex items-center gap-1.5"><Clock className="h-4 w-4 text-[#12372f]"/>{duration}</span><span className="flex items-center gap-1.5"><Users className="h-4 w-4 text-[#12372f]"/>Up to {maxGroup}</span></div><div className="mt-5 flex items-end justify-between gap-4 border-t border-slate-100 pt-4"><div><span className="text-[10px] font-bold uppercase tracking-[.16em] text-slate-400">From</span><p className="text-xl font-bold text-[#12372f]">LKR {Number(price||0).toLocaleString()} <span className="text-xs font-normal text-slate-400">/ person</span></p></div><span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#12372f] text-white transition-transform group-hover:rotate-45"><ArrowUpRight className="h-4 w-4"/></span></div></div></button></motion.article>}
+import { useState } from "react";
+import { Clock, Users, Heart, MapPin } from "lucide-react";
+
+interface TourCardProps {
+  id: number;
+  image: string;
+  title: string;
+  location: string;
+  price: number;
+  duration: string;
+  maxGroup: number;
+  badge?: string;
+  category: string;
+  onView?: (id: number) => void;
+}
+
+export function TourCard({ id, image, title, location, price, duration, maxGroup, badge, category, onView }: TourCardProps) {
+  const [liked, setLiked] = useState(false);
+  const [imgError, setImgError] = useState(false);
+
+  return (
+    <div onClick={() => onView?.(id)} className="bg-white rounded-2xl overflow-hidden flex flex-col md:flex-row hover:shadow-xl transition-all duration-300 cursor-pointer group" style={{ border: "1px solid #e5e7eb" }}>
+      {/* Image */}
+      <div className="relative md:w-64 shrink-0" style={{ minHeight: 200 }}>
+        <img
+          src={imgError ? "https://images.unsplash.com/photo-1586500036706-41963de24d8b?w=600" : image}
+          alt={title}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          style={{ minHeight: 200 }}
+          onError={() => setImgError(true)}
+        />
+        {badge && (
+          <span
+            className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-bold text-white"
+            style={{ background: "linear-gradient(135deg, #00AA6C, #008A56)" }}
+          >
+            {badge}
+          </span>
+        )}
+        <button
+          onClick={(e) => { e.stopPropagation(); setLiked(!liked); }}
+          className="absolute top-3 right-3 p-2 rounded-full bg-white/90 hover:bg-white transition-colors shadow"
+        >
+          <Heart className="w-4 h-4" style={{ fill: liked ? "#FF385C" : "none", color: liked ? "#FF385C" : "#6b7280" }} />
+        </button>
+      </div>
+
+      {/* Content */}
+      <div className="flex flex-col flex-1 p-5">
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <div className="flex-1 min-w-0">
+            <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: "#FF385C" }}>{category}</span>
+            <h3 className="text-gray-900 mt-0.5 group-hover:text-gray-700 transition-colors" style={{ fontWeight: 700, fontSize: "1rem", lineHeight: 1.3 }}>{title}</h3>
+            <div className="flex items-center gap-1 mt-1 text-sm text-gray-500">
+              <MapPin className="w-3.5 h-3.5" />
+              <span>{location}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Meta */}
+        <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+          <div className="flex items-center gap-1.5">
+            <Clock className="w-4 h-4" />
+            <span>{duration}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Users className="w-4 h-4" />
+            <span>Max {maxGroup} people</span>
+          </div>
+        </div>
+
+        {/* Price & CTA */}
+        <div className="flex items-center justify-between mt-auto pt-3" style={{ borderTop: "1px solid #f0f0f0" }}>
+          <div>
+            <p className="text-xs text-gray-400">From</p>
+            <p style={{ fontWeight: 800, fontSize: "1.35rem", color: "#111" }}>
+              රු{price}
+              <span className="text-sm font-normal text-gray-500"> / person</span>
+            </p>
+          </div>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onView?.(id);
+            }}
+            className="px-5 py-2.5 rounded-xl text-white text-sm font-semibold transition-opacity hover:opacity-90"
+            style={{ background: "linear-gradient(135deg, #003580, #0057B8)" }}
+          >
+            View Details
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

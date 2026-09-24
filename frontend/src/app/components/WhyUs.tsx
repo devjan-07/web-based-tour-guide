@@ -1,4 +1,59 @@
-import { Compass, Route, ShieldCheck, Sparkles } from "lucide-react";
-import { motion } from "motion/react";
-const features=[{icon:Compass,title:"Discover in context",desc:"Explore destinations with connected tours, routes and practical travel details instead of isolated listings."},{icon:Route,title:"Build one journey",desc:"Bring guides, accommodation and transport together around the trip you actually want to take."},{icon:ShieldCheck,title:"Availability-aware planning",desc:"Voyara checks the selected travel resources during booking so your plan is based on current platform data."},{icon:Sparkles,title:"Help when you need it",desc:"Use voyAI for questions about destinations, tours, bookings and the cancellation rules supported by the platform."}];
-export function WhyUs(){return <section className="relative overflow-hidden bg-[#12372f] py-24 text-white md:py-32"><div className="absolute -right-40 -top-40 h-96 w-96 rounded-full bg-[#d9b77a]/10 blur-3xl"/><div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"><motion.div initial={{opacity:0,y:24}} whileInView={{opacity:1,y:0}} viewport={{once:true,amount:.3}} transition={{duration:.65}} className="max-w-3xl"><p className="text-xs font-bold uppercase tracking-[.3em] text-[#d9b77a]">The Voyara approach</p><h2 className="mt-4 text-4xl font-semibold leading-[.98] tracking-[-.04em] md:text-6xl">Less searching.<br/><span className="text-white/45">More travelling.</span></h2><p className="mt-6 max-w-2xl text-sm leading-7 text-white/65 md:text-base">Voyara connects the pieces of a trip so travellers can move from inspiration to a real booking without losing the feeling of discovery.</p></motion.div><div className="mt-14 grid gap-px overflow-hidden rounded-[2rem] border border-white/10 bg-white/10 md:grid-cols-2 lg:grid-cols-4">{features.map(({icon:Icon,title,desc},index)=><motion.div key={title} initial={{opacity:0,y:20}} whileInView={{opacity:1,y:0}} viewport={{once:true,amount:.2}} transition={{duration:.5,delay:index*.07}} className="bg-[#12372f] p-7 md:p-8"><div className="flex items-center justify-between"><Icon className="h-6 w-6 text-[#d9b77a]"/><span className="text-xs font-bold text-white/25">0{index+1}</span></div><h3 className="mt-12 text-lg font-semibold">{title}</h3><p className="mt-3 text-sm leading-6 text-white/55">{desc}</p></motion.div>)}</div></div></section>}
+import { ShieldCheck, Headphones, Award, CreditCard } from "lucide-react";
+
+const features = [
+  {
+    icon: ShieldCheck,
+    color: "#FF385C",
+    title: "Verified Guides",
+    desc: "Every guide is background-checked, licensed, and rated by real travelers.",
+  },
+  {
+    icon: Award,
+    color: "#003580",
+    title: "Best Price Guarantee",
+    desc: "Find a lower price? We'll match it — no questions asked.",
+  },
+  {
+    icon: Headphones,
+    color: "#00AA6C",
+    title: "24/7 Support",
+    desc: "Our travel experts are available around the clock to assist you anywhere.",
+  },
+  {
+    icon: CreditCard,
+    color: "#FF8C00",
+    title: "Free Cancellation",
+    desc: "Plans change. Cancel up to 24 hours before your tour for a full refund.",
+  },
+];
+
+export function WhyUs() {
+  return (
+    <section className="py-16" style={{ background: "#f9fafb" }}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <p className="text-sm font-semibold uppercase tracking-widest mb-1" style={{ color: "#FF385C" }}>Why Voyara</p>
+          <h2 className="text-gray-900" style={{ fontWeight: 800, fontSize: "1.75rem" }}>Travel with confidence</h2>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {features.map((f) => {
+            const Icon = f.icon;
+            return (
+              <div key={f.title} className="bg-white rounded-2xl p-6 text-center hover:shadow-md transition-shadow" style={{ border: "1px solid #e5e7eb" }}>
+                <div
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                  style={{ background: `${f.color}15` }}
+                >
+                  <Icon className="w-7 h-7" style={{ color: f.color }} />
+                </div>
+                <h4 className="text-gray-900 mb-2" style={{ fontWeight: 700 }}>{f.title}</h4>
+                <p className="text-sm text-gray-500 leading-relaxed">{f.desc}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
