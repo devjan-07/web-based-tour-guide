@@ -19,7 +19,7 @@ import logoImg from "../../imports/c8f8ad87-0b32-4268-ba96-7d4a61b80241.png";
 
 const navItems = [
   { label: "Explore", href: "/explore" },
-  { label: "Journeys", href: "#journeys-section" },
+  { label: "Journeys", href: "#listings-section" },
   { label: "Stays", href: "#stays-section" },
   { label: "Transport", href: "#transport-section" },
 ];

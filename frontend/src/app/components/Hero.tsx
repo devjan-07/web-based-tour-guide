@@ -38,7 +38,7 @@ export function Hero({ onSearch, onClear, hasActiveFilter = false, onCategoryCha
 
   const handleSearch = () => {
     onSearch?.(query.trim());
-    document.getElementById("destinations-section")?.scrollIntoView({ behavior: "smooth" });
+    document.getElementById("listings-section")?.scrollIntoView({ behavior: "smooth" });
   };
 
   const quickTags = [
@@ -146,7 +146,7 @@ export function Hero({ onSearch, onClear, hasActiveFilter = false, onCategoryCha
                 type="button"
                 onClick={() => {
                   onCategoryChange?.(cat);
-                  document.getElementById("destinations-section")?.scrollIntoView({ behavior: "smooth" });
+                  document.getElementById("listings-section")?.scrollIntoView({ behavior: "smooth" });
                 }}
                 className="group flex items-center gap-2 rounded-full border border-white/25 bg-black/10 px-4 py-2.5 text-xs font-semibold text-white backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-white/50 hover:bg-white/15 sm:text-sm"
               >
