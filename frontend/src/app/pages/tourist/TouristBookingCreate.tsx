@@ -294,18 +294,18 @@ export default function TouristBookingCreate() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
         <Link to="/" className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-900 mb-5">
           <ArrowLeft className="w-4 h-4" /> Back to explore
         </Link>
 
-        <section className="rounded-3xl overflow-hidden mb-6" style={{ background: "linear-gradient(135deg, #003580, #0057B8)" }}>
-          <div className="p-6 md:p-8 text-white">
-              <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-2">Create {bookingTypeLabel(bookingType)} Booking</p>
+        <section className="mb-6 overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#062a56] to-[#0057B8] shadow-sm">
+          <div className="p-6 text-white md:p-8">
+              <div className="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-white/70"><span>Booking</span><span className="h-1 w-1 rounded-full bg-white/40" />{bookingTypeLabel(bookingType)}</div>
               <h1 className="text-3xl md:text-4xl font-extrabold mb-2">
               {bookingTitle(bookingType, destination, tourPackage, selectedAccommodation, selectedVehicle)}
             </h1>
-            <p className="text-white/75 max-w-2xl">
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-white/75">
               Submit your preferred dates, then open the booking details to complete payment.
             </p>
           </div>
@@ -314,9 +314,9 @@ export default function TouristBookingCreate() {
         {loading ? (
           <div className="bg-white rounded-3xl border border-gray-200 p-8 text-sm text-gray-400">Loading booking details...</div>
         ) : (
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-            <section className="lg:col-span-2 bg-white rounded-3xl border border-gray-200 p-6">
-              <h2 className="font-bold text-gray-900 mb-5">Travel details</h2>
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
+            <section className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+              <div className="mb-5 flex items-center justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-rose-500">Step 1</p><h2 className="mt-1 font-extrabold text-gray-900">Your travel details</h2></div><span className="rounded-full bg-gray-50 px-3 py-1 text-xs font-semibold text-gray-500">Dates · people · preferences</span></div>
 
               {error && (
                 <div className="mb-5 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600">
