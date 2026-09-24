@@ -47,7 +47,7 @@ public class TouristBookingController {
     @GetMapping("/{id}/readiness")
     public TripReadiness readiness(@PathVariable String id, Principal principal) {
         if (!securityEnabled && !hasPrincipal(principal)) {
-            return bookingService.getTripReadiness("anonymous", id);
+            return bookingService.getTripReadinessById(id);
         }
         return bookingService.getTripReadiness(currentEmail(principal), id);
     }
