@@ -43,13 +43,15 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 - [x] Destination suitability information
 - [x] Destination discovery/recommendations
 - [ ] Nearby experiences
-- [ ] Add destination/activity to trip
+- [x] Add destination to trip
+- [ ] Add activity/attraction to trip (not implemented because the current approved model does not expose a separate activity resource)
 
 ### 2. Tour Package Management
 - [ ] Preserve existing CRUD
 - [x] Package comparison
-- [ ] Package customization
-- [ ] Dynamic package pricing
+- [x] Package customization
+- [x] Customized package price estimate using existing package/resource prices
+- [ ] Server-authoritative dynamic package pricing rules (requires an approved pricing policy if different from existing booking calculation)
 - [x] Better package discovery
 
 ### 3. Booking Management
@@ -85,6 +87,8 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 - [x] Itinerary planning
 - [x] Connect destination, package, guide, vehicle and accommodation
 - [x] Plan My Trip experience
+- [x] Package customization → booking handoff
+- [x] My Trip → package customization handoff
 
 ## Commit Log
 
@@ -128,6 +132,10 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 | 2026-09-24 | `397aaf011a75309d104572932001fe3d756091bf` | Expose package comparison route | Implemented; verification pending |
 | 2026-09-24 | `23eb417ae9611750116f7a094d3d0874241b96c3` | Improve package discovery controls | Implemented; verification pending |
 | 2026-09-24 | `3a4fa8cdc48371e0e9051aeea07e68ae09495676` | Add destination discovery by travel style | Implemented; verification pending |
+| 2026-09-24 | `3eb7b283d53dd6eb4229fd125188d24a95e85bdf` | Add package customization flow | Implemented; verification pending |
+| 2026-09-24 | `5e46cdbb73b9c28c3faa817cc875c3cc2079c482` | Expose package customization route | Implemented; verification pending |
+| 2026-09-24 | `8e0d8dce2dcfd0b8521fc78c51a845dae7b05e4e` | Link package details to customization | Implemented; verification pending |
+| 2026-09-24 | `49a790adbcd945c8a5400aa1e2728007ab6471b3` | Connect My Trip to package customization | Implemented; verification pending |
 
 ## Final Verification Checklist
 
@@ -157,6 +165,19 @@ Run after the enhancement batch is complete:
 - [x] Plan My Trip package, guide, accommodation and vehicle matches are consistent with the existing recommendation APIs.
 - [x] Cross-module flows are checked after all enhancements are integrated.
 - [ ] Frontend production build completes successfully.
+- [ ] Package detail page opens “Customize this package” for active packages.
+- [ ] Package customization loads the selected package and its existing destinations/duration/price.
+- [ ] Changing guests, dates, language, luggage or driver requirement refreshes guide/accommodation/vehicle recommendations.
+- [ ] Customization shows suitability reasons from the existing recommendation APIs.
+- [ ] Customized price estimate changes according to guests and selected guide/accommodation/vehicle daily rates.
+- [ ] Customized booking creates successfully and carries package, guide, accommodation, vehicle and trip details into the existing booking model.
+- [ ] My Trip with a saved package opens the customization flow instead of bypassing it.
+- [ ] Existing package booking still works independently.
+- [ ] No new database schema is required for the customization flow.
+- [ ] Existing recommendation APIs remain compatible.
+- [ ] Frontend production build completes successfully after the new route/component is added.
+- [ ] Backend/API smoke test confirms customized booking creation still returns the existing booking response and server-calculated total.
+
 - [ ] Backend tests/build complete successfully.
 - [ ] No unrelated regressions are observed.
 
@@ -164,3 +185,16 @@ Run after the enhancement batch is complete:
 
 A feature is not marked complete merely because the code compiles. Before recording an improvement as complete, verify the relevant backend/API behaviour and frontend behaviour, and run the applicable tests.
 
+
+
+### API impact for the latest enhancement batch
+
+The package customization flow intentionally reuses the existing APIs rather than introducing a new database table or duplicate pricing service:
+
+- GET /packages/{id} — loads the selected package.
+- GET /tour-guides/recommendations — matches a guide using language/location.
+- GET /accommodations/recommendations — matches accommodation using destination/travellers.
+- GET /vehicles/recommendations — matches transport using passengers/luggage/driver/location.
+- POST /tourist/bookings — creates the final customized booking.
+
+The frontend price shown during customization is explicitly an estimate. The backend remains the source of truth for the final booking total. This avoids inventing a new pricing policy that is not present in the approved requirements.
