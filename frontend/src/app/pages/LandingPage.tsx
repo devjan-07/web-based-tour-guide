@@ -273,7 +273,10 @@ export default function LandingPage() {
               <p className="mt-1 text-sm text-gray-500">Open a destination for details, then book when you are ready.</p>
             </div>
             <div className="flex flex-wrap gap-3">
-              <a href="#listings-section" className="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-100">
+              <Link to="/tourist/plan" className="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-100">
+                Plan my trip
+              </Link>
+              <a href="#listings-section" className="rounded-xl bg-white/70 px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-white">
                 Explore trips
               </a>
               <Link to="/tourist/dashboard" className="rounded-xl px-4 py-2.5 text-sm font-semibold text-white" style={{ background: "#FF385C" }}>
