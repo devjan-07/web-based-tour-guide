@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { motion } from "motion/react";
 import type { ComponentType, ReactNode } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
 import { ArrowLeft, BedDouble, CalendarDays, Car, CheckCircle, CreditCard, Fuel, Languages, MapPin, Package, Users } from "lucide-react";
