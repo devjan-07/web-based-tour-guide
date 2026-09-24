@@ -27,8 +27,8 @@ export default function MyTrip() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-        <section className="overflow-hidden rounded-3xl bg-gradient-to-br from-[#003580] to-[#0057B8] text-white shadow-lg">
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <section className="overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#003580] to-[#0057B8] text-white shadow-lg">
           <div className="p-7 md:p-10">
             <p className="text-sm font-bold uppercase tracking-[0.18em] text-white/70">My Trip</p>
             <h1 className="mt-2 max-w-3xl text-3xl font-extrabold md:text-5xl">Turn saved ideas into a simple itinerary.</h1>
@@ -56,7 +56,7 @@ export default function MyTrip() {
           </div>
         </section>
 
-        <section className="mt-6 rounded-3xl border border-gray-200 bg-white p-5 shadow-sm md:p-6">
+        <section className="mt-6 rounded-[2rem] border border-gray-200 bg-white p-5 shadow-sm md:p-6">
           <div className="flex flex-col gap-3 border-b border-gray-100 pb-5 md:flex-row md:items-center md:justify-between">
             <div>
               <h2 className="text-xl font-extrabold text-gray-900">Itinerary builder</h2>
@@ -83,14 +83,14 @@ export default function MyTrip() {
               <h3 className="mt-4 font-bold text-gray-900">Your trip is empty</h3>
               <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-gray-500">Explore a destination or package and select “Add to My Trip” to start building your itinerary.</p>
               <div className="mt-5 flex justify-center gap-3">
-                <Link to="/" className="rounded-xl bg-[#FF385C] px-4 py-2.5 text-sm font-bold text-white">Explore destinations</Link>
-                <Link to="/tourist/plan" className="rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-bold text-white">Plan My Trip</Link>
+                <Link to="/explore?tab=destinations" className="rounded-xl bg-[#FF385C] px-4 py-2.5 text-sm font-bold text-white transition hover:opacity-90">Explore destinations</Link>
+                <Link to="/tourist/plan" className="rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-gray-800">Plan My Trip</Link>
               </div>
             </div>
           ) : (
             <div className="mt-5 space-y-4">
               {grouped.map(({ day, items: dayItems }) => (
-                <div key={day} className="rounded-2xl border border-gray-200 p-4">
+                <div key={day} className="rounded-2xl border border-gray-200 bg-white p-4 transition hover:border-gray-300">
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Day {day}</p>
@@ -104,7 +104,7 @@ export default function MyTrip() {
                   ) : (
                     <div className="mt-4 space-y-3">
                       {dayItems.map((item) => (
-                        <article key={item.key} className="flex flex-col gap-3 rounded-xl bg-gray-50 p-4 md:flex-row md:items-center md:justify-between">
+                        <article key={item.key} className="flex flex-col gap-3 rounded-2xl border border-transparent bg-gray-50 p-4 transition hover:border-gray-200 md:flex-row md:items-center md:justify-between">
                           <div className="min-w-0">
                             <span className="rounded-full bg-white px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-gray-500">{tripItemTypeLabel(item.type)}</span>
                             <h4 className="mt-2 truncate font-bold text-gray-900">{item.title}</h4>
@@ -136,7 +136,7 @@ export default function MyTrip() {
             <p className="font-extrabold">Ready to turn the plan into a booking?</p>
             <p className="mt-1 text-sm text-white/60">Your saved itinerary is a planning aid. Review availability and dates during the booking process.</p>
           </div>
-          {items.some((item) => item.type === "package") ? (() => { const packageItem = items.find((item) => item.type === "package")!; return <Link to={`/tourist/packages/${packageItem.id}/customize`} className="rounded-xl bg-[#FF385C] px-5 py-3 text-sm font-bold text-white">Customize package & book</Link>; })() : <Link to="/tourist/bookings/new" className="rounded-xl bg-[#FF385C] px-5 py-3 text-sm font-bold text-white">Continue to booking</Link>}
+          {items.some((item) => item.type === "package") ? (() => { const packageItem = items.find((item) => item.type === "package")!; return <Link to={`/tourist/packages/${packageItem.id}/customize`} className="rounded-xl bg-[#FF385C] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:opacity-90">Customize package & book</Link>; })() : <Link to="/tourist/bookings/new" className="rounded-xl bg-[#FF385C] px-5 py-3 text-sm font-bold text-white">Continue to booking</Link>}
         </section>
       </main>
       <Footer />
