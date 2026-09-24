@@ -56,18 +56,18 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 - [ ] Better package discovery
 
 ### 3. Booking Management
-- [ ] Preserve existing CRUD
-- [ ] My Trip / Trip Command Center
-- [ ] Trip readiness indicator
-- [ ] Booking status timeline
-- [ ] Action-oriented notifications
+- [x] Preserve existing CRUD
+- [x] My Trip / Trip Command Center
+- [x] Trip readiness indicator
+- [x] Booking status timeline
+- [x] Action-oriented notifications
 
 ### 4. Tour Guide Management
-- [ ] Preserve existing CRUD
-- [ ] Guide matching
-- [ ] Language/interest compatibility
-- [ ] Availability-aware recommendations
-- [ ] Guide suitability score
+- [x] Preserve existing CRUD
+- [x] Guide matching
+- [x] Language/interest compatibility
+- [x] Availability-aware recommendations
+- [x] Guide suitability score
 
 ### 5. Vehicle Management
 - [ ] Preserve existing CRUD
@@ -96,6 +96,16 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 | 2026-09-24 | `853dbdcc0536aba03219d5e271793671d83f18d1` | Pre-enhancement baseline | Known good |
 | 2026-09-24 | `c984fbeb03af50eed747134535014c4e16921053` | Destination Smart Discovery — travel-style “Perfect for” signals | Implemented; final verification pending |
 | 2026-09-24 | `8e2b380d2e3f45f6d00b6bb1e46741451a2b1c80` | Tour Package Discovery — package-fit signals | Implemented; final verification pending |
+| 2026-09-24 | `e2dda037019fb28a0d7a525c96d427cbb4cee493` | Booking trip-readiness model | Implemented; final verification pending |
+| 2026-09-24 | `a1098802efef8fb9ec5d1298f25de44208ac8a29` | Guide recommendation model | Implemented; final verification pending |
+| 2026-09-24 | `6e2c59d3c5b7ae49c8a5803a12d4867c1f65ec0f` | Trip readiness calculation | Implemented; final verification pending |
+| 2026-09-24 | `43a1e33ae280803eb8ebdc55fb4f5c06b8d12800` | Development-mode readiness lookup | Implemented; final verification pending |
+| 2026-09-24 | `c4027d0111fb5ac99904e5110cec19536bfb5e82` | Readiness endpoint development-mode fix | Implemented; final verification pending |
+| 2026-09-24 | `b238551edc22fca546e716d4060549ce8cda7604` | Availability-aware guide matching | Implemented; final verification pending |
+| 2026-09-24 | `dfb8194fdef984319ab88b8bbfaffbe91140511c` | Guide recommendation API endpoint | Implemented; final verification pending |
+| 2026-09-24 | `0cb426360ac5bcbee9b5e5018a79dc639904ca5d` | Frontend booking-readiness and guide-matching APIs | Implemented; final verification pending |
+| 2026-09-24 | `6e1fc6bd245af049714040ef8f9e91e83a99b37a` | Tourist trip command center and action center | Implemented; final verification pending |
+| 2026-09-24 | `8fbbc7e567185fdfc54289ea04673a7c43545b7f` | Availability-aware guide matches on destination pages | Implemented; final verification pending |
 
 ## Final Verification Checklist
 
@@ -104,6 +114,12 @@ Run after the enhancement batch is complete:
 - [ ] Existing CRUD operations for destinations, packages, bookings, guides, vehicles and accommodations still work.
 - [ ] Destination detail pages load without frontend console/runtime errors.
 - [ ] “Perfect for” signals appear correctly for destinations with matching categories.
+- [ ] Tourist dashboard shows trip readiness for the next trip.
+- [ ] Booking detail status timeline still reflects Pending → Confirmed → Completed/Cancelled.
+- [ ] Action center displays unread booking notifications when available.
+- [ ] Trip readiness endpoint returns sensible completed/pending items for a booking.
+- [ ] Guide recommendations return only available guides and show suitability reasons/scores.
+- [ ] Guide recommendations respond correctly to language, specialty and location inputs.
 - [ ] Destinations without matching categories show the fallback “Flexible travel” signal.
 - [ ] Existing booking/login navigation remains functional.
 - [ ] Package detail pages and package routes remain functional.
