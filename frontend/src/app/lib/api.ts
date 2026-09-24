@@ -122,6 +122,10 @@ export interface AdminTourist {
   createdAt?: string;
 }
 
+export interface AccommodationRecommendation { accommodation: Accommodation; suitabilityScore: number; reasons: string[]; }
+
+export interface VehicleRecommendation { vehicle: Vehicle; suitabilityScore: number; reasons: string[]; }
+
 export interface Accommodation {
   id: number;
   ownerUserId?: number | null;
@@ -354,6 +358,18 @@ export const partnerAccommodationBookingsApi = {
   list: () => request<Booking[]>("/stakeholder/accommodation-bookings"),
   decide: (id: string, decision: "CONFIRM" | "REJECT") => request<Booking>(`/stakeholder/accommodation-bookings/${id}/decision`, { method: "PATCH", body: JSON.stringify({ decision }) }),
 };
+export const accommodationRecommendationsApi = {
+  list: (params: { destinationId?: number; destination?: string; travellers?: number; maxDailyBudget?: number; accommodationType?: string; preferences?: string } = {}) => {
+    const query = new URLSearchParams();
+    if (params.destinationId) query.set("destinationId", String(params.destinationId));
+    if (params.destination) query.set("destination", params.destination);
+    if (params.travellers) query.set("travellers", String(params.travellers));
+    if (params.maxDailyBudget) query.set("maxDailyBudget", String(params.maxDailyBudget));
+    if (params.accommodationType) query.set("accommodationType", params.accommodationType);
+    if (params.preferences) query.set("preferences", params.preferences);
+    return request<AccommodationRecommendation[]>(`/accommodations/recommendations?${query.toString()}`);
+  },
+};
 export const accommodationSearchApi = {
   list: (params: { destinationId?: number; destination?: string } = {}) => {
     const query = new URLSearchParams();
@@ -361,6 +377,17 @@ export const accommodationSearchApi = {
     if (params.destination) query.set("destination", params.destination);
     const suffix = query.toString() ? `?${query.toString()}` : "";
     return request<Accommodation[]>(`/accommodations${suffix}`);
+  },
+};
+export const vehicleRecommendationsApi = {
+  list: (params: { passengers?: number; luggage?: number; driverRequired?: boolean; location?: string; maxDailyBudget?: number } = {}) => {
+    const query = new URLSearchParams();
+    if (params.passengers) query.set("passengers", String(params.passengers));
+    if (params.luggage !== undefined) query.set("luggage", String(params.luggage));
+    if (params.driverRequired !== undefined) query.set("driverRequired", String(params.driverRequired));
+    if (params.location) query.set("location", params.location);
+    if (params.maxDailyBudget) query.set("maxDailyBudget", String(params.maxDailyBudget));
+    return request<VehicleRecommendation[]>(`/vehicles/recommendations?${query.toString()}`);
   },
 };
 export const publicVehiclesApi = {
