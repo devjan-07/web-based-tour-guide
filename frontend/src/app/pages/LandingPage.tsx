@@ -276,6 +276,9 @@ export default function LandingPage() {
               <Link to="/tourist/plan" className="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-100">
                 Plan my trip
               </Link>
+              <Link to="/tourist/my-trip" className="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-100">
+                My trip
+              </Link>
               <a href="#listings-section" className="rounded-xl bg-white/70 px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-white">
                 Explore trips
               </a>
