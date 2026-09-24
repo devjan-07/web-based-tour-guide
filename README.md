@@ -123,6 +123,7 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 | 2026-09-24 | `4fcc7359047bef9fd42cb404d8357a1507ef227f` | Restrict package customization CTA to package details | Implemented; browser verification pending |
 | 2026-09-24 | `a936363357e4e05cb4a23dc7fdedb8963c2e4490` | Align hero search scrolling with the homepage discovery section | Implemented; browser verification pending |
 | 2026-09-24 | `c79fbb03c6b219e788ee229f9c55f5eab1a0c91d` | Remove stray literal newline escapes from trip planner source | Implemented; browser verification pending |
+| 2026-09-24 | `01e0a8ef7cd4841c295c61f5b2fbdfb1a3cd9a42` | Polish booking experience with responsive review summary and loading state | Implemented; browser verification pending |
 
 | Date | Commit | Improvement | Status |
 |---|---|---|---|
