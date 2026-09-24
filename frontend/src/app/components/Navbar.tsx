@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-import { Menu, User, LogIn, UserPlus, LayoutDashboard, LogOut, HelpCircle, Search, Compass, MapPinned, CalendarHeart } from "lucide-react";
+import { Menu, User, LogIn, UserPlus, LayoutDashboard, LogOut, HelpCircle, Compass, MapPinned, CalendarHeart } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { NotificationBell } from "./NotificationBell";
 import logoImg from "../../imports/c8f8ad87-0b32-4268-ba96-7d4a61b80241.png";
