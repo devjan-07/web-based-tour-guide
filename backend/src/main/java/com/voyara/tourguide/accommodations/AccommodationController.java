@@ -27,6 +27,18 @@ public class AccommodationController {
         return service.findPublic().stream().map(AccommodationResponse::from).toList();
     }
 
+    @GetMapping("/recommendations")
+    public List<AccommodationRecommendation> recommendations(
+            @RequestParam(required = false) Long destinationId,
+            @RequestParam(required = false) String destination,
+            @RequestParam(required = false) Integer travellers,
+            @RequestParam(required = false) Integer maxDailyBudget,
+            @RequestParam(required = false) String accommodationType,
+            @RequestParam(required = false) String preferences
+    ) {
+        return service.recommend(destinationId, destination, travellers, maxDailyBudget, accommodationType, preferences);
+    }
+
     @GetMapping("/{id}")
     public AccommodationResponse one(@PathVariable Long id) {
         return AccommodationResponse.from(service.findPublicById(id));
