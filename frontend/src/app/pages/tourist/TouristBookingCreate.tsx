@@ -650,7 +650,6 @@ export default function TouristBookingCreate() {
                   title={`${selectedVehicle.name} reviews`}
                 />
               )}
-                </div>
               </details>
 
               <details className="group mt-4 rounded-2xl border border-gray-200 bg-gray-50/50 p-4 sm:p-5">
