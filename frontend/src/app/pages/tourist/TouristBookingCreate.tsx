@@ -551,7 +551,6 @@ export default function TouristBookingCreate() {
                     <p className="text-xs text-gray-400 mt-0.5">Choose the transport option for this package request</p>
                   </div>
                   {vehiclesLoading && <span className="text-xs text-gray-400">Loading vehicles...</span>}
-                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <OwnOptionCard
@@ -666,7 +665,6 @@ export default function TouristBookingCreate() {
                   placeholder="Pickup location, dietary needs, preferred guide language, or anything staff should know..."
                 />
               </div>
-                </div>
               </details>
             </section>
 
