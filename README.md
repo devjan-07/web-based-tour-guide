@@ -176,6 +176,7 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 
 | 2026-09-24 | `8f1a45555b757a3964607dceeb5f936ed20d291c` | Rebuild footer navigation cleanly | Implemented; browser verification pending |
 | 2026-09-24 | `c72727e70fd90856ae87c6d88d564093806f3f25` | Remove stray navbar brace | Implemented; browser verification pending |
+| 2026-09-25 | `ab1590068540f74b44e2f0e30e4db71dc58d12a2` | Simplify tourist booking checkout UI | Implemented; browser verification pending |
 ## Final Verification Checklist
 
 Run after the enhancement batch is complete:
@@ -224,6 +225,8 @@ Run after the enhancement batch is complete:
 
 - [ ] Backend tests/build complete successfully.
 - [ ] No unrelated regressions are observed.
+
+- [ ] Booking checkout UI is browser-verified after the final accordion/summary redesign.
 
 ## Quality Rule
 
