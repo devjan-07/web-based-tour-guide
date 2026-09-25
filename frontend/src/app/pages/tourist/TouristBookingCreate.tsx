@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { ComponentType, ReactNode } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
-import { ArrowLeft, BedDouble, CalendarDays, Car, CheckCircle, CreditCard, Fuel, Languages, MapPin, Package, Users } from "lucide-react";
+import { ArrowLeft, BedDouble, CalendarDays, Car, CheckCircle, Fuel, Languages, MapPin, Package, Users } from "lucide-react";
 import { Navbar } from "../../components/Navbar";
 import { Footer } from "../../components/Footer";
 import { ResourceReviews, RatingStars } from "../../components/ResourceReviews";
@@ -316,7 +316,7 @@ export default function TouristBookingCreate() {
         ) : (
           <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
             <section className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-              <div className="mb-5 flex items-center justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-rose-500">Step 1</p><h2 className="mt-1 font-extrabold text-gray-900">Your travel details</h2></div><span className="rounded-full bg-gray-50 px-3 py-1 text-xs font-semibold text-gray-500">Dates · people · preferences</span></div>
+              <div className="mb-6 flex items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-rose-500">Step 1</p><h2 className="mt-1 text-xl font-extrabold text-gray-900">Start with the essentials</h2><p className="mt-1 text-sm text-gray-500">Tell us when you are travelling and who is coming. Everything else is optional.</p></div><span className="hidden rounded-full bg-gray-50 px-3 py-1.5 text-xs font-semibold text-gray-500 sm:inline-flex">Required first</span></div>
 
               {error && (
                 <div className="mb-5 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600">
@@ -372,9 +372,6 @@ export default function TouristBookingCreate() {
                   />
                 </Field>
 
-                <Field icon={CreditCard} label="Estimated total">
-                  <p className="text-sm font-semibold text-gray-800">{total ? `LKR ${total.toLocaleString()}` : "Pending quote"}</p>
-                </Field>
 
                 <Field icon={Languages} label="Preferred guide language">
                   <select
@@ -387,6 +384,11 @@ export default function TouristBookingCreate() {
                 </Field>
               </div>
 
+              <details open className="group mt-6 rounded-2xl border border-gray-200 bg-gray-50/50 p-4 sm:p-5">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
+                  <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-rose-500">Step 2</p><h3 className="mt-1 font-bold text-gray-900">Choose a local guide</h3><p className="mt-0.5 text-xs text-gray-400">Optional — expand to compare available guides.</p></div><span className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-gray-500 shadow-sm">View options</span>
+                </summary>
+                <div className="mt-4">
               <OptionSection
                 title="Guide options"
                 description={`Available guides ${nearbyGuides.length ? "near this destination" : "for your trip request"}`}
@@ -433,6 +435,14 @@ export default function TouristBookingCreate() {
                   title={`${selectedGuide.name} reviews`}
                 />
               )}
+                </div>
+              </details>
+
+              <details open className="group mt-4 rounded-2xl border border-gray-200 bg-gray-50/50 p-4 sm:p-5">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
+                  <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-rose-500">Step 3</p><h3 className="mt-1 font-bold text-gray-900">Choose your stay</h3><p className="mt-0.5 text-xs text-gray-400">Set preferences first, then choose from matching stays.</p></div><span className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-gray-500 shadow-sm">View options</span>
+                </summary>
+                <div className="mt-4">
 
               {selectedAccommodation && (
                 <div className="mt-5 rounded-2xl border border-gray-200 p-4">
@@ -528,11 +538,16 @@ export default function TouristBookingCreate() {
                   title={`${selectedAccommodation.name} reviews`}
                 />
               )}
+                </div>
+              </details>
 
-              <div className="mt-5">
-                <div className="flex items-center justify-between gap-4 mb-3">
-                  <div>
-                    <h3 className="font-bold text-gray-900">Vehicle options</h3>
+              <details open className="group mt-4 rounded-2xl border border-gray-200 bg-gray-50/50 p-4 sm:p-5">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
+                  <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-rose-500">Step 4</p><h3 className="mt-1 font-bold text-gray-900">Choose your transport</h3><p className="mt-0.5 text-xs text-gray-400">Use your own vehicle or select an available Voyara option.</p></div><span className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-gray-500 shadow-sm">View options</span>
+                </summary>
+                <div className="mt-4">
+
+              <div className="mt-0">
                     <p className="text-xs text-gray-400 mt-0.5">Choose the transport option for this package request</p>
                   </div>
                   {vehiclesLoading && <span className="text-xs text-gray-400">Loading vehicles...</span>}
@@ -635,8 +650,14 @@ export default function TouristBookingCreate() {
                   title={`${selectedVehicle.name} reviews`}
                 />
               )}
+                </div>
+              </details>
 
-              <div className="mt-4 rounded-2xl bg-gray-50 p-4">
+              <details className="group mt-4 rounded-2xl border border-gray-200 bg-gray-50/50 p-4 sm:p-5">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
+                  <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-gray-400">Optional</p><h3 className="mt-1 font-bold text-gray-900">Special requests</h3><p className="mt-0.5 text-xs text-gray-400">Anything staff should know about your trip.</p></div><span className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-gray-500 shadow-sm">Add note</span>
+                </summary>
+                <div className="mt-4 rounded-2xl bg-white p-4">
                 <label className="block text-xs font-semibold uppercase tracking-wide text-gray-400 mb-2">Special requests</label>
                 <textarea
                   value={notes}
@@ -646,10 +667,12 @@ export default function TouristBookingCreate() {
                   placeholder="Pickup location, dietary needs, preferred guide language, or anything staff should know..."
                 />
               </div>
+                </div>
+              </details>
             </section>
 
             <aside className="h-fit rounded-3xl border border-gray-200 bg-white p-6 shadow-sm lg:sticky lg:top-24">
-              <h2 className="font-bold text-gray-900 mb-5">Booking summary</h2>
+              <div className="mb-5"><p className="text-xs font-bold uppercase tracking-[0.16em] text-rose-500">Your trip</p><h2 className="mt-1 text-xl font-extrabold text-gray-900">Review & book</h2><p className="mt-1 text-xs leading-5 text-gray-400">Your selections can be reviewed after this request is created.</p></div>
               <div className="space-y-3 text-sm">
                 <SummaryRow label="Tourist" value={user?.fullName || "Current user"} />
                 <SummaryRow label="Email" value={user?.email || "Signed-in account"} />
@@ -662,7 +685,7 @@ export default function TouristBookingCreate() {
                 <SummaryRow label="Vehicle" value={selectedVehicle ? vehicleLabel(selectedVehicle) : OWN_VEHICLE_LABEL} />
                 {selectedVehicle && <SummaryRow label="Pickup" value={`${pickupLocation} ${pickupTime}`} />}
                 {selectedVehicle && <SummaryRow label="Return" value={`${returnLocation} ${returnTime}`} />}
-                <SummaryRow label="Estimated total" value={total ? `LKR ${total.toLocaleString()}` : "Pending quote"} />
+                <div className="rounded-2xl bg-gray-50 px-4 py-3"><div className="flex items-end justify-between gap-4"><span className="text-xs font-semibold uppercase tracking-wide text-gray-400">Estimated total</span><span className="text-lg font-extrabold text-gray-900">{total ? `LKR ${total.toLocaleString()}` : "Pending quote"}</span></div><p className="mt-1 text-[11px] leading-4 text-gray-400">Final booking total is determined by the backend.</p></div>
                 <SummaryRow label="Status" value="Pending" />
                 <SummaryRow label="Payment" value="Pending" />
               </div>
@@ -680,7 +703,7 @@ export default function TouristBookingCreate() {
                 className="mt-5 w-full rounded-xl px-4 py-3 text-sm font-semibold text-white disabled:opacity-60"
                 style={{ background: "linear-gradient(135deg, #FF385C, #E31C5F)" }}
               >
-                {submitting ? "Creating booking..." : "Confirm Booking Request"}
+                {submitting ? "Creating booking..." : "Continue with booking"}
               </button>
             </aside>
           </form>
