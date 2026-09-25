@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { ComponentType, ReactNode } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
-import { ArrowLeft, BedDouble, CalendarDays, Car, CheckCircle, Fuel, Languages, MapPin, Package, Users } from "lucide-react";
+import { ArrowLeft, BedDouble, CalendarDays, Car, CheckCircle, CreditCard, Fuel, Languages, MapPin, Package, Users } from "lucide-react";
 import { Navbar } from "../../components/Navbar";
 import { Footer } from "../../components/Footer";
 import { ResourceReviews, RatingStars } from "../../components/ResourceReviews";
