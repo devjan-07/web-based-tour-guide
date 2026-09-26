@@ -25,7 +25,7 @@ class LocationResolverTest {
         when(httpResponse.body()).thenReturn("""
                 {"results":[{"name":"Kandy","latitude":7.2906,"longitude":80.6337}]}
                 """);
-        when(httpClient.send(any(), any())).thenReturn(httpResponse);
+        when(httpClient.<String>send(any(), any())).thenReturn(httpResponse);
 
         LocationResolver resolver = new LocationResolver(httpClient, new ObjectMapper(), "http://localhost/geocode");
 
