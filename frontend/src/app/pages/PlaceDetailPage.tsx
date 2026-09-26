@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
-import { ArrowLeft, CalendarDays, CheckCircle, Clock, CreditCard, HelpCircle, MapPin, ShieldCheck, Tag, Users, Star, Sparkles, SlidersHorizontal } from "lucide-react";
+import { ArrowLeft, CalendarDays, CheckCircle, Clock, CreditCard, HelpCircle, MapPin, ShieldCheck, Tag, Users, Star, Sparkles, SlidersHorizontal, Share2 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
@@ -122,7 +122,7 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
 
         {!loading && detail && (
           <article className="overflow-hidden rounded-[2rem] border border-gray-200 bg-white shadow-sm">
-            <div className="relative min-h-[420px] overflow-hidden md:min-h-[500px]">
+            <div className="relative min-h-[460px] overflow-hidden md:min-h-[560px]">
               <img
                 src={detail.image || "https://images.unsplash.com/photo-1586500036706-41963de24d8b?w=1200"}
                 alt={detail.title}
@@ -140,7 +140,12 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
                     </span>
                   )}
                 </div>
-                <h1 className="max-w-4xl text-4xl font-extrabold leading-[1.05] tracking-tight md:text-6xl">{detail.title}</h1>
+                <div className="flex items-start justify-between gap-5">
+                  <h1 className="max-w-4xl text-4xl font-extrabold leading-[1.05] tracking-tight md:text-6xl">{detail.title}</h1>
+                  <button type="button" onClick={() => navigator.clipboard?.writeText(window.location.href)} className="hidden shrink-0 items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-xs font-bold backdrop-blur transition hover:bg-white/25 sm:flex" title="Copy page link">
+                    <Share2 className="h-4 w-4" /> Share
+                  </button>
+                </div>
                 <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/90">
                   <span className="inline-flex items-center gap-1.5"><MapPin className="h-4 w-4" /> {detail.location}</span>
                   {item?.mode === "package" && <span className="inline-flex items-center gap-1.5"><Clock className="h-4 w-4" /> {detail.durationLabel}</span>}
@@ -149,7 +154,7 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-8 p-5 sm:p-6 md:grid-cols-[1fr_340px] md:p-8">
+            <div className="grid grid-cols-1 gap-8 p-5 sm:p-6 md:grid-cols-[1fr_340px] md:p-10">
               <section>
                 <div className="mb-6 flex flex-wrap gap-2">
                   {detail.tags.map((tag) => (
