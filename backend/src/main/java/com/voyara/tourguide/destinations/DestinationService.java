@@ -37,6 +37,68 @@ public class DestinationService {
         return destination;
     }
 
+
+    @Transactional(readOnly = true)
+    public List<DestinationRecommendation> similarDestinations(Long id) {
+        Destination source = findById(id);
+        List<String> sourceCategories = source.getCategories() == null ? List.of() : source.getCategories().stream()
+                .filter(value -> value != null && !value.isBlank())
+                .map(value -> value.trim().toLowerCase())
+                .toList();
+
+        return repository.findAll().stream()
+                .filter(candidate -> candidate.getId() != null && !candidate.getId().equals(id))
+                .filter(candidate -> "Active".equalsIgnoreCase(candidate.getStatus()))
+                .map(candidate -> {
+                    initializeCollections(candidate);
+                    int score = 0;
+                    List<String> reasons = new ArrayList<>();
+                    List<String> candidateCategories = candidate.getCategories() == null ? List.of() : candidate.getCategories();
+
+                    long categoryMatches = candidateCategories.stream()
+                            .filter(value -> value != null)
+                            .map(value -> value.trim().toLowerCase())
+                            .filter(sourceCategories::contains)
+                            .count();
+
+                    if (categoryMatches > 0) {
+                        score += (int) Math.min(60, categoryMatches * 25);
+                        reasons.add(categoryMatches == 1 ? "Travel style match" : "Multiple travel style matches");
+                    }
+
+                    if (source.getCountry() != null && !source.getCountry().isBlank()
+                            && source.getCountry().equalsIgnoreCase(candidate.getCountry())) {
+                        score += 15;
+                        reasons.add("Same country");
+                    }
+
+                    if (source.getContinent() != null && !source.getContinent().isBlank()
+                            && source.getContinent().equalsIgnoreCase(candidate.getContinent())) {
+                        score += 10;
+                        reasons.add("Same region");
+                    }
+
+                    if (candidate.getRating() >= 4.5) {
+                        score += 10;
+                        reasons.add("Highly rated");
+                    } else if (candidate.getRating() >= 4.0) {
+                        score += 5;
+                        reasons.add("Well rated");
+                    }
+
+                    if (reasons.isEmpty()) {
+                        reasons.add("Nearby travel option");
+                        score = 20;
+                    }
+
+                    return new DestinationRecommendation(candidate, Math.min(score, 100), reasons);
+                })
+                .sorted(java.util.Comparator.comparingInt(DestinationRecommendation::suitabilityScore).reversed()
+                        .thenComparing(d -> d.destination().getRating(), java.util.Comparator.reverseOrder()))
+                .limit(6)
+                .toList();
+    }
+
     @Transactional
     public Destination save(Destination destination) {
         clearUnsupportedRatings(destination);
