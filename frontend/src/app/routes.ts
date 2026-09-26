@@ -6,6 +6,7 @@ import LoginPage from "./pages/LoginPage";
 import HelpPage from "./pages/HelpPage";
 import ListTourPage from "./pages/ListTourPage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
+import { AppLayout } from "./components/AppLayout";
 import { DestinationDetailPage, PackageDetailPage } from "./pages/PlaceDetailPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AdminRoute, HotelPartnerRoute, StakeholderRoute, TouristRoute, TransportProviderRoute } from "./components/RoleBasedRoute";
@@ -37,7 +38,7 @@ export const router = createBrowserRouter([
   {
     Component: AppLayout,
     children: [
-  { path: "/", Component: LandingPage },
+      { path: "/", Component: LandingPage },
   { path: "/explore", Component: ExplorePage },
   { path: "/guides", Component: GuidesPage },
   { path: "/compare-packages", Component: ComparePackages },
