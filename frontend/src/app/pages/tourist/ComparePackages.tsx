@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
-import { ArrowLeft, Check, Clock, Star } from "lucide-react";
+import { ArrowLeft, Check, Clock, Star, GitCompare, ArrowRight } from "lucide-react";
 import { Navbar } from "../../components/Navbar";
 import { Footer } from "../../components/Footer";
 import { packagesApi, type TourPackage } from "../../lib/api";
@@ -22,15 +22,15 @@ export default function ComparePackages() {
 
   return <div className="min-h-screen bg-gray-50"><Navbar /><main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
     <Link to="/explore?tab=tours" className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 transition hover:text-gray-900"><ArrowLeft className="h-4 w-4" /> Back to tour packages</Link>
-    <div className="mt-5 rounded-[2rem] bg-gradient-to-br from-[#003580] to-[#0057B8] p-7 text-white md:p-10">
-      <p className="text-xs font-bold uppercase tracking-widest text-white/70">Package comparison</p>
+    <div className="mt-5 overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#062a56] via-[#003580] to-[#0057B8] p-7 text-white shadow-xl md:p-10">
+      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white/70"><GitCompare className="h-4 w-4" /> Package comparison</div>
       <h1 className="mt-2 text-3xl font-extrabold md:text-5xl">Compare tours before you choose.</h1>
       <p className="mt-3 max-w-2xl text-sm text-white/80">Select up to three active packages and compare price, duration, group size, difficulty and rating side by side.</p>
     </div>
     <section className="mt-6 rounded-[2rem] border border-gray-200 bg-white p-5 shadow-sm md:p-6">
-      <div className="flex items-center justify-between gap-3"><h2 className="font-extrabold text-gray-900">Choose packages</h2><span className="text-xs font-semibold text-gray-400">{selected.length}/3 selected</span></div>
+      <div className="flex items-center justify-between gap-3"><h2 className="font-extrabold text-gray-900">Choose packages</h2><span className={"rounded-full px-3 py-1 text-xs font-bold " + (selected.length === 3 ? "bg-rose-50 text-rose-600" : "bg-gray-100 text-gray-500")}>{selected.length}/3 selected</span></div>
       <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-        {packages.map((pkg) => <button key={pkg.id} type="button" onClick={() => toggle(pkg.id)} aria-pressed={selected.includes(pkg.id)} className={"text-left rounded-2xl border p-4 transition " + (selected.includes(pkg.id) ? "border-rose-400 bg-rose-50 shadow-sm" : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm")}>
+        {packages.map((pkg) => <button key={pkg.id} type="button" onClick={() => toggle(pkg.id)} aria-pressed={selected.includes(pkg.id)} className={"group text-left rounded-2xl border p-4 transition duration-200 " + (selected.includes(pkg.id) ? "border-rose-400 bg-rose-50 shadow-sm" : "border-gray-200 bg-white hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-md")}>
           <div className="flex items-start justify-between gap-3"><div><p className="font-bold text-gray-900">{pkg.name}</p><p className="mt-1 text-xs text-gray-500">{pkg.category} · {pkg.destinations.join(", ")}</p></div>{selected.includes(pkg.id) && <Check className="h-5 w-5 text-rose-500" />}</div>
           <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-gray-500">
             <span className="font-extrabold text-gray-900">LKR {Number(pkg.price || 0).toLocaleString()}</span>
@@ -41,7 +41,7 @@ export default function ComparePackages() {
       </div>
     </section>
     {selectedPackages.length >= 2 && <section className="mt-6 overflow-x-auto rounded-[2rem] border border-gray-200 bg-white p-5 shadow-sm md:p-6">
-      <div className="flex items-center justify-between"><h2 className="font-extrabold text-gray-900">Comparison</h2><button type="button" onClick={() => setSelected([])} className="text-xs font-semibold text-gray-500">Clear</button></div>
+      <div className="flex items-center justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-rose-500">Side by side</p><h2 className="mt-1 font-extrabold text-gray-900">Comparison</h2></div><button type="button" onClick={() => setSelected([])} className="text-xs font-semibold text-gray-500">Clear</button></div>
       <table className="mt-4 min-w-[760px] w-full text-left text-sm"><thead><tr><th className="sticky left-0 z-10 bg-white p-3 text-xs uppercase tracking-wide text-gray-400">Feature</th>{selectedPackages.map((pkg) => <th key={pkg.id} className="p-3 font-bold text-gray-900">{pkg.name}</th>)}</tr></thead>
       <tbody>{[
         ["Price", ...selectedPackages.map((p) => "LKR " + Number(p.price || 0).toLocaleString())],
