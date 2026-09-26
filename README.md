@@ -42,6 +42,7 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 - [x] Preserve existing CRUD
 - [x] Destination suitability information
 - [x] Destination discovery/recommendations
+- [x] Similar-destination recommendations from existing destination categories, country, region, and ratings (no database schema change)
 - [ ] Nearby experiences
 - [x] Add destination to trip
 - [ ] Add activity/attraction to trip (not implemented because the current approved model does not expose a separate activity resource)
