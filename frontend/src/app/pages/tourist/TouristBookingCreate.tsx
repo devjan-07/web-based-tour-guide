@@ -543,112 +543,119 @@ export default function TouristBookingCreate() {
 
               <details open className="group mt-4 rounded-2xl border border-gray-200 bg-gray-50/50 p-4 sm:p-5">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
-                  <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-rose-500">Step 4</p><h3 className="mt-1 font-bold text-gray-900">Choose your transport</h3><p className="mt-0.5 text-xs text-gray-400">Use your own vehicle or select an available Voyara option.</p></div><span className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-gray-500 shadow-sm">View options</span>
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-rose-500">Step 4</p>
+                    <h3 className="mt-1 font-bold text-gray-900">Choose your transport</h3>
+                    <p className="mt-0.5 text-xs text-gray-400">Use your own vehicle or select an available Voyara option.</p>
+                  </div>
+                  <span className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-gray-500 shadow-sm">View options</span>
                 </summary>
+
                 <div className="mt-4">
+                  <p className="text-xs text-gray-400">Choose the transport option for this package request</p>
 
-              <div className="mt-0">
-                    <p className="text-xs text-gray-400 mt-0.5">Choose the transport option for this package request</p>
+                  {vehiclesLoading && <span className="mt-2 inline-block text-xs text-gray-400">Loading vehicles...</span>}
+
+                  <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
+                    <OwnOptionCard
+                      selected={selectedVehicleId === null}
+                      title={OWN_VEHICLE_LABEL}
+                      description="You will use your own transport for this trip."
+                      detail="No vehicle charge"
+                      icon={Fuel}
+                      onClick={() => setSelectedVehicleId(null)}
+                    />
+
+                    {!vehiclesLoading && vehicles.length === 0 ? (
+                      <div className="rounded-2xl border border-dashed border-gray-200 p-5 text-sm text-gray-400">
+                        No available Voyara vehicles are listed right now.
+                      </div>
+                    ) : (
+                      vehicles.map((vehicle) => {
+                        const selected = vehicle.id === selectedVehicleId;
+                        const match = vehicleRecommendations.find((item) => item.vehicle.id === vehicle.id);
+
+                        return (
+                          <button
+                            type="button"
+                            key={vehicle.id}
+                            onClick={() => setSelectedVehicleId(vehicle.id)}
+                            className="rounded-2xl border p-4 text-left transition-colors"
+                            style={{
+                              borderColor: selected ? "#FF385C" : "#e5e7eb",
+                              background: selected ? "#fff5f7" : "#fff",
+                            }}
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div>
+                                <p className="font-bold text-gray-900">{vehicle.name}</p>
+                                <p className="mt-0.5 text-xs text-gray-400">{vehicle.brand} {vehicle.model} · {vehicle.type}</p>
+                              </div>
+                              <ChoiceBadge selected={selected} />
+                            </div>
+
+                            <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-gray-500">
+                              <span className="inline-flex items-center gap-1.5"><Users className="h-3.5 w-3.5" /> {vehicle.capacity} seats</span>
+                              <span className="inline-flex items-center gap-1.5"><Fuel className="h-3.5 w-3.5" /> {vehicle.fuel}</span>
+                              <RatingStars rating={Number(vehicle.rating || 0)} reviews={Number(vehicle.reviews || 0)} compact />
+                              <span>{vehicle.transmission}</span>
+                              <span className="font-semibold text-gray-800">LKR {Number(vehicle.pricePerDay || 0).toLocaleString()} / day</span>
+                            </div>
+
+                            {match && (
+                              <div className="mt-2 flex flex-wrap gap-1.5">
+                                <span className="rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-bold text-emerald-700">{match.suitabilityScore}% fit</span>
+                                {match.reasons.slice(0, 2).map((reason) => (
+                                  <span key={reason} className="rounded-full bg-gray-100 px-2 py-1 text-[11px] font-semibold text-gray-600">{reason}</span>
+                                ))}
+                              </div>
+                            )}
+
+                            {vehicle.location && <p className="mt-2 text-xs text-gray-400">{vehicle.location}</p>}
+                          </button>
+                        );
+                      })
+                    )}
                   </div>
-                  {vehiclesLoading && <span className="text-xs text-gray-400">Loading vehicles...</span>}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <OwnOptionCard
-                    selected={selectedVehicleId === null}
-                    title={OWN_VEHICLE_LABEL}
-                    description="You will use your own transport for this trip."
-                    detail="No vehicle charge"
-                    icon={Fuel}
-                    onClick={() => setSelectedVehicleId(null)}
-                  />
-                  {!vehiclesLoading && vehicles.length === 0 ? (
-                    <div className="rounded-2xl border border-dashed border-gray-200 p-5 text-sm text-gray-400">
-                      No available Voyara vehicles are listed right now.
+                  {selectedVehicle && (
+                    <div className="mt-5 rounded-2xl border border-gray-200 p-4">
+                      <h3 className="font-bold text-gray-900">Vehicle details</h3>
+                      <p className="mt-0.5 text-xs text-gray-400">These pickup and return details are saved with the selected vehicle.</p>
+
+                      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <Field icon={MapPin} label="Pickup location">
+                          <input value={pickupLocation} onChange={(event) => setPickupLocation(event.target.value)} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
+                        </Field>
+                        <Field icon={CalendarDays} label="Pickup time">
+                          <input type="time" value={pickupTime} onChange={(event) => setPickupTime(event.target.value)} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
+                        </Field>
+                        <Field icon={MapPin} label="Return location">
+                          <input value={returnLocation} onChange={(event) => setReturnLocation(event.target.value)} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
+                        </Field>
+                        <Field icon={CalendarDays} label="Return time">
+                          <input type="time" value={returnTime} onChange={(event) => setReturnTime(event.target.value)} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
+                        </Field>
+                        <Field icon={Car} label="Driver">
+                          <select value={driverRequired ? "Yes" : "No"} onChange={(event) => setDriverRequired(event.target.value === "Yes")} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none">
+                            <option>Yes</option>
+                            <option>No</option>
+                          </select>
+                        </Field>
+                        <Field icon={Package} label="Luggage count">
+                          <input type="number" value={luggageCount} onChange={(event) => setLuggageCount(Number(event.target.value))} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
+                        </Field>
+                      </div>
                     </div>
-                  ) : (
-                    vehicles.map((vehicle) => {
-                      const selected = vehicle.id === selectedVehicleId;
-                      return (
-                        <button
-                          type="button"
-                          key={vehicle.id}
-                          onClick={() => setSelectedVehicleId(vehicle.id)}
-                          className="text-left rounded-2xl border p-4 transition-colors"
-                          style={{
-                            borderColor: selected ? "#FF385C" : "#e5e7eb",
-                            background: selected ? "#fff5f7" : "#fff",
-                          }}
-                        >
-                          <div className="flex items-start justify-between gap-3">
-                            <div>
-                              <p className="font-bold text-gray-900">{vehicle.name}</p>
-                              <p className="text-xs text-gray-400 mt-0.5">{vehicle.brand} {vehicle.model} · {vehicle.type}</p>
-                            </div>
-                            <ChoiceBadge selected={selected} />
-                          </div>
-                          <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-gray-500">
-                            <span className="inline-flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> {vehicle.capacity} seats</span>
-                            <span className="inline-flex items-center gap-1.5"><Fuel className="w-3.5 h-3.5" /> {vehicle.fuel}</span>
-                            <RatingStars rating={Number(vehicle.rating || 0)} reviews={Number(vehicle.reviews || 0)} compact />
-                            <span>{vehicle.transmission}</span>
-                            <span className="font-semibold text-gray-800">LKR {Number(vehicle.pricePerDay || 0).toLocaleString()} / day</span>
-                          </div>
-                          {vehicleRecommendations.find((item) => item.vehicle.id === vehicle.id) && (
-                            <div className="mt-2 flex flex-wrap gap-1.5">
-                              {(() => {
-                                const match = vehicleRecommendations.find((item) => item.vehicle.id === vehicle.id)!;
-                                return <>
-                                  <span className="rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-bold text-emerald-700">{match.suitabilityScore}% fit</span>
-                                  {match.reasons.slice(0, 2).map((reason) => <span key={reason} className="rounded-full bg-gray-100 px-2 py-1 text-[11px] font-semibold text-gray-600">{reason}</span>)}
-                                </>;
-                              })()}
-                            </div>
-                          )}
-                          {vehicle.location && <p className="mt-2 text-xs text-gray-400">{vehicle.location}</p>}
-                        </button>
-                      );
-                    })
                   )}
-                </div>
-              </div>
 
-              {selectedVehicle && (
-                <div className="mt-5 rounded-2xl border border-gray-200 p-4">
-                  <h3 className="font-bold text-gray-900">Vehicle details</h3>
-                  <p className="mt-0.5 text-xs text-gray-400">These pickup and return details are saved with the selected vehicle.</p>
-                  <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <Field icon={MapPin} label="Pickup location">
-                      <input value={pickupLocation} onChange={(event) => setPickupLocation(event.target.value)} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
-                    </Field>
-                    <Field icon={CalendarDays} label="Pickup time">
-                      <input type="time" value={pickupTime} onChange={(event) => setPickupTime(event.target.value)} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
-                    </Field>
-                    <Field icon={MapPin} label="Return location">
-                      <input value={returnLocation} onChange={(event) => setReturnLocation(event.target.value)} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
-                    </Field>
-                    <Field icon={CalendarDays} label="Return time">
-                      <input type="time" value={returnTime} onChange={(event) => setReturnTime(event.target.value)} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
-                    </Field>
-                    <Field icon={Car} label="Driver">
-                      <select value={driverRequired ? "Yes" : "No"} onChange={(event) => setDriverRequired(event.target.value === "Yes")} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none">
-                        <option>Yes</option>
-                        <option>No</option>
-                      </select>
-                    </Field>
-                    <Field icon={Package} label="Luggage count">
-                      <input type="number" value={luggageCount} onChange={(event) => setLuggageCount(Number(event.target.value))} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
-                    </Field>
-                  </div>
-                </div>
-              )}
-
-              {selectedVehicle && (
-                <ResourceReviews
-                  targetType="VEHICLE"
-                  targetId={selectedVehicle.id}
-                  title={`${selectedVehicle.name} reviews`}
-                />
-              )}
+                  {selectedVehicle && (
+                    <ResourceReviews
+                      targetType="VEHICLE"
+                      targetId={selectedVehicle.id}
+                      title={`${selectedVehicle.name} reviews`}
+                    />
+                  )}
                 </div>
               </details>
 
