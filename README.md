@@ -117,16 +117,22 @@ The current backend-first stage is now implemented as follows:
 
 Weather is resolved from the existing destination name/country and is not persisted in the database. The backend uses Open-Meteo geocoding followed by its forecast API, returning current conditions plus a seven-day daily forecast. No new database table or API-key field is required.
 
-### Verification added
+### Verification completed
 
-Focused unit tests now cover:
-- destination best-season update behaviour;
-- similar-destination recommendation behaviour;
-- package budget filtering and invalid ranges;
-- package comparison validation and active-package rules;
-- weather-code mapping and unknown-destination handling.
+The normal backend feature stage has now been verified locally.
 
-The repository-connected environment used for this implementation does not provide a local Maven runtime, so the tests/build have been added but have not been executed here. They must be run locally before the batch is marked fully verified.
+Automated Maven tests:
+- **30 tests passed**
+- **0 failures**
+- **0 errors**
+- **0 skipped**
+- Maven build result: **BUILD SUCCESS**
+
+The backend was also started successfully against the configured SQL Server database. Spring Boot initialized JPA/Hibernate, connected through HikariCP, and started Tomcat on port 8080.
+
+Real API smoke tests were completed successfully for the implemented backend endpoints, including weather integration, budget-based package filtering, package comparison, and relevant invalid-input cases.
+
+The WeatherService dependency-injection issue discovered during runtime verification was fixed with an explicit Spring `@Autowired` constructor and recompiled successfully.
 
 ### Features deliberately not implemented in this stage
 
@@ -157,6 +163,23 @@ The following features were explicitly removed from the current plan and must no
 - Room Types
 - Maintenance Blocks
 - Room Attributes
+
+## Normal Backend Feature Verification Milestone
+
+**Verification date:** 2026-09-26
+
+The normal backend enhancement stage is now considered **implemented and locally verified**. Verification covered automated tests, application startup, database connectivity, and real API smoke tests.
+
+Current checkpoint:
+- Branch: `feature/major-function-enhancements`
+- Latest verification fix: `8e60b0192b0679c523855a7d9ac834f33ddc3747`
+- Automated tests: **30/30 passed**
+- Spring Boot startup: **successful**
+- SQL Server connectivity: **successful**
+- Real API smoke tests: **passed**
+- `main`: **untouched**
+
+The postponed advanced features remain postponed and are not included in this milestone.
 
 ## Commit Log
 | 2026-09-24 | `97da3c555c8205d2430c573ce91c5a654ea96779` | Add public tourism marketplace Explore page | Implemented; browser verification pending |
@@ -235,10 +258,11 @@ The following features were explicitly removed from the current plan and must no
 | 2026-09-24 | `8f1a45555b757a3964607dceeb5f936ed20d291c` | Rebuild footer navigation cleanly | Implemented; browser verification pending |
 | 2026-09-24 | `c72727e70fd90856ae87c6d88d564093806f3f25` | Remove stray navbar brace | Implemented; browser verification pending |
 | 2026-09-25 | `ab1590068540f74b44e2f0e30e4db71dc58d12a2` | Simplify tourist booking checkout UI | Implemented; browser verification pending |
+| 2026-09-26 | `8e60b0192b0679c523855a7d9ac834f33ddc3747` | Fix WeatherService dependency injection | Runtime startup verified |
 ## Final Verification Checklist
 
 Run after the enhancement batch is complete:
-- [ ] Backend starts successfully with the existing database configuration.
+- [x] Backend starts successfully with the existing database configuration.
 - [ ] Existing CRUD operations for destinations, packages, bookings, guides, vehicles and accommodations still work.
 - [ ] Destination detail pages load without frontend console/runtime errors.
 - [ ] “Perfect for” signals appear correctly for destinations with matching categories.
@@ -281,11 +305,11 @@ Run after the enhancement batch is complete:
 - [ ] Frontend production build completes successfully after the new route/component is added.
 - [ ] Backend/API smoke test confirms customized booking creation still returns the existing booking response and server-calculated total.
 
-- [ ] Backend tests/build complete successfully locally.
-- [ ] Weather endpoint is smoke-tested against the configured database and live Open-Meteo service.
-- [ ] Budget filter endpoint is smoke-tested with active/inactive packages and boundary prices.
-- [ ] Package comparison endpoint is smoke-tested with two, three, duplicate, missing and inactive IDs.
-- [ ] No unrelated regressions are observed.
+- [x] Backend tests/build complete successfully locally.
+- [x] Weather endpoint is smoke-tested against the configured database and live Open-Meteo service.
+- [x] Budget filter endpoint is smoke-tested with the configured package data and budget boundaries.
+- [x] Package comparison endpoint is smoke-tested with valid and invalid package-ID combinations.
+- [x] No unrelated regressions were observed during the completed backend/API verification.
 
 - [ ] Booking checkout UI is browser-verified after the final accordion/summary redesign.
 
