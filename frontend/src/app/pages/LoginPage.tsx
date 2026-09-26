@@ -166,10 +166,10 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left panel */}
-      <div className="hidden lg:flex lg:w-1/2 relative flex-col justify-between p-12 overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 relative min-h-screen flex-col justify-between overflow-hidden p-12">
         <img src={bgImage} alt="Sri Lanka travel" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(15,23,42,0.75) 0%, rgba(255,56,92,0.35) 100%)" }} />
-        <div className="relative flex items-center gap-2.5">
+        <div className="relative flex items-center gap-2.5 transition-transform duration-300 hover:scale-[1.02]">
           <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #FF385C, #E31C5F)" }}>
             <Globe className="w-5 h-5 text-white" />
           </div>
@@ -244,7 +244,7 @@ export default function LoginPage() {
 
               {/* Verify button */}
               <button onClick={handleVerify} disabled={loading}
-                className="w-full py-3 rounded-xl text-white font-semibold text-sm transition-opacity hover:opacity-90 flex items-center justify-center gap-2"
+                className="w-full rounded-xl py-3 text-sm font-semibold text-white transition duration-200 hover:-translate-y-0.5 hover:opacity-90 flex items-center justify-center gap-2 shadow-sm"
                 style={{ background: loading ? "#9ca3af" : "linear-gradient(135deg, #FF385C, #E31C5F)" }}>
                 {loading ? (
                   <><svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
@@ -271,9 +271,9 @@ export default function LoginPage() {
           ) : (
             <>
               {/* Mode tabs */}
-              <div className="flex rounded-2xl p-1 mb-8" style={{ background: "#f0f0f5" }}>
+              <div className="mb-8 flex rounded-2xl bg-gray-100/80 p-1 shadow-inner">
                 {(["login", "signup"] as const).map((m) => (
-                  <button key={m} onClick={() => switchMode(m)} className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all"
+                  <button key={m} onClick={() => switchMode(m)} className="flex-1 rounded-xl py-2.5 text-sm font-semibold transition-all duration-200"
                     style={{ background: mode === m ? "white" : "transparent", color: mode === m ? "#111" : "#6b7280", boxShadow: mode === m ? "0 1px 4px rgba(0,0,0,0.1)" : "none" }}>
                     {m === "login" ? "Log In" : "Sign Up"}
                   </button>
