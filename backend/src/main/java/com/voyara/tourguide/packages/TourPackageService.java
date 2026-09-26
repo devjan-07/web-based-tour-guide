@@ -8,7 +8,9 @@ import com.voyara.tourguide.routes.Route;
 import com.voyara.tourguide.routes.RouteRepository;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,6 +62,28 @@ public class TourPackageService {
                 .peek(this::initializeCollections)
                 .sorted(java.util.Comparator.comparing(TourPackage::getPrice))
                 .toList();
+    }
+
+    /**
+     * Returns two or three active packages in the same order requested by the client.
+     * Validation stays server-side so comparison cannot be built from stale or inactive records.
+     */
+    @Transactional(readOnly = true)
+    public List<TourPackage> comparePackages(List<Long> ids) {
+        validateComparisonIds(ids);
+
+        List<TourPackage> result = new ArrayList<>();
+        for (Long id : ids) {
+            TourPackage tourPackage = repository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Package", id));
+            if (!isActive(tourPackage)) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Package " + id + " is not available for public comparison.");
+            }
+            initializeCollections(tourPackage);
+            result.add(tourPackage);
+        }
+        return result;
     }
 
     @Transactional
@@ -130,6 +154,18 @@ public class TourPackageService {
         }
         if (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Minimum price cannot exceed maximum price.");
+        }
+    }
+
+    private void validateComparisonIds(List<Long> ids) {
+        if (ids == null || ids.size() < 2 || ids.size() > 3) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Package comparison requires between two and three package IDs.");
+        }
+        Set<Long> uniqueIds = new HashSet<>(ids);
+        if (uniqueIds.size() != ids.size() || ids.stream().anyMatch(id -> id == null || id <= 0)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Package comparison IDs must be unique positive values.");
         }
     }
 

@@ -75,6 +75,49 @@ class TourPackageServiceTest {
         assertEquals(List.of(low, high), service.filterByBudget(null, null));
     }
 
+    @Test
+    void compareReturnsRequestedActivePackagesInOrder() {
+        TourPackage first = packageOf(50000, "Active");
+        first.setId(10L);
+        TourPackage second = packageOf(80000, "Active");
+        second.setId(20L);
+        when(repository.findById(20L)).thenReturn(Optional.of(second));
+        when(repository.findById(10L)).thenReturn(Optional.of(first));
+
+        assertEquals(List.of(second, first), service.comparePackages(List.of(20L, 10L)));
+    }
+
+    @Test
+    void compareRejectsMoreThanThreePackages() {
+        ResponseStatusException error = assertThrows(ResponseStatusException.class,
+                () -> service.comparePackages(List.of(1L, 2L, 3L, 4L)));
+
+        assertEquals(400, error.getStatusCode().value());
+        verify(repository, never()).findById(1L);
+    }
+
+    @Test
+    void compareRejectsDuplicateIds() {
+        ResponseStatusException error = assertThrows(ResponseStatusException.class,
+                () -> service.comparePackages(List.of(1L, 1L)));
+
+        assertEquals(400, error.getStatusCode().value());
+        verify(repository, never()).findById(1L);
+    }
+
+    @Test
+    void compareRejectsInactivePackage() {
+        TourPackage inactive = packageOf(50000, "Draft");
+        inactive.setId(10L);
+        when(repository.findById(10L)).thenReturn(Optional.of(inactive));
+        when(repository.findById(20L)).thenReturn(Optional.of(packageOf(80000, "Active")));
+
+        ResponseStatusException error = assertThrows(ResponseStatusException.class,
+                () -> service.comparePackages(List.of(10L, 20L)));
+
+        assertEquals(404, error.getStatusCode().value());
+    }
+
     private TourPackage packageOf(int price, String status) {
         TourPackage value = new TourPackage();
         value.setId((long) price);

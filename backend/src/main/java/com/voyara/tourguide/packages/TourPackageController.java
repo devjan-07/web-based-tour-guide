@@ -35,6 +35,11 @@ public class TourPackageController {
         return service.filterByBudget(minPrice, maxPrice);
     }
 
+    @GetMapping("/compare")
+    public List<TourPackage> compare(@RequestParam List<Long> ids) {
+        return service.comparePackages(ids);
+    }
+
     @GetMapping("/{id}/routes")
     public List<com.voyara.tourguide.routes.Route> routes(@PathVariable Long id) {
         return service.routesForPackage(id);
