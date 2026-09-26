@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
-import { ArrowRight, BedDouble, Car, Compass, MapPin, Search, Star, Users } from "lucide-react";
+import { ArrowRight, BedDouble, Car, Compass, MapPin, Search, Star, Users, SlidersHorizontal } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { destinationsApi, packagesApi, accommodationSearchApi, publicVehiclesApi, type Destination, type TourPackage, type Accommodation, type Vehicle } from "../lib/api";
@@ -59,18 +59,36 @@ export default function ExplorePage() {
         <p className="mt-5 max-w-2xl text-base leading-7 text-white/75 md:text-lg">Discover places, curated tours, stays and transport in one travel marketplace. Compare first, save your favourites, then book when you are ready.</p>
         <div className="mt-8 flex max-w-3xl items-center gap-3 rounded-2xl bg-white p-2 shadow-2xl">
           <Search className="ml-3 h-5 w-5 text-rose-500" />
-          <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search Ella, beaches, cultural tours, hotels..." className="min-w-0 flex-1 bg-transparent px-1 py-3 text-sm text-gray-900 outline-none" />
+          <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search destinations, tours, stays or transport..." className="min-w-0 flex-1 bg-transparent px-1 py-3 text-sm text-gray-900 outline-none" aria-label="Search travel options" />
           {query && <button onClick={() => setQuery("")} className="rounded-xl px-3 py-2 text-xs font-bold text-gray-500 hover:bg-gray-100">Clear</button>}
         </div>
       </div>
     </header>
 
     <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        {tabs.map(({ id, label, icon: Icon, count }) => <button key={id} onClick={() => setTab(id)} className={`rounded-2xl border p-4 text-left transition-all ${tab === id ? "border-rose-300 bg-rose-50 shadow-sm" : "border-gray-200 bg-white hover:border-gray-300"}`}>
-          <Icon className={`h-5 w-5 ${tab === id ? "text-rose-500" : "text-gray-500"}`} />
-          <p className="mt-3 text-sm font-extrabold text-gray-900">{label}</p>
-          <p className="mt-0.5 text-xs text-gray-500">{count} available</p>
+      <div className="sticky top-[72px] z-30 -mx-4 mb-8 border-y border-gray-200/80 bg-[#f8fafc]/95 px-4 py-3 backdrop-blur-xl sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+        <div className="flex items-center gap-3 overflow-x-auto pb-0.5">
+          <div className="hidden shrink-0 items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-400 md:flex">
+            <SlidersHorizontal className="h-4 w-4" /> Browse
+          </div>
+          <div className="grid min-w-max grid-cols-4 gap-2 md:flex">
+            {tabs.map(({ id, label, icon: Icon, count }) => (
+              <button key={id} onClick={() => setTab(id)} className={`flex min-w-[120px] items-center gap-2 rounded-xl border px-3 py-2.5 text-left transition ${
+                tab === id ? "border-rose-200 bg-rose-50 text-rose-700 shadow-sm" : "border-transparent bg-white/70 text-gray-600 hover:border-gray-200 hover:bg-white"
+              }`}>
+                <Icon className="h-4 w-4 shrink-0" />
+                <span className="text-xs font-bold sm:text-sm">{label}</span>
+                <span className="ml-auto rounded-full bg-white px-1.5 py-0.5 text-[10px] font-bold text-gray-400">{count}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="mb-8 grid grid-cols-2 gap-3 md:grid-cols-4">
+        {tabs.map(({ id, label, icon: Icon, count }) => <button key={id} onClick={() => setTab(id)} className={`rounded-2xl border p-4 text-left transition-all ${tab === id ? "border-gray-900 bg-gray-900 shadow-lg" : "border-gray-200 bg-white hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-md"}`}>
+          <Icon className={`h-5 w-5 ${tab === id ? "text-rose-300" : "text-gray-500"}`} />
+          <p className={`mt-3 text-sm font-extrabold ${tab === id ? "text-white" : "text-gray-900"}`}>{label}</p>
+          <p className={`mt-0.5 text-xs ${tab === id ? "text-white/60" : "text-gray-500"}`}>{count} available</p>
         </button>)}
       </div>
 
