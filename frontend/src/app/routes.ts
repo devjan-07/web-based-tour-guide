@@ -34,6 +34,9 @@ import { PartnerAccommodationBookings } from "./pages/dashboard/PartnerAccommoda
 import { TransportProviderBookings } from "./pages/dashboard/TransportProviderBookings";
 
 export const router = createBrowserRouter([
+  {
+    Component: AppLayout,
+    children: [
   { path: "/", Component: LandingPage },
   { path: "/explore", Component: ExplorePage },
   { path: "/guides", Component: GuidesPage },

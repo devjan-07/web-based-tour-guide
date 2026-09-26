@@ -2,3 +2,12 @@
 @source '../**/*.{js,ts,jsx,tsx}';
 
 @import 'tw-animate-css';
+
+@theme {
+  --color-voyara-brand: #ff385c;
+  --color-voyara-brand-dark: #e31c5f;
+  --color-voyara-navy: #062a56;
+  --color-voyara-surface: #f8fafc;
+  --color-voyara-ink: #172033;
+  --color-voyara-muted: #64748b;
+}
