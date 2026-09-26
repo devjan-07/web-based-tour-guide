@@ -299,7 +299,7 @@ export default function TouristBookingCreate() {
           <ArrowLeft className="w-4 h-4" /> Back to explore
         </Link>
 
-        <section className="mb-6 overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#062a56] to-[#0057B8] shadow-sm">
+        <section className="mb-6 overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#062a56] via-[#003580] to-[#0057B8] shadow-lg">
           <div className="p-6 text-white md:p-8">
               <div className="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-white/70"><span>Booking</span><span className="h-1 w-1 rounded-full bg-white/40" />{bookingTypeLabel(bookingType)}</div>
               <h1 className="text-3xl md:text-4xl font-extrabold mb-2">
@@ -316,7 +316,7 @@ export default function TouristBookingCreate() {
         ) : (
           <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
             <section className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-              <div className="mb-6 flex items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-rose-500">Step 1</p><h2 className="mt-1 text-xl font-extrabold text-gray-900">Start with the essentials</h2><p className="mt-1 text-sm text-gray-500">Tell us when you are travelling and who is coming. Everything else is optional.</p></div><span className="hidden rounded-full bg-gray-50 px-3 py-1.5 text-xs font-semibold text-gray-500 sm:inline-flex">Required first</span></div>
+              <div className="mb-6"><div className="mb-5 grid grid-cols-4 gap-2">{["Essentials", "Guide", "Stay", "Transport"].map((step, index) => <div key={step} className="flex items-center gap-2"><span className={"flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-black " + (index === 0 ? "bg-rose-500 text-white" : "bg-gray-100 text-gray-400")}>{index + 1}</span><span className={"hidden text-xs font-bold sm:block " + (index === 0 ? "text-gray-900" : "text-gray-400")}>{step}</span></div>)}</div><div className="flex items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-rose-500">Step 1</p><h2 className="mt-1 text-xl font-extrabold text-gray-900">Start with the essentials</h2><p className="mt-1 text-sm text-gray-500">Tell us when you are travelling and who is coming. Everything else is optional.</p></div><span className="hidden rounded-full bg-gray-50 px-3 py-1.5 text-xs font-semibold text-gray-500 sm:inline-flex">Required first</span></div>
 
               {error && (
                 <div className="mb-5 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600">
