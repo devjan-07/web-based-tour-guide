@@ -95,11 +95,11 @@ public class WeatherService {
             throw exception;
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY,
-                    "Weather provider request was interrupted.", exception);
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
+                    "Weather service is temporarily unavailable. Please try again later.", exception);
         } catch (IOException | RuntimeException exception) {
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY,
-                    "Weather information is temporarily unavailable.", exception);
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
+                    "Weather service is temporarily unavailable. Please try again later.", exception);
         }
     }
 
@@ -159,8 +159,13 @@ public class WeatherService {
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY,
-                    "Weather provider returned HTTP " + response.statusCode() + ".");
+            HttpStatus status = response.statusCode() >= 500
+                    ? HttpStatus.SERVICE_UNAVAILABLE
+                    : HttpStatus.BAD_GATEWAY;
+            String message = response.statusCode() >= 500
+                    ? "Weather service is temporarily unavailable. Please try again later."
+                    : "Weather provider returned HTTP " + response.statusCode() + ".";
+            throw new ResponseStatusException(status, message);
         }
         return response.body();
     }
