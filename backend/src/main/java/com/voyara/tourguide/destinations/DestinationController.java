@@ -25,6 +25,11 @@ public class DestinationController {
         return service.findAll();
     }
 
+    @GetMapping("/{id}/similar")
+    public List<DestinationRecommendation> similar(@PathVariable Long id) {
+        return service.similarDestinations(id);
+    }
+
     @GetMapping("/{id}")
     public Destination one(@PathVariable Long id) {
         return service.findById(id);
