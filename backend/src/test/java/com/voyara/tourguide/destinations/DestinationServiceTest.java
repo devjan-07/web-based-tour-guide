@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import com.voyara.tourguide.accommodations.AccommodationRepository;
 import com.voyara.tourguide.packages.TourPackageRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -75,7 +76,7 @@ class DestinationServiceTest {
         value.setId(id);
         value.setName(name);
         value.setStatus(status);
-        value.setCategories(categories);
+        value.setCategories(new ArrayList<>(categories));
         return value;
     }
 }
