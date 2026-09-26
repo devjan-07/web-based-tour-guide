@@ -17,6 +17,9 @@ export interface Destination {
   highlights: string;
 }
 
+
+export interface DestinationRecommendation { destination: Destination; suitabilityScore: number; reasons: string[]; }
+
 export interface Route { id: number; destinationId: number; routeName: string; startLocation: string; endLocation: string; distanceKm?: number | null; estimatedDuration?: number | null; description?: string; status: "ACTIVE" | "INACTIVE"; }
 
 export interface TourPackage {
@@ -259,7 +262,10 @@ function resource<T extends { id: Id }, Id extends string | number>(path: string
   };
 }
 
-export const destinationsApi = resource<Destination, number>("/destinations");
+export const destinationsApi = {
+  ...resource<Destination, number>("/destinations"),
+  similar: (id: number) => request<DestinationRecommendation[]>(`/destinations/${id}/similar`),
+};
 export const packagesApi = {
   ...resource<TourPackage, number>("/packages"),
   routes: (id: number) => request<Route[]>(`/packages/${id}/routes`),
