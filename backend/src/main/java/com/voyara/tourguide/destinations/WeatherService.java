@@ -5,11 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.voyara.tourguide.common.ResourceNotFoundException;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,29 +19,40 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class WeatherService {
-    private static final String GEOCODING_API = "https://geocoding-api.open-meteo.com/v1/search";
     private static final String FORECAST_API = "https://api.open-meteo.com/v1/forecast";
     private static final String SOURCE = "Open-Meteo";
 
     private final DestinationRepository destinationRepository;
+    private final LocationResolver locationResolver;
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
-    private final String geocodingApi;
     private final String forecastApi;
 
     @Autowired
-    public WeatherService(DestinationRepository destinationRepository, ObjectMapper objectMapper) {
-        this(destinationRepository, HttpClient.newBuilder()
+    public WeatherService(DestinationRepository destinationRepository,
+                          LocationResolver locationResolver,
+                          ObjectMapper objectMapper) {
+        this(destinationRepository, locationResolver, HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(5))
-                .build(), objectMapper, GEOCODING_API, FORECAST_API);
+                .build(), objectMapper, FORECAST_API);
     }
 
     WeatherService(DestinationRepository destinationRepository, HttpClient httpClient,
-            ObjectMapper objectMapper, String geocodingApi, String forecastApi) {
+                   ObjectMapper objectMapper, String geocodingApi, String forecastApi) {
+        this(destinationRepository,
+                new LocationResolver(httpClient, objectMapper, geocodingApi),
+                httpClient, objectMapper, forecastApi);
+    }
+
+    private WeatherService(DestinationRepository destinationRepository,
+                           LocationResolver locationResolver,
+                           HttpClient httpClient,
+                           ObjectMapper objectMapper,
+                           String forecastApi) {
         this.destinationRepository = destinationRepository;
+        this.locationResolver = locationResolver;
         this.httpClient = httpClient;
         this.objectMapper = objectMapper;
-        this.geocodingApi = geocodingApi;
         this.forecastApi = forecastApi;
     }
 
@@ -52,23 +61,10 @@ public class WeatherService {
         Destination destination = destinationRepository.findById(destinationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Destination", destinationId));
 
-        if (destination.getName() == null || destination.getName().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Weather cannot be resolved because the destination has no name.");
-        }
-
         try {
-            JsonNode location = geocode(destination);
-            double latitude = location.path("latitude").asDouble(Double.NaN);
-            double longitude = location.path("longitude").asDouble(Double.NaN);
-
-            if (Double.isNaN(latitude) || Double.isNaN(longitude)) {
-                throw new ResponseStatusException(HttpStatus.BAD_GATEWAY,
-                        "Weather provider returned an invalid location.");
-            }
-
-            String forecastUrl = forecastUrl(latitude, longitude);
-            JsonNode weather = objectMapper.readTree(get(forecastUrl));
+            GeoCoordinates coordinates = locationResolver.resolve(destination);
+            JsonNode weather = objectMapper.readTree(get(
+                    forecastUrl(coordinates.latitude(), coordinates.longitude())));
             JsonNode current = weather.path("current");
             JsonNode daily = weather.path("daily");
 
@@ -83,9 +79,9 @@ public class WeatherService {
             return new WeatherForecast(
                     destination.getId(),
                     destination.getName(),
-                    location.path("name").asText(destination.getName()),
-                    latitude,
-                    longitude,
+                    coordinates.locationName(),
+                    coordinates.latitude(),
+                    coordinates.longitude(),
                     weather.path("timezone").asText("auto"),
                     current.path("temperature_2m").asDouble(),
                     current.path("weather_code").asInt(),
@@ -103,25 +99,6 @@ public class WeatherService {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
                     "Weather service is temporarily unavailable. Please try again later.", exception);
         }
-    }
-
-    private JsonNode geocode(Destination destination) throws IOException, InterruptedException {
-        String query = destination.getName();
-        if (destination.getCountry() != null && !destination.getCountry().isBlank()) {
-            query += ", " + destination.getCountry();
-        }
-
-        String url = geocodingApi
-                + "?name=" + encode(query)
-                + "&count=1&language=en&format=json";
-
-        JsonNode root = objectMapper.readTree(get(url));
-        JsonNode results = root.path("results");
-        if (!results.isArray() || results.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "Weather location could not be found for " + destination.getName() + ".");
-        }
-        return results.get(0);
     }
 
     private String forecastUrl(double latitude, double longitude) {
@@ -159,7 +136,9 @@ public class WeatherService {
                 .GET()
                 .build();
 
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response =
+                httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
         if (response.statusCode() < 200 || response.statusCode() >= 300) {
             HttpStatus status = response.statusCode() >= 500
                     ? HttpStatus.SERVICE_UNAVAILABLE
@@ -170,10 +149,6 @@ public class WeatherService {
             throw new ResponseStatusException(status, message);
         }
         return response.body();
-    }
-
-    private String encode(String value) {
-        return URLEncoder.encode(value, StandardCharsets.UTF_8);
     }
 
     private String textAt(JsonNode array, int index) {

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -16,15 +17,26 @@ import org.springframework.web.bind.annotation.RestController;
 public class DestinationController {
     private final DestinationService service;
     private final WeatherService weatherService;
+    private final GeoSpatialService geoSpatialService;
 
-    public DestinationController(DestinationService service, WeatherService weatherService) {
+    public DestinationController(DestinationService service, WeatherService weatherService,
+                                 GeoSpatialService geoSpatialService) {
         this.service = service;
         this.weatherService = weatherService;
+        this.geoSpatialService = geoSpatialService;
     }
 
     @GetMapping
     public List<Destination> all() {
         return service.findAll();
+    }
+
+    @GetMapping("/nearby")
+    public List<NearbyDestination> nearby(
+            @RequestParam double latitude,
+            @RequestParam double longitude,
+            @RequestParam double radiusKm) {
+        return geoSpatialService.findNearby(latitude, longitude, radiusKm);
     }
 
     @GetMapping("/{id}/similar")

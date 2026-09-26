@@ -134,19 +134,37 @@ Real API smoke tests were completed successfully for the implemented backend end
 
 The WeatherService dependency-injection issue discovered during runtime verification was fixed with an explicit Spring `@Autowired` constructor and recompiled successfully.
 
-### Features deliberately not implemented in this stage
+### Advanced Feature Roadmap
 
-The following advanced features remain postponed until the normal feature stage is fully verified:
+#### Phase 2 — Geo-Spatial Search
+Geo-Spatial Search is the only feature in Phase 2.
 
-1. Geo-Spatial Search
-2. Promo Codes
-3. Group Booking
-4. Booking State Machine
-5. Multi-language Tourism Content
-6. Extra Bed Charges
-7. Cancellation & Refund Engine
-8. Language Proficiency
-9. Vehicle Availability Rules
+Implementation approach:
+- Reuse the existing Open-Meteo geocoding capability already used by WeatherService.
+- Introduce a reusable LocationResolver so WeatherService and GeoSpatialService share the same geocoding responsibility.
+- Keep resolved coordinates in a lightweight in-memory cache during application runtime.
+- Do not add latitude/longitude columns to the Destination table.
+- Calculate destination distance in Java using the Haversine formula.
+- Return only active destinations within the requested radius, sorted by distance.
+- Backend first; no frontend changes in this milestone.
+- No manual SQL or database migration is required.
+
+API:
+- `GET /api/destinations/nearby?latitude=&longitude=&radiusKm=`
+
+#### Phase 3 — Postponed Features
+After Phase 2 is verified, the following features will be implemented in this order:
+
+1. Booking State Machine
+2. Extra Bed Charges
+3. Language Proficiency
+4. Vehicle Availability Rules
+5. Cancellation & Refund Engine
+6. Multi-language Tourism Content
+7. Promo Codes
+
+**Group Booking has been removed from the roadmap and must not be reintroduced without an explicit project decision.**
+
 
 The following features were explicitly removed from the current plan and must not be reintroduced without an explicit project decision:
 
@@ -259,6 +277,36 @@ The postponed advanced features remain postponed and are not included in this mi
 | 2026-09-24 | `c72727e70fd90856ae87c6d88d564093806f3f25` | Remove stray navbar brace | Implemented; browser verification pending |
 | 2026-09-25 | `ab1590068540f74b44e2f0e30e4db71dc58d12a2` | Simplify tourist booking checkout UI | Implemented; browser verification pending |
 | 2026-09-26 | `8e60b0192b0679c523855a7d9ac834f33ddc3747` | Fix WeatherService dependency injection | Runtime startup verified |
+## Phase 2 — Geo-Spatial Search Milestone
+
+**Rollback target:** commit message `feat(geo): add reusable geospatial search foundation`
+**Commit message:** `feat(geo): add reusable geospatial search foundation`
+**Status:** Backend implemented; local Maven/Postman verification pending.
+
+### Implemented backend components
+- `GeoCoordinates` — immutable coordinate value object.
+- `LocationResolver` — reusable Open-Meteo geocoding with runtime coordinate cache.
+- `GeoSpatialService` — Haversine distance calculation, radius filtering, active-destination filtering, and distance sorting.
+- `NearbyDestination` — API response model containing destination, distance, latitude, and longitude.
+- `GET /api/destinations/nearby?latitude=&longitude=&radiusKm=` — nearby destination endpoint.
+- WeatherService now reuses the shared LocationResolver, preserving the existing weather integration.
+- No Destination schema changes.
+- No manual SQL migration.
+- Frontend intentionally unchanged.
+
+### Verification required before marking complete
+- [ ] `mvn clean`
+- [ ] `mvn test`
+- [ ] Spring Boot startup with the configured SQL Server database
+- [ ] Postman valid nearby-search request
+- [ ] Postman invalid latitude/longitude/radius checks
+- [ ] Postman check that inactive destinations are excluded
+- [ ] Postman check that results are sorted by distance
+- [ ] Existing weather endpoint still works after LocationResolver refactor
+
+### Rollback reference
+This Phase 2 implementation is isolated in one feature commit. Revert the commit identified above to remove Geo-Spatial Search.
+
 ## Final Verification Checklist
 
 Run after the enhancement batch is complete:
