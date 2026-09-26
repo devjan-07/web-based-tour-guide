@@ -249,16 +249,23 @@ export function DashboardHome() {
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "#FF385C" }}>{today}</p>
-          <h1 className="text-gray-900 dark:text-white" style={{ fontWeight: 800, fontSize: "1.6rem" }}>Dashboard Overview</h1>
-          <p className="text-gray-400 dark:text-slate-500 text-sm mt-1">{loading ? "Loading Voyara operations data..." : "Here&apos;s what&apos;s happening with Voyara today."}</p>
-          {error && <p className="text-xs font-semibold text-red-500 mt-2">{error}</p>}
+      <div className="mb-6 overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-[#062a56] via-[#003580] to-[#0057B8] px-6 py-6 text-white shadow-lg md:px-7">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/65">Voyara operations</p>
+            <h1 className="mt-1 text-2xl font-extrabold md:text-3xl">Dashboard Overview</h1>
+            <p className="mt-2 max-w-xl text-sm text-white/70">{loading ? "Loading Voyara operations data..." : "A live view of bookings, resources and travel activity."}</p>
+          </div>
+          <button onClick={exportDailyReport} disabled={exporting} className="flex items-center justify-center gap-1.5 rounded-xl bg-white/10 px-4 py-2.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20 disabled:opacity-50">
+            <Download className="h-4 w-4" /> {exporting ? "Preparing..." : "Export report"}
+          </button>
         </div>
-        <button onClick={exportDailyReport} disabled={exporting} className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold text-gray-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors disabled:opacity-50">
-          <Download className="w-4 h-4" /> {exporting ? "Preparing..." : "Export"}
-        </button>
+      </div>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "#FF385C" }}>{today}</p>
+          {error && <p className="mt-2 text-xs font-semibold text-red-500">{error}</p>}
+        </div>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
