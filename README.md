@@ -43,16 +43,16 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 - [x] Destination suitability information
 - [x] Destination discovery/recommendations
 - [x] Similar-destination recommendations from existing destination categories, country, region, and ratings (no database schema change)
-- [ ] Nearby experiences
+- [x] Best Time to Visit audit — existing `bestSeason` field is preserved by create/update flows and verified by unit test
+- [x] Weather integration — live seven-day forecast endpoint using destination geocoding and Open-Meteo weather data
 - [x] Add destination to trip
-- [ ] Add activity/attraction to trip (not implemented because the current approved model does not expose a separate activity resource)
 
 ### 2. Tour Package Management
-- [ ] Preserve existing CRUD
-- [x] Package comparison
+- [x] Preserve existing CRUD
+- [x] Package comparison — public comparison UI plus server-side validation for two or three active packages
 - [x] Package customization
 - [x] Customized package price estimate using existing package/resource prices
-- [ ] Server-authoritative dynamic package pricing rules (requires an approved pricing policy if different from existing booking calculation)
+- [x] Budget-based package filtering
 - [x] Better package discovery
 
 ### 3. Booking Management
@@ -100,6 +100,63 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 - [x] Homepage language reshaped around travel discovery rather than CRUD resources
 - [x] Mobile-friendly tourism navigation
 - [x] Real internal footer navigation
+
+## Current Normal-Feature Backend Completion
+
+The current backend-first stage is now implemented as follows:
+
+| Feature | Backend status | API |
+|---|---|---|
+| Best Time to Visit | Complete/audited | Existing `GET /api/destinations/{id}` returns `bestSeason` |
+| Weather Integration | Implemented | `GET /api/destinations/{id}/weather` |
+| Budget-Based Package Filtering | Implemented | `GET /api/packages/filter?minPrice=&maxPrice=` |
+| Package Comparison | Backend validation implemented | `GET /api/packages/compare?ids=1&ids=2` |
+| Existing recommendation/booking modules | Preserved | Existing endpoints unchanged |
+
+### Weather integration design
+
+Weather is resolved from the existing destination name/country and is not persisted in the database. The backend uses Open-Meteo geocoding followed by its forecast API, returning current conditions plus a seven-day daily forecast. No new database table or API-key field is required.
+
+### Verification added
+
+Focused unit tests now cover:
+- destination best-season update behaviour;
+- similar-destination recommendation behaviour;
+- package budget filtering and invalid ranges;
+- package comparison validation and active-package rules;
+- weather-code mapping and unknown-destination handling.
+
+The repository-connected environment used for this implementation does not provide a local Maven runtime, so the tests/build have been added but have not been executed here. They must be run locally before the batch is marked fully verified.
+
+### Features deliberately not implemented in this stage
+
+The following advanced features remain postponed until the normal feature stage is fully verified:
+
+1. Geo-Spatial Search
+2. Promo Codes
+3. Group Booking
+4. Booking State Machine
+5. Multi-language Tourism Content
+6. Extra Bed Charges
+7. Cancellation & Refund Engine
+8. Language Proficiency
+9. Vehicle Availability Rules
+
+The following features were explicitly removed from the current plan and must not be reintroduced without an explicit project decision:
+
+- Accessibility Filters
+- Sustainability Tags
+- Dynamic Package Pricing
+- Group Tier Pricing
+- Package Composition / Line Items
+- Audit Log
+- Add-On Services
+- Guide Certifications
+- Driver Management
+- Insurance / Registration Tracking
+- Room Types
+- Maintenance Blocks
+- Room Attributes
 
 ## Commit Log
 | 2026-09-24 | `97da3c555c8205d2430c573ce91c5a654ea96779` | Add public tourism marketplace Explore page | Implemented; browser verification pending |
@@ -224,7 +281,10 @@ Run after the enhancement batch is complete:
 - [ ] Frontend production build completes successfully after the new route/component is added.
 - [ ] Backend/API smoke test confirms customized booking creation still returns the existing booking response and server-calculated total.
 
-- [ ] Backend tests/build complete successfully.
+- [ ] Backend tests/build complete successfully locally.
+- [ ] Weather endpoint is smoke-tested against the configured database and live Open-Meteo service.
+- [ ] Budget filter endpoint is smoke-tested with active/inactive packages and boundary prices.
+- [ ] Package comparison endpoint is smoke-tested with two, three, duplicate, missing and inactive IDs.
 - [ ] No unrelated regressions are observed.
 
 - [ ] Booking checkout UI is browser-verified after the final accordion/summary redesign.
