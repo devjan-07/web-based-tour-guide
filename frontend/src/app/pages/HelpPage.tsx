@@ -69,7 +69,7 @@ export default function HelpPage() {
       <Navbar />
 
       {/* Hero */}
-      <div className="py-20 px-4 text-center" style={{ background: "linear-gradient(135deg, #FF385C 0%, #E31C5F 50%, #C13584 100%)" }}>
+      <div className="px-4 py-16 text-center md:py-20" style={{ background: "linear-gradient(135deg, #062a56 0%, #003580 58%, #0057B8 100%)" }}>
         <p className="text-white/70 text-sm font-medium uppercase tracking-widest mb-3">We are here to help</p>
         <h1 className="text-white mb-4" style={{ fontWeight: 800, fontSize: "clamp(2rem, 5vw, 3rem)" }}>Help Center</h1>
         <p className="text-white/80 mb-8 max-w-md mx-auto">Find answers to common questions about tours, bookings, and your account.</p>
@@ -80,7 +80,7 @@ export default function HelpPage() {
             placeholder="Search your question…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-12 pr-4 py-4 rounded-2xl text-sm text-gray-800 outline-none shadow-xl"
+            className="w-full rounded-2xl py-4 pl-12 pr-4 text-sm text-gray-800 outline-none shadow-xl transition focus:ring-4 focus:ring-white/20"
           />
         </div>
       </div>
@@ -96,7 +96,7 @@ export default function HelpPage() {
                 <button
                   key={cat.id}
                   onClick={() => { setActiveCategory(cat.id); setOpenItems(new Set()); }}
-                  className="flex flex-col items-center gap-3 p-6 rounded-2xl border-2 transition-all text-center"
+                  className="flex flex-col items-center gap-3 rounded-2xl border-2 p-6 text-center transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
                   style={{
                     borderColor: isActive ? "#FF385C" : "#e5e7eb",
                     background: isActive ? "#fff5f7" : "white",
@@ -137,7 +137,7 @@ export default function HelpPage() {
                   <div key={key} className="rounded-2xl overflow-hidden" style={{ border: "1px solid #e5e7eb" }}>
                     <button
                       onClick={() => toggleItem(key)}
-                      className="w-full flex items-center justify-between gap-4 px-6 py-4 text-left hover:bg-gray-50 transition-colors"
+                      className="w-full flex items-center justify-between gap-4 px-6 py-4 text-left transition-colors hover:bg-gray-50"
                     >
                       <span className="text-sm font-semibold text-gray-800">{faq.q}</span>
                       <ChevronDown className="w-4 h-4 shrink-0 text-gray-400 transition-transform" style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }} />
@@ -155,7 +155,7 @@ export default function HelpPage() {
         </div>
 
         {/* CTA */}
-        <div className="mt-16 rounded-2xl p-8 text-center" style={{ background: "#f9fafb", border: "1px solid #e5e7eb" }}>
+        <div className="mt-16 rounded-[2rem] p-8 text-center shadow-sm" style={{ background: "#f9fafb", border: "1px solid #e5e7eb" }}>
           <HelpCircle className="w-10 h-10 mx-auto mb-4" style={{ color: "#FF385C" }} />
           <h3 className="text-gray-900 font-bold text-lg mb-2">Still need help?</h3>
           <p className="text-gray-500 text-sm mb-6">Our support team is available 24/7 and typically responds within a few hours.</p>
