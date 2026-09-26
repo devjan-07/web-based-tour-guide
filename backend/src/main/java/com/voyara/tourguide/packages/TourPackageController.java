@@ -1,6 +1,7 @@
 package com.voyara.tourguide.packages;
 
 import jakarta.validation.Valid;
+import java.math.BigDecimal;
 import java.util.List;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -24,6 +26,13 @@ public class TourPackageController {
     public List<TourPackage> all()
     {
         return service.findAll();
+    }
+
+    @GetMapping("/filter")
+    public List<TourPackage> filterByBudget(
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice) {
+        return service.filterByBudget(minPrice, maxPrice);
     }
 
     @GetMapping("/{id}/routes")

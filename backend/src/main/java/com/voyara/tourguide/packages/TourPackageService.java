@@ -6,6 +6,7 @@ import com.voyara.tourguide.destinations.Destination;
 import com.voyara.tourguide.destinations.DestinationRepository;
 import com.voyara.tourguide.routes.Route;
 import com.voyara.tourguide.routes.RouteRepository;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,25 @@ public class TourPackageService {
         TourPackage tourPackage = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Package", id));
         initializeCollections(tourPackage);
         return tourPackage;
+    }
+
+    /**
+     * Returns active packages within the requested budget range.
+     * The budget filter is intentionally kept in the service layer so the
+     * existing schema and package CRUD model remain unchanged.
+     */
+    @Transactional(readOnly = true)
+    public List<TourPackage> filterByBudget(BigDecimal minPrice, BigDecimal maxPrice) {
+        validateBudgetRange(minPrice, maxPrice);
+
+        return repository.findAll().stream()
+                .filter(this::isActive)
+                .filter(pkg -> pkg.getPrice() != null)
+                .filter(pkg -> minPrice == null || pkg.getPrice().compareTo(minPrice) >= 0)
+                .filter(pkg -> maxPrice == null || pkg.getPrice().compareTo(maxPrice) <= 0)
+                .peek(this::initializeCollections)
+                .sorted(java.util.Comparator.comparing(TourPackage::getPrice))
+                .toList();
     }
 
     @Transactional
@@ -95,6 +115,22 @@ public class TourPackageService {
                     "This package is referenced by existing bookings. Archive it instead.");
         }
         repository.delete(tourPackage);
+    }
+
+    private boolean isActive(TourPackage tourPackage) {
+        return "Active".equalsIgnoreCase(tourPackage.getStatus());
+    }
+
+    private void validateBudgetRange(BigDecimal minPrice, BigDecimal maxPrice) {
+        if (minPrice != null && minPrice.signum() < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Minimum price cannot be negative.");
+        }
+        if (maxPrice != null && maxPrice.signum() < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Maximum price cannot be negative.");
+        }
+        if (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Minimum price cannot exceed maximum price.");
+        }
     }
 
     private void initializeCollections(TourPackage tourPackage) {
