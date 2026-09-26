@@ -4,7 +4,7 @@ import { ArrowLeft, CalendarDays, CheckCircle, Clock, CreditCard, HelpCircle, Ma
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
-import { destinationsApi, guidesApi, packagesApi, type Destination, type GuideRecommendation, type TourPackage, type Route } from "../lib/api";
+import { destinationsApi, guidesApi, packagesApi, type Destination, type DestinationRecommendation, type GuideRecommendation, type TourPackage, type Route } from "../lib/api";
 import { addTripItem } from "../lib/tripPlanner";
 
 type DetailMode = "destination" | "package";
@@ -31,6 +31,7 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
   const [packageRoutes, setPackageRoutes] = useState<Route[]>([]);
   const [routesLoading, setRoutesLoading] = useState(false);
   const [guideRecommendations, setGuideRecommendations] = useState<GuideRecommendation[]>([]);
+  const [similarDestinations, setSimilarDestinations] = useState<DestinationRecommendation[]>([]);
   const [savedToTrip, setSavedToTrip] = useState(false);
   const isTourist = isAuthenticated && user?.roles.includes("TOURIST");
 
@@ -47,6 +48,7 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
     setError("");
     setPackageRoutes([]);
     setGuideRecommendations([]);
+    setSimilarDestinations([]);
     setSavedToTrip(false);
 
     const request = mode === "destination"
@@ -61,6 +63,9 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
             location: destination.country,
             specialty: destination.categories?.[0],
           }).then((guides) => { if (!cancelled) setGuideRecommendations(guides); }).catch(() => { if (!cancelled) setGuideRecommendations([]); });
+          destinationsApi.similar(destination.id)
+            .then((destinations) => { if (!cancelled) setSimilarDestinations(destinations); })
+            .catch(() => { if (!cancelled) setSimilarDestinations([]); });
         }
         if (data.mode === "package") {
           setRoutesLoading(true);
@@ -185,6 +190,51 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
                           ))}
                         </div>
                       </div>
+                    </div>
+                  </div>
+                )}
+
+                {item?.mode === "destination" && similarDestinations.length > 0 && (
+                  <div className="mb-8 rounded-2xl border border-gray-200 bg-white p-5">
+                    <div className="flex items-end justify-between gap-4">
+                      <div>
+                        <h2 className="text-xl font-bold text-gray-900">You may also like</h2>
+                        <p className="mt-1 text-sm text-gray-500">Destinations with similar travel styles and regional characteristics.</p>
+                      </div>
+                      <Link to="/explore?tab=destinations" className="hidden text-sm font-semibold text-rose-600 hover:text-rose-700 sm:inline">
+                        Explore all
+                      </Link>
+                    </div>
+                    <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      {similarDestinations.slice(0, 3).map(({ destination, suitabilityScore, reasons }) => (
+                        <Link
+                          key={destination.id}
+                          to={`/destinations/${destination.id}`}
+                          className="group overflow-hidden rounded-2xl border border-gray-200 bg-gray-50 transition hover:-translate-y-0.5 hover:border-gray-300 hover:bg-white"
+                        >
+                          <div className="h-36 overflow-hidden bg-gray-100">
+                            <img
+                              src={destination.image || "https://images.unsplash.com/photo-1586500036706-41963de24d8b?w=600"}
+                              alt={destination.name}
+                              className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                            />
+                          </div>
+                          <div className="p-4">
+                            <div className="flex items-start justify-between gap-3">
+                              <div>
+                                <p className="font-bold text-gray-900">{destination.name}</p>
+                                <p className="mt-1 text-xs text-gray-500">{destination.country}</p>
+                              </div>
+                              <span className="rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-bold text-emerald-700">{suitabilityScore}% match</span>
+                            </div>
+                            <div className="mt-3 flex flex-wrap gap-1.5">
+                              {reasons.slice(0, 2).map((reason) => (
+                                <span key={reason} className="rounded-full bg-white px-2 py-1 text-[11px] font-semibold text-gray-600">{reason}</span>
+                              ))}
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
                     </div>
                   </div>
                 )}
