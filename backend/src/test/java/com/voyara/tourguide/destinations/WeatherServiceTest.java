@@ -5,13 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.voyara.tourguide.common.ResourceNotFoundException;
 import java.net.http.HttpClient;
-import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.web.server.ResponseStatusException;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,9 +37,9 @@ class WeatherServiceTest {
                 "http://localhost/geocode",
                 "http://localhost/forecast");
 
-        ResponseStatusException error = assertThrows(ResponseStatusException.class,
+        ResourceNotFoundException error = assertThrows(ResourceNotFoundException.class,
                 () -> service.forecastForDestination(99L));
 
-        assertEquals(404, error.getStatusCode().value());
+        assertEquals("Destination not found with id: 99", error.getMessage());
     }
 }
