@@ -184,9 +184,9 @@ export default function TouristDashboard() {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <section className="rounded-3xl overflow-hidden mb-6" style={{ background: "linear-gradient(135deg, #003580, #0057B8)" }}>
+        <section className="overflow-hidden rounded-[2rem] shadow-lg" style={{ background: "linear-gradient(135deg, #062a56, #003580 58%, #0057B8)" }}>
           <div className="p-6 md:p-8 text-white">
-            <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-2">Tourist Dashboard</p>
+            <p className="text-white/70 text-sm font-semibold uppercase tracking-[0.18em] mb-2">Your travel dashboard</p>
             <h1 className="text-3xl md:text-4xl font-extrabold mb-2">Welcome back, {firstName(user?.fullName)}</h1>
             <p className="text-white/75 max-w-2xl">
               Manage your Voyara bookings, track upcoming trips, and complete payments tied to {user?.email}.
@@ -207,9 +207,9 @@ export default function TouristDashboard() {
           </div>
         </section>
 
-        <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <section className="grid grid-cols-2 gap-4 mb-6 lg:grid-cols-4">
           {cards.map(({ label, value, detail, icon: Icon, color, bg }) => (
-            <div key={label} className="bg-white rounded-2xl border border-gray-200 p-5">
+            <div key={label} className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4" style={{ background: bg }}>
                 <Icon className="w-5 h-5" style={{ color }} />
               </div>
