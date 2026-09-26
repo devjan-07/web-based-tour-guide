@@ -129,7 +129,7 @@ export default function PlanMyTrip() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 md:py-10">
         <section className="overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#003580] to-[#0057B8] text-white shadow-lg">
           <div className="p-7 md:p-10">
             <div className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-[0.18em] text-white/70">
@@ -147,6 +147,16 @@ export default function PlanMyTrip() {
         ) : (
           <>
             <section className="mt-6 rounded-[2rem] border border-gray-200 bg-white p-5 shadow-sm md:p-6">
+              <div className="mb-6 grid grid-cols-3 gap-2">
+                {[["01", "Trip basics"], ["02", "Preferences"], ["03", "Matches"]].map(([step, label], index) => (
+                  <div key={step} className="flex items-center gap-2">
+                    <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-black ${index === 0 ? "bg-rose-500 text-white" : "bg-gray-100 text-gray-400"}`}>{step}</div>
+                    <div className="hidden min-w-0 sm:block"><p className={`text-xs font-bold ${index === 0 ? "text-gray-900" : "text-gray-400"}`}>{label}</p></div>
+                    {index < 2 && <div className="mx-1 h-px flex-1 bg-gray-200" />}
+                  </div>
+                ))}
+              </div>
+
               <div className="mb-5 flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-rose-50 text-rose-500"><Compass className="h-5 w-5" /></div>
                 <div>
@@ -217,7 +227,7 @@ export default function PlanMyTrip() {
               </div>
             </section>
 
-            <section className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-3">
+            <section className="mt-6 grid scroll-mt-24 grid-cols-1 gap-5 lg:grid-cols-3">
               <RecommendationCard title="Tour packages" icon={Package} empty="No matching package was found. A custom trip can still use the matched resources below.">
                 {matchingPackages.map((item) => (
                   <div key={item.id} className="rounded-2xl border border-gray-200 p-4">
