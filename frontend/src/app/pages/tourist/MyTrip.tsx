@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router";
-import { CalendarDays, CheckCircle2, MapPin, Package, Trash2, Users } from "lucide-react";
+import { CalendarDays, CheckCircle2, MapPin, Package, Trash2, Users, ArrowRight, Sparkles } from "lucide-react";
 import { Navbar } from "../../components/Navbar";
 import { Footer } from "../../components/Footer";
 import { clearTripItems, loadTripItems, removeTripItem, tripItemTypeLabel, updateTripItemDay, type TripItem } from "../../lib/tripPlanner";
@@ -28,9 +28,9 @@ export default function MyTrip() {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <section className="overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#003580] to-[#0057B8] text-white shadow-lg">
+        <section className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#062a56] via-[#003580] to-[#0057B8] text-white shadow-lg">
           <div className="p-7 md:p-10">
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-white/70">My Trip</p>
+            <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-[0.18em] text-white/70"><Sparkles className="h-4 w-4" /> My Trip</div>
             <h1 className="mt-2 max-w-3xl text-3xl font-extrabold md:text-5xl">Turn saved ideas into a simple itinerary.</h1>
             <p className="mt-4 max-w-2xl text-sm leading-6 text-white/80 md:text-base">
               Add destinations and travel resources while exploring Voyara. Then organise them into days before you move on to booking.
@@ -39,7 +39,7 @@ export default function MyTrip() {
         </section>
 
         <section className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div className="rounded-3xl border border-gray-200 bg-white p-5">
+          <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
             <MapPin className="h-5 w-5 text-rose-500" />
             <p className="mt-3 text-2xl font-extrabold text-gray-900">{items.length}</p>
             <p className="text-xs text-gray-500">Saved trip items</p>
@@ -59,7 +59,7 @@ export default function MyTrip() {
         <section className="mt-6 rounded-[2rem] border border-gray-200 bg-white p-5 shadow-sm md:p-6">
           <div className="flex flex-col gap-3 border-b border-gray-100 pb-5 md:flex-row md:items-center md:justify-between">
             <div>
-              <h2 className="text-xl font-extrabold text-gray-900">Itinerary builder</h2>
+              <div className="flex items-center gap-2"><h2 className="text-xl font-extrabold text-gray-900">Itinerary builder</h2><span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-700">Saved locally</span></div>
               <p className="mt-1 text-sm text-gray-500">Move saved resources between days. This does not create a booking.</p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -136,7 +136,7 @@ export default function MyTrip() {
             <p className="font-extrabold">Ready to turn the plan into a booking?</p>
             <p className="mt-1 text-sm text-white/60">Your saved itinerary is a planning aid. Review availability and dates during the booking process.</p>
           </div>
-          {items.some((item) => item.type === "package") ? (() => { const packageItem = items.find((item) => item.type === "package")!; return <Link to={`/tourist/packages/${packageItem.id}/customize`} className="rounded-xl bg-[#FF385C] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:opacity-90">Customize package & book</Link>; })() : <Link to="/tourist/bookings/new" className="rounded-xl bg-[#FF385C] px-5 py-3 text-sm font-bold text-white">Continue to booking</Link>}
+          {items.some((item) => item.type === "package") ? (() => { const packageItem = items.find((item) => item.type === "package")!; return <Link to={`/tourist/packages/${packageItem.id}/customize`} className="inline-flex items-center gap-2 rounded-xl bg-[#FF385C] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:opacity-90">Customize package & book <ArrowRight className="h-4 w-4" /></Link>; })() : <Link to="/tourist/bookings/new" className="rounded-xl bg-[#FF385C] px-5 py-3 text-sm font-bold text-white">Continue to booking</Link>}
         </section>
       </main>
       <Footer />
