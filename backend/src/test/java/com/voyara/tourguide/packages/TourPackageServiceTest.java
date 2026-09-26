@@ -110,7 +110,6 @@ class TourPackageServiceTest {
         TourPackage inactive = packageOf(50000, "Draft");
         inactive.setId(10L);
         when(repository.findById(10L)).thenReturn(Optional.of(inactive));
-        when(repository.findById(20L)).thenReturn(Optional.of(packageOf(80000, "Active")));
 
         ResponseStatusException error = assertThrows(ResponseStatusException.class,
                 () -> service.comparePackages(List.of(10L, 20L)));
