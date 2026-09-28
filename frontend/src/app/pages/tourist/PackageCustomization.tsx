@@ -44,6 +44,7 @@ export default function PackageCustomization() {
   const [matching, setMatching] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [openOption, setOpenOption] = useState<"guide" | "stay" | "vehicle" | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -74,7 +75,9 @@ export default function PackageCustomization() {
       setStayOptions(stays.slice(0, 3));
       setVehicleOptions(vehicles.slice(0, 3));
     }).catch(() => {
-      setGuideOptions([]); setStayOptions([]); setVehicleOptions([]);
+      setGuideOptions([]);
+      setStayOptions([]);
+      setVehicleOptions([]);
     }).finally(() => setMatching(false));
   }, [pkg, guests, language, luggage, driverRequired]);
 
@@ -82,16 +85,20 @@ export default function PackageCustomization() {
   const estimatedTotal = useMemo(() => {
     if (!pkg) return 0;
     const base = Number(pkg.price || 0) * Math.max(1, guests);
-    const guideCost = guide ? Number(guide.guide.pricePerDay || 0) * tripDays : 0;
-    const stayCost = stay ? Number(stay.accommodation.price || 0) * tripDays : 0;
-    const vehicleCost = vehicle ? Number(vehicle.vehicle.pricePerDay || 0) * tripDays : 0;
+    const guideCost = guide && !hasIncludedGuide ? Number(guide.guide.pricePerDay || 0) * tripDays : 0;
+    const stayCost = stay && !hasIncludedAccommodation ? Number(stay.accommodation.price || 0) * tripDays : 0;
+    const vehicleCost = vehicle && !hasIncludedTransport ? Number(vehicle.vehicle.pricePerDay || 0) * tripDays : 0;
     return base + guideCost + stayCost + vehicleCost;
-  }, [pkg, guests, guide, stay, vehicle, tripDays]);
+  }, [pkg, guests, guide, stay, vehicle, tripDays, hasIncludedGuide, hasIncludedAccommodation, hasIncludedTransport]);
 
   const continueToBooking = async () => {
     if (!pkg) return;
-    if (new Date(checkOut) <= new Date(checkIn)) { setError("Please choose a check-out date after check-in."); return; }
-    setSaving(true); setError("");
+    if (new Date(checkOut) <= new Date(checkIn)) {
+      setError("Please choose a check-out date after check-in.");
+      return;
+    }
+    setSaving(true);
+    setError("");
     try {
       const booking = await touristBookingsApi.create({
         bookingType: "PACKAGE",
@@ -120,87 +127,150 @@ export default function PackageCustomization() {
       navigate("/tourist/bookings/" + booking.id);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not create the booking.");
-    } finally { setSaving(false); }
+    } finally {
+      setSaving(false);
+    }
   };
 
-  if (loading) return <PageShell><div className="mx-auto max-w-7xl px-4 py-20 text-center text-gray-500">Loading your package...</div></PageShell>;
-  if (!pkg) return <PageShell><div className="mx-auto max-w-4xl px-4 py-20 text-center"><p className="font-black text-gray-900">{error || "Package not found."}</p><Link to="/explore?tab=tours" className="mt-4 inline-block font-bold text-rose-500">Back to packages</Link></div></PageShell>;
+  if (loading) return <Shell><div className="mx-auto max-w-7xl px-4 py-24 text-center text-sm font-semibold text-gray-500">Loading your journey...</div></Shell>;
+  if (!pkg) return <Shell><div className="mx-auto max-w-4xl px-4 py-24 text-center"><p className="font-black text-gray-900">{error || "Package not found."}</p><Link to="/explore?tab=tours" className="mt-4 inline-flex rounded-full bg-[#ff385c] px-5 py-3 text-sm font-black text-white">Back to journeys</Link></div></Shell>;
 
   return (
-    <PageShell>
+    <Shell>
       <main>
-        <section className="relative overflow-hidden bg-[#071a33] text-white">
-          <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[1.25fr_.75fr] lg:px-8 lg:py-12">
+        <section className="relative overflow-hidden bg-[#0b1f3a] text-white">
+          <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[1.3fr_.7fr] lg:px-8 lg:py-12">
             <div className="relative min-h-[360px] overflow-hidden rounded-[2rem]">
               <img src={pkg.image} alt={pkg.name} className="absolute inset-0 h-full w-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              <div className="absolute left-5 top-5"><Link to={"/packages/" + pkg.id} className="inline-flex items-center gap-2 rounded-full bg-black/35 px-4 py-2 text-xs font-bold text-white backdrop-blur"><ArrowLeft className="h-4 w-4" /> Package details</Link></div>
-              <div className="absolute bottom-0 p-6 md:p-8"><div className="flex flex-wrap gap-2"><span className="rounded-full bg-white/90 px-3 py-1 text-xs font-black text-gray-800">{pkg.category}</span><span className="rounded-full bg-black/30 px-3 py-1 text-xs font-bold text-white">{pkg.duration} days</span></div><h1 className="mt-3 text-3xl font-black md:text-5xl">{pkg.name}</h1><div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-white/80"><span className="inline-flex items-center gap-1"><Star className="h-4 w-4 fill-current text-amber-300" />{Number(pkg.rating || 0).toFixed(1)}</span><span className="inline-flex items-center gap-1"><MapPin className="h-4 w-4" />{pkg.destinations.join(" · ")}</span></div></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+              <div className="absolute left-5 top-5"><Link to={"/packages/" + pkg.id} className="inline-flex items-center gap-2 rounded-full bg-black/35 px-4 py-2 text-xs font-black text-white backdrop-blur"><ArrowLeft className="h-4 w-4" /> Back to journey</Link></div>
+              <div className="absolute bottom-0 p-6 md:p-8">
+                <div className="flex flex-wrap gap-2"><span className="rounded-full bg-white/90 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-[#10213b]">{pkg.category}</span><span className="rounded-full bg-white/15 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-white">{pkg.duration} days</span></div>
+                <h1 className="mt-3 max-w-3xl text-3xl font-black md:text-5xl">{pkg.name}</h1>
+                <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-white/80"><span className="inline-flex items-center gap-1"><Star className="h-4 w-4 fill-amber-300 text-amber-300" /> {Number(pkg.rating || 0).toFixed(1)}</span><span className="inline-flex items-center gap-1"><MapPin className="h-4 w-4" /> {pkg.destinations.join(" · ")}</span></div>
+              </div>
             </div>
-            <div className="self-end rounded-[2rem] bg-white p-6 text-[#10213b] shadow-2xl">
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-gray-400">Starting from</p>
+            <div className="flex flex-col justify-end rounded-[2rem] bg-white p-6 text-[#10213b] shadow-2xl">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-gray-400">Your journey starts from</p>
               <p className="mt-1 text-4xl font-black">LKR {Number(pkg.price || 0).toLocaleString()}</p>
               <p className="mt-1 text-sm text-gray-500">per traveller · package base</p>
               <div className="mt-5 grid grid-cols-2 gap-3"><Stat icon={Clock3} label="Duration" value={pkg.duration + " days"} /><Stat icon={Users} label="Group" value={"Up to " + (pkg.maxGroup || "flexible")} /></div>
+              <div className="mt-5 rounded-2xl bg-emerald-50 p-4"><p className="text-xs font-black uppercase tracking-wider text-emerald-700">Package first</p><p className="mt-1 text-sm font-semibold leading-5 text-emerald-900">Your package already contains the services listed below. You only change them when you want an alternative.</p></div>
             </div>
           </div>
         </section>
 
-        <section className="mx-auto grid max-w-7xl gap-6 px-4 py-10 sm:px-6 lg:grid-cols-[1.2fr_.8fr] lg:px-8">
-          <div className="space-y-6">
+        <section className="mx-auto grid max-w-7xl gap-7 px-4 py-10 sm:px-6 lg:grid-cols-[1fr_360px] lg:px-8">
+          <div className="space-y-7">
             <section className="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-gray-200 md:p-8">
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-500">Your journey</p>
-              <h2 className="mt-1 text-2xl font-black text-[#10213b]">Set the essentials</h2>
+              <div className="flex items-end justify-between gap-4"><div><p className="text-xs font-black uppercase tracking-[0.2em] text-rose-500">01 · Your dates</p><h2 className="mt-2 text-3xl font-black text-[#10213b]">Make the journey yours</h2></div><span className="rounded-full bg-gray-50 px-3 py-1.5 text-xs font-black text-gray-500">{tripDays} days</span></div>
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                <Field label="Travellers"><input type="number" min="1" max={pkg.maxGroup || 99} value={guests} onChange={e=>setGuests(Math.max(1,Number(e.target.value)))} /></Field>
-                <Field label="Guide language"><select value={language} onChange={e=>setLanguage(e.target.value)}><option>English</option><option>French</option><option>Spanish</option><option>Japanese</option><option>Korean</option><option>Chinese</option><option>German</option></select></Field>
-                <Field label="Check-in"><input type="date" min={today()} value={checkIn} onChange={e=>setCheckIn(e.target.value)} /></Field>
-                <Field label="Check-out"><input type="date" min={checkIn} value={checkOut} onChange={e=>setCheckOut(e.target.value)} /></Field>
-                <Field label="Luggage pieces"><input type="number" min="0" value={luggage} onChange={e=>setLuggage(Math.max(0,Number(e.target.value)))} /></Field>
-                <Field label="Driver"><select value={driverRequired ? "Required" : "Not required"} onChange={e=>setDriverRequired(e.target.value === "Required")}><option>Required</option><option>Not required</option></select></Field>
+                <Field label="Travellers"><input type="number" min="1" max={pkg.maxGroup || 99} value={guests} onChange={(e) => setGuests(Math.max(1, Number(e.target.value)))} /></Field>
+                <Field label="Guide language"><select value={language} onChange={(e) => setLanguage(e.target.value)}><option>English</option><option>French</option><option>Spanish</option><option>Japanese</option><option>Korean</option><option>Chinese</option><option>German</option></select></Field>
+                <Field label="Check-in"><input type="date" min={today()} value={checkIn} onChange={(e) => { setCheckIn(e.target.value); if (new Date(e.target.value) >= new Date(checkOut)) setCheckOut(addDays(e.target.value, Math.max(1, pkg.duration))); }} /></Field>
+                <Field label="Check-out"><input type="date" min={checkIn} value={checkOut} onChange={(e) => setCheckOut(e.target.value)} /></Field>
+                <Field label="Luggage"><input type="number" min="0" value={luggage} onChange={(e) => setLuggage(Math.max(0, Number(e.target.value)))} /></Field>
+                <Field label="Driver preference"><select value={driverRequired ? "Driver preferred" : "No driver"} onChange={(e) => setDriverRequired(e.target.value === "Driver preferred")}><option>Driver preferred</option><option>No driver</option></select></Field>
               </div>
             </section>
 
             <section className="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-gray-200 md:p-8">
-              <div className="flex items-end justify-between gap-4"><div><p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-600">Included in the package</p><h2 className="mt-1 text-2xl font-black text-[#10213b]">Your base experience</h2></div><ShieldCheck className="h-7 w-7 text-emerald-500" /></div>
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                {included.length ? included.map((item) => <div key={item} className="flex items-start gap-3 rounded-2xl bg-emerald-50/70 p-4"><Check className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" /><div><p className="font-black text-[#10213b]">{item}</p><p className="mt-1 text-xs text-emerald-800/70">Included in the package price</p></div></div>) : <p className="text-sm text-gray-500">The package does not currently list inclusions.</p>}
+              <div className="flex items-end justify-between gap-4"><div><p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-600">02 · Already included</p><h2 className="mt-2 text-3xl font-black text-[#10213b]">Your package experience</h2><p className="mt-2 text-sm text-gray-500">Nothing needs to be selected again. These services belong to the package.</p></div><ShieldCheck className="h-8 w-8 text-emerald-500" /></div>
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                {included.map((item) => <div key={item} className="flex items-center gap-3 rounded-2xl bg-emerald-50/70 p-4"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-emerald-600"><Check className="h-4 w-4" /></span><div><p className="font-black text-[#10213b]">{item}</p><p className="text-xs font-semibold text-emerald-800/70">Included in package price</p></div></div>)}
               </div>
             </section>
 
             <section className="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-gray-200 md:p-8">
-              <div><p className="text-xs font-black uppercase tracking-[0.18em] text-rose-500">Optional changes</p><h2 className="mt-1 text-2xl font-black text-[#10213b]">Personalise without rebuilding the trip</h2><p className="mt-2 text-sm text-gray-500">Your package already covers the services listed above. Choose an alternative only when you want to change or add something.</p></div>
+              <div><p className="text-xs font-black uppercase tracking-[0.2em] text-rose-500">03 · Personalise</p><h2 className="mt-2 text-3xl font-black text-[#10213b]">Change something only if you want to</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-gray-500">Voyara will keep the package intact unless you choose an alternative guide, stay or vehicle.</p></div>
 
-              <OptionGroup icon={Languages} title="Guide" included={hasIncludedGuide} current={guide?.guide.name} loading={matching} empty="No guide matches are available right now." onClear={()=>setGuide(null)}>
-                {guideOptions.map((item)=><OptionCard key={item.guide.id} title={item.guide.name} subtitle={(item.guide.location || item.guide.country) + " · " + item.guide.experience + " years"} price={item.guide.pricePerDay ? "LKR " + Number(item.guide.pricePerDay).toLocaleString() + "/day" : "Price on request"} selected={guide?.guide.id===item.guide.id} onClick={()=>setGuide(item)} />)}
-              </OptionGroup>
+              <ChoiceSection title="Local guide" icon={Languages} included={hasIncludedGuide} selected={guide?.guide.name} loading={matching} open={openOption === "guide"} onToggle={() => setOpenOption(openOption === "guide" ? null : "guide")} onClear={() => setGuide(null)}>
+                {guideOptions.map((item) => <GuideCard key={item.guide.id} item={item} selected={guide?.guide.id === item.guide.id} onSelect={() => setGuide(item)} />)}
+              </ChoiceSection>
 
-              <OptionGroup icon={BedDouble} title="Stay" included={hasIncludedAccommodation} current={stay?.accommodation.name} loading={matching} empty="No stay matches are available right now." onClear={()=>setStay(null)}>
-                {stayOptions.map((item)=><OptionCard key={item.accommodation.id} title={item.accommodation.name} subtitle={item.accommodation.type + " · " + item.accommodation.location} price={"LKR " + Number(item.accommodation.price || 0).toLocaleString() + "/night"} selected={stay?.accommodation.id===item.accommodation.id} onClick={()=>setStay(item)} />)}
-              </OptionGroup>
+              <ChoiceSection title="Where you stay" icon={BedDouble} included={hasIncludedAccommodation} selected={stay?.accommodation.name} loading={matching} open={openOption === "stay"} onToggle={() => setOpenOption(openOption === "stay" ? null : "stay")} onClear={() => setStay(null)}>
+                {stayOptions.map((item) => <StayCard key={item.accommodation.id} item={item} selected={stay?.accommodation.id === item.accommodation.id} onSelect={() => setStay(item)} />)}
+              </ChoiceSection>
 
-              <OptionGroup icon={Car} title="Transport" included={hasIncludedTransport} current={vehicle?.vehicle.name} loading={matching} empty="No vehicle matches are available right now." onClear={()=>setVehicle(null)}>
-                {vehicleOptions.map((item)=><OptionCard key={item.vehicle.id} title={item.vehicle.name} subtitle={item.vehicle.type + " · " + item.vehicle.capacity + " seats"} price={"LKR " + Number(item.vehicle.pricePerDay || 0).toLocaleString() + "/day"} selected={vehicle?.vehicle.id===item.vehicle.id} onClick={()=>setVehicle(item)} />)}
-              </OptionGroup>
+              <ChoiceSection title="Transport" icon={Car} included={hasIncludedTransport} selected={vehicle?.vehicle.name} loading={matching} open={openOption === "vehicle"} onToggle={() => setOpenOption(openOption === "vehicle" ? null : "vehicle")} onClear={() => setVehicle(null)}>
+                {vehicleOptions.map((item) => <VehicleCard key={item.vehicle.id} item={item} selected={vehicle?.vehicle.id === item.vehicle.id} onSelect={() => setVehicle(item)} />)}
+              </ChoiceSection>
             </section>
           </div>
 
           <aside className="h-fit lg:sticky lg:top-24">
-            <div className="overflow-hidden rounded-[2rem] bg-[#10213b] text-white shadow-xl">
-              <div className="p-6 md:p-7"><p className="text-xs font-black uppercase tracking-[0.18em] text-rose-300">Ready when you are</p><h2 className="mt-1 text-2xl font-black">Your trip summary</h2><div className="mt-5 space-y-4"><Summary label="Package" value={pkg.name} /><Summary label="Travellers" value={String(guests)} /><Summary label="Dates" value={checkIn + " → " + checkOut} /><Summary label="Included" value={included.length + " package services"} /><Summary label="Optional changes" value={String([guide,stay,vehicle].filter(Boolean).length)} /></div></div>
-              <div className="bg-white p-6 text-[#10213b]"><p className="text-xs font-black uppercase tracking-wider text-gray-400">Estimated total</p><p className="mt-1 text-4xl font-black">LKR {estimatedTotal.toLocaleString()}</p><p className="mt-2 text-xs leading-5 text-gray-500">Package price + any optional services selected above. The backend confirms the final booking total.</p><button type="button" disabled={saving} onClick={continueToBooking} className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-[#FF385C] px-5 py-4 text-sm font-black text-white disabled:opacity-60">{saving ? "Creating booking..." : "Continue to booking"} <ArrowRight className="h-4 w-4" /></button></div>
+            <div className="overflow-hidden rounded-[2rem] bg-[#0b1f3a] text-white shadow-xl">
+              <div className="p-6">
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-rose-300">Your journey</p>
+                <h2 className="mt-2 text-2xl font-black">{pkg.name}</h2>
+                <p className="mt-1 text-sm text-white/60">{tripDays} days · {guests} traveller{guests === 1 ? "" : "s"}</p>
+              </div>
+              <div className="space-y-3 border-y border-white/10 p-6 text-sm">
+                <Summary label="Dates" value={checkIn + " → " + checkOut} />
+                <Summary label="Guide" value={guide ? guide.guide.name : hasIncludedGuide ? "Included in package" : "No guide selected"} />
+                <Summary label="Stay" value={stay ? stay.accommodation.name : hasIncludedAccommodation ? "Included in package" : "No stay selected"} />
+                <Summary label="Transport" value={vehicle ? vehicle.vehicle.name : hasIncludedTransport ? "Included services" : "Not selected"} />
+                <Summary label="Language" value={language} />
+              </div>
+              <div className="bg-white p-6 text-[#10213b]">
+                <p className="text-[10px] font-black uppercase tracking-wider text-gray-400">Estimated total</p>
+                <p className="mt-1 text-3xl font-black">LKR {estimatedTotal.toLocaleString()}</p>
+                <p className="mt-2 text-xs leading-5 text-gray-500">Package base plus any selected optional services. The backend confirms the final booking total.</p>
+                {error && <div className="mt-4 rounded-xl bg-rose-50 p-3 text-xs font-bold text-rose-700">{error}</div>}
+                <button type="button" disabled={saving} onClick={continueToBooking} className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-[#ff385c] px-5 py-4 text-sm font-black text-white transition hover:bg-[#e91f47] disabled:opacity-60">
+                  {saving ? "Creating booking..." : "Continue to booking"} <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
             </div>
-            {error && <div className="mt-4 rounded-2xl bg-rose-50 p-4 text-sm font-bold text-rose-700">{error}</div>}
           </aside>
         </section>
       </main>
-    </PageShell>
+    </Shell>
   );
 }
 
-function PageShell({ children }: { children: React.ReactNode }) { return <div className="min-h-screen bg-[#f7f8fa]"><Navbar />{children}<Footer /></div>; }
-function Field({ label, children }: { label:string; children:React.ReactNode }) { return <label className="block"><span className="mb-2 block text-xs font-black uppercase tracking-wider text-gray-400">{label}</span><div className="rounded-xl bg-gray-50 px-4 py-3 ring-1 ring-gray-200 [&>input]:w-full [&>input]:bg-transparent [&>input]:outline-none [&>select]:w-full [&>select]:bg-transparent [&>select]:outline-none">{children}</div></label>; }
-function Stat({ icon:Icon,label,value }:{icon:typeof Clock3;label:string;value:string}){return <div className="rounded-xl bg-gray-50 p-3"><Icon className="h-4 w-4 text-gray-400"/><p className="mt-2 text-[10px] font-black uppercase tracking-wider text-gray-400">{label}</p><p className="mt-0.5 text-sm font-black">{value}</p></div>}
-function Summary({label,value}:{label:string;value:string}){return <div className="flex justify-between gap-4 border-b border-white/10 pb-3 text-sm"><span className="text-white/55">{label}</span><span className="text-right font-bold">{value}</span></div>}
-function OptionGroup({icon:Icon,title,included,current,loading,empty,children,onClear}:{icon:typeof Languages;title:string;included:boolean;current?:string;loading:boolean;empty:string;children:React.ReactNode;onClear:()=>void}){return <div className="mt-6 border-t border-gray-100 pt-6"><div className="flex items-start justify-between gap-4"><div className="flex items-start gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-50"><Icon className="h-5 w-5 text-gray-600"/></div><div><h3 className="font-black text-[#10213b]">{title}</h3><p className="mt-1 text-xs text-gray-500">{included ? "Included in your package" : "Not listed as included · choose if you need it"}{current ? " · " + current : ""}</p></div></div>{current && <button type="button" onClick={onClear} className="text-xs font-bold text-gray-400 hover:text-gray-700">Remove</button>}</div><div className="mt-4 grid gap-3 md:grid-cols-2">{loading ? <div className="text-xs text-gray-400">Finding options…</div> : children}</div>{!loading && !children && <p className="mt-3 text-xs text-gray-400">{empty}</p>}</div>}
-function OptionCard({title,subtitle,price,selected,onClick}:{title:string;subtitle:string;price:string;selected:boolean;onClick:()=>void}){return <button type="button" onClick={onClick} className={"rounded-2xl border p-4 text-left transition hover:-translate-y-0.5 hover:shadow-sm "+(selected?"border-rose-400 bg-rose-50":"border-gray-200 bg-white")}><div className="flex items-start justify-between gap-3"><div><p className="font-black text-[#10213b]">{title}</p><p className="mt-1 text-xs text-gray-500">{subtitle}</p></div>{selected?<span className="rounded-full bg-rose-500 px-2 py-1 text-[10px] font-black text-white">Selected</span>:<span className="text-xs font-bold text-gray-400">Choose</span>}</div><p className="mt-3 text-xs font-black text-gray-700">{price}</p></button>}
+function Shell({ children }: { children: React.ReactNode }) { return <div className="min-h-screen bg-[#f6f7f5]"><Navbar />{children}<Footer /></div>; }
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return <label className="block rounded-2xl bg-gray-50 p-4 ring-1 ring-gray-200"><span className="text-[10px] font-black uppercase tracking-wider text-gray-400">{label}</span><div className="mt-2">{children}</div></label>;
+}
+
+function Stat({ icon: Icon, label, value }: { icon: typeof Clock3; label: string; value: string }) {
+  return <div className="rounded-2xl bg-gray-50 p-3"><Icon className="h-4 w-4 text-gray-400" /><p className="mt-2 text-[10px] font-black uppercase tracking-wider text-gray-400">{label}</p><p className="mt-1 text-sm font-black text-[#10213b]">{value}</p></div>;
+}
+
+function Summary({ label, value }: { label: string; value: string }) {
+  return <div className="flex items-start justify-between gap-4"><span className="text-white/50">{label}</span><span className="text-right font-bold">{value}</span></div>;
+}
+
+function ChoiceSection({ title, icon: Icon, included, selected, loading, open, onToggle, onClear, children }: { title: string; icon: typeof BedDouble; included: boolean; selected?: string; loading: boolean; open: boolean; onToggle: () => void; onClear: () => void; children: React.ReactNode }) {
+  return <div className="mt-4 overflow-hidden rounded-2xl border border-gray-200">
+    <button type="button" onClick={onToggle} className="flex w-full items-center justify-between gap-4 bg-white p-5 text-left hover:bg-gray-50">
+      <div className="flex items-center gap-3"><span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gray-50 text-gray-600"><Icon className="h-5 w-5" /></span><div><p className="font-black text-[#10213b]">{title}</p><p className="mt-1 text-xs text-gray-500">{selected ? "Alternative: " + selected : included ? "Included with this package" : "Choose an optional service"}</p></div></div>
+      <div className="flex items-center gap-2">{selected && <button type="button" onClick={(event) => { event.stopPropagation(); onClear(); }} className="rounded-full px-3 py-1.5 text-xs font-black text-gray-500 hover:bg-gray-100">Reset</button>}<span className={"rounded-full px-3 py-1.5 text-xs font-black " + (included ? "bg-emerald-50 text-emerald-700" : "bg-gray-100 text-gray-600")}>{included ? "Included" : "Optional"}</span><ArrowRight className={"h-4 w-4 text-gray-400 transition " + (open ? "rotate-90" : "")} /></div>
+    </button>
+    {open && <div className="border-t border-gray-100 bg-[#fafafa] p-4">{loading ? <p className="p-4 text-sm text-gray-400">Finding suitable options...</p> : <div className="grid gap-3 md:grid-cols-2">{children}</div>}</div>}
+  </div>;
+}
+
+function GuideCard({ item, selected, onSelect }: { item: GuideRecommendation; selected: boolean; onSelect: () => void }) {
+  const guide = item.guide;
+  return <button type="button" onClick={onSelect} className={"overflow-hidden rounded-2xl border bg-white text-left transition hover:-translate-y-0.5 hover:shadow-md " + (selected ? "border-rose-400 ring-2 ring-rose-100" : "border-gray-200")}>
+    <div className="flex items-center gap-3 p-4"><div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-100 text-sm font-black text-gray-500">{guide.profilePhoto ? <img src={guide.profilePhoto} alt={guide.name} className="h-full w-full object-cover" /> : guide.initials}</div><div className="min-w-0 flex-1"><p className="truncate font-black text-[#10213b]">{guide.name}</p><p className="text-xs text-gray-500">{guide.location} · {guide.experience} years</p></div>{selected && <Check className="h-5 w-5 text-rose-500" />}</div>
+    <div className="border-t border-gray-100 px-4 py-3"><div className="flex justify-between text-xs"><span className="font-bold text-gray-500">★ {Number(guide.rating || 0).toFixed(1)}</span><span className="font-black text-gray-800">LKR {Number(guide.pricePerDay || 0).toLocaleString()}/day</span></div><div className="mt-2 flex flex-wrap gap-1">{item.reasons.slice(0, 2).map((reason) => <span key={reason} className="rounded-full bg-gray-50 px-2 py-1 text-[10px] font-bold text-gray-500">{reason}</span>)}</div></div>
+  </button>;
+}
+
+function StayCard({ item, selected, onSelect }: { item: AccommodationRecommendation; selected: boolean; onSelect: () => void }) {
+  const stay = item.accommodation;
+  return <button type="button" onClick={onSelect} className={"overflow-hidden rounded-2xl border bg-white text-left transition hover:-translate-y-0.5 hover:shadow-md " + (selected ? "border-rose-400 ring-2 ring-rose-100" : "border-gray-200")}>
+    <div className="h-28 overflow-hidden bg-gray-100"><img src={stay.image} alt={stay.name} className="h-full w-full object-cover" /></div><div className="p-4"><div className="flex items-start justify-between gap-2"><div><p className="font-black text-[#10213b]">{stay.name}</p><p className="mt-1 text-xs text-gray-500">{stay.type} · {stay.location}</p></div>{selected && <Check className="h-5 w-5 text-rose-500" />}</div><div className="mt-3 flex items-center justify-between text-xs"><span className="font-bold text-gray-500">★ {Number(stay.rating || 0).toFixed(1)}</span><span className="font-black text-gray-800">LKR {Number(stay.price).toLocaleString()}/night</span></div></div>
+  </button>;
+}
+
+function VehicleCard({ item, selected, onSelect }: { item: VehicleRecommendation; selected: boolean; onSelect: () => void }) {
+  const vehicle = item.vehicle;
+  return <button type="button" onClick={onSelect} className={"overflow-hidden rounded-2xl border bg-white text-left transition hover:-translate-y-0.5 hover:shadow-md " + (selected ? "border-rose-400 ring-2 ring-rose-100" : "border-gray-200")}>
+    <div className="h-28 overflow-hidden bg-gray-100"><img src={vehicle.image} alt={vehicle.name} className="h-full w-full object-cover" /></div><div className="p-4"><div className="flex items-start justify-between gap-2"><div><p className="font-black text-[#10213b]">{vehicle.name}</p><p className="mt-1 text-xs text-gray-500">{vehicle.type} · {vehicle.capacity} seats</p></div>{selected && <Check className="h-5 w-5 text-rose-500" />}</div><div className="mt-3 flex items-center justify-between text-xs"><span className="font-bold text-gray-500">{vehicle.transmission} · {vehicle.fuel}</span><span className="font-black text-gray-800">LKR {Number(vehicle.pricePerDay).toLocaleString()}/day</span></div></div>
+  </button>;
+}
