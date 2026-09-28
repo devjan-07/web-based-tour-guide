@@ -4,6 +4,16 @@ import { ArrowLeft, CalendarDays, CheckCircle, Clock, CreditCard, HelpCircle, Ma
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
+import {
+  destinationsApi,
+  packagesApi,
+  guidesApi,
+  type Destination,
+  type TourPackage,
+  type Route,
+  type GuideRecommendation,
+  type DestinationRecommendation,
+} from "../lib/api";
 
 type DetailMode = "destination" | "package";
 
