@@ -132,10 +132,6 @@ export default function PlanMyTrip() {
     }
   }
 
-  const customBookingLink = selectedDestination
-    ? `/tourist/bookings/new?destinationId=${selectedDestination.id}&destination=${encodeURIComponent(selectedDestination.name)}`
-    : "/tourist/bookings/new";
-
   const saveTripResource = (item: Omit<TripItem, "key">) => {
     const next = addTripItem(item);
     setSavedTripKeys(new Set(next.map((tripItem) => tripItem.key)));
@@ -150,7 +146,7 @@ export default function PlanMyTrip() {
             <div className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-[0.18em] text-white/70">
               <Sparkles className="h-4 w-4" /> Voyara trip planner
             </div>
-            <h1 className="max-w-3xl text-3xl font-extrabold md:text-5xl">Build a trip around the way you actually travel.</h1>
+            <h1 className="max-w-3xl text-3xl font-extrabold md:text-5xl">Plan a trip around the way you actually travel.</h1>
             <p className="mt-4 max-w-2xl text-sm leading-6 text-white/80 md:text-base">
               Choose a destination, dates, group size and preferences. Voyara then connects packages, guides, stays and transport into one practical starting plan.
             </p>
