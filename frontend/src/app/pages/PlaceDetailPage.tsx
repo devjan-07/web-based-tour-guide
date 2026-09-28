@@ -36,6 +36,7 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
   const [nearbyDestinations, setNearbyDestinations] = useState<import("../lib/api").NearbyDestination[]>([]);
   const [nearbyRadiusKm, setNearbyRadiusKm] = useState(50);
   const [nearbyLoading, setNearbyLoading] = useState(false);
+  const [nearbyError, setNearbyError] = useState("");
   const isTourist = isAuthenticated && user?.roles.includes("TOURIST");
 
   useEffect(() => {
@@ -510,7 +511,7 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
                       </div>
                     </div>
                   ))}
-                    {item.mode === "package" ? (
+                    {item?.mode === "package" ? (
                       <Link
                         to={`/tourist/packages/${item.data.id}/customize`}
                         className="mt-3 flex w-full items-center justify-center rounded-xl px-4 py-3.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90"
@@ -548,6 +549,7 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
                 <p className="mt-4 text-center text-[11px] leading-5 text-gray-400">
                   {item?.mode === "package" ? "Your final booking total is calculated by the booking service after availability is checked." : "Choose your dates and trip details after selecting this destination."}
                 </p>
+                </div>
               </aside>
             </div>
           </article>
