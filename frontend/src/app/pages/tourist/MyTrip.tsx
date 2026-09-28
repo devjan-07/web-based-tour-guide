@@ -31,9 +31,9 @@ export default function MyTrip() {
         <section className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#062a56] via-[#003580] to-[#0057B8] text-white shadow-lg">
           <div className="p-7 md:p-10">
             <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-[0.18em] text-white/70"><Sparkles className="h-4 w-4" /> My Trip</div>
-            <h1 className="mt-2 max-w-3xl text-3xl font-extrabold md:text-5xl">Turn saved ideas into a simple itinerary.</h1>
+            <h1 className="mt-2 max-w-3xl text-3xl font-extrabold md:text-5xl">Review and organise your trip before you book.</h1>
             <p className="mt-4 max-w-2xl text-sm leading-6 text-white/80 md:text-base">
-              Add destinations and travel resources while exploring Voyara. Then organise them into days before you move on to booking.
+              Keep the destinations, packages and travel services you are considering in one place. When the plan is ready, continue to customization and booking.
             </p>
           </div>
         </section>
@@ -42,7 +42,7 @@ export default function MyTrip() {
           <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
             <MapPin className="h-5 w-5 text-rose-500" />
             <p className="mt-3 text-2xl font-extrabold text-gray-900">{items.length}</p>
-            <p className="text-xs text-gray-500">Saved trip items</p>
+            <p className="text-xs text-gray-500">Selected trip items</p>
           </div>
           <div className="rounded-3xl border border-gray-200 bg-white p-5">
             <CalendarDays className="h-5 w-5 text-blue-600" />
@@ -51,16 +51,16 @@ export default function MyTrip() {
           </div>
           <div className="rounded-3xl border border-gray-200 bg-white p-5">
             <Users className="h-5 w-5 text-emerald-600" />
-            <p className="mt-3 text-sm font-extrabold text-gray-900">{items.length ? "Ready to organise" : "Start exploring"}</p>
-            <p className="text-xs text-gray-500">Your saved plan stays in this browser</p>
+            <p className="mt-3 text-sm font-extrabold text-gray-900">{items.length ? "Planning in progress" : "Start exploring"}</p>
+            <p className="text-xs text-gray-500">Your planning draft is saved in this browser</p>
           </div>
         </section>
 
         <section className="mt-6 rounded-[2rem] border border-gray-200 bg-white p-5 shadow-sm md:p-6">
           <div className="flex flex-col gap-3 border-b border-gray-100 pb-5 md:flex-row md:items-center md:justify-between">
             <div>
-              <div className="flex items-center gap-2"><h2 className="text-xl font-extrabold text-gray-900">Itinerary builder</h2><span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-700">Saved locally</span></div>
-              <p className="mt-1 text-sm text-gray-500">Move saved resources between days. This does not create a booking.</p>
+              <div className="flex items-center gap-2"><h2 className="text-xl font-extrabold text-gray-900">Trip plan</h2><span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-700">Planning draft</span></div>
+              <p className="mt-1 text-sm text-gray-500">Move selected resources between days. This is a planning workspace; it does not create a booking.</p>
             </div>
             <div className="flex flex-wrap gap-2">
               <label className="flex items-center gap-2 rounded-xl bg-gray-50 px-3 py-2 text-xs font-semibold text-gray-600">
@@ -81,7 +81,7 @@ export default function MyTrip() {
             <div className="py-16 text-center">
               <Package className="mx-auto h-12 w-12 text-gray-300" />
               <h3 className="mt-4 font-bold text-gray-900">Your trip is empty</h3>
-              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-gray-500">Explore a destination or package and select “Add to My Trip” to start building your itinerary.</p>
+              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-gray-500">Explore a destination or package and select “Add to My Trip” to start planning.</p>
               <div className="mt-5 flex justify-center gap-3">
                 <Link to="/explore?tab=destinations" className="rounded-xl bg-[#FF385C] px-4 py-2.5 text-sm font-bold text-white transition hover:opacity-90">Explore destinations</Link>
                 <Link to="/tourist/plan" className="rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-gray-800">Plan My Trip</Link>
@@ -133,8 +133,8 @@ export default function MyTrip() {
 
         <section className="mt-6 flex flex-col gap-4 rounded-3xl bg-gray-900 p-6 text-white md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="font-extrabold">Ready to turn the plan into a booking?</p>
-            <p className="mt-1 text-sm text-white/60">Your saved itinerary is a planning aid. Review availability and dates during the booking process.</p>
+            <p className="font-extrabold">Ready to turn your plan into a booking?</p>
+            <p className="mt-1 text-sm text-white/60">Your trip plan is a planning aid. Review dates, availability and final services during customization and booking.</p>
           </div>
           {items.some((item) => item.type === "package") ? (() => { const packageItem = items.find((item) => item.type === "package")!; return <Link to={`/tourist/packages/${packageItem.id}/customize`} className="inline-flex items-center gap-2 rounded-xl bg-[#FF385C] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:opacity-90">Customize package & book <ArrowRight className="h-4 w-4" /></Link>; })() : <Link to="/tourist/bookings/new" className="rounded-xl bg-[#FF385C] px-5 py-3 text-sm font-bold text-white">Continue to booking</Link>}
         </section>
