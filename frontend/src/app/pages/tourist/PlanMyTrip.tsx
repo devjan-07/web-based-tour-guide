@@ -134,8 +134,14 @@ export default function PlanMyTrip() {
             <p className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.22em] text-rose-300"><Sparkles className="h-4 w-4" /> Travel concierge</p>
             <h1 className="mt-4 text-4xl font-black tracking-tight md:text-6xl">Build the Sri Lanka escape that feels like you.</h1>
             <p className="mt-5 max-w-xl text-base leading-7 text-white/70 md:text-lg">
-              Start with a place and a feeling. We will surface existing Voyara packages first, then show the local services that can complement your journey.
+              Start with a destination, dates and travel style. Voyara then connects the existing packages and supporting services that fit those choices.
             </p>
+            <div className="mt-7 flex flex-wrap gap-2 text-xs font-bold text-white/75">
+              <span className="rounded-full bg-white/10 px-3 py-2">Destination</span>
+              <span className="rounded-full bg-white/10 px-3 py-2">Dates & people</span>
+              <span className="rounded-full bg-white/10 px-3 py-2">Preferences</span>
+              <span className="rounded-full bg-white/10 px-3 py-2">Matched options</span>
+            </div>
           </div>
           {selectedDestination && (
             <div className="relative min-h-[330px] overflow-hidden rounded-[2rem] shadow-2xl ring-1 ring-white/20">
