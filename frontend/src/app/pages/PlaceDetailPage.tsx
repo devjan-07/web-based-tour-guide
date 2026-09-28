@@ -235,8 +235,27 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
                           </div>
                           {weather && <div className="rounded-2xl bg-white px-4 py-3 text-right shadow-sm"><p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Now</p><p className="mt-1 text-xl font-extrabold text-gray-900">{Math.round(weather.currentTemperatureC)}°C</p><p className="text-xs font-semibold text-gray-500">{weather.currentCondition}</p></div>}
                         </div>
-                        {weatherLoading && <div className="rounded-2xl bg-white p-4 text-sm text-gray-500">Loading live weather...</div>}
-                        {!weatherLoading && weatherError && <div className="rounded-2xl bg-white p-4 text-sm text-rose-600">{weatherError}</div>}
+                        {weatherLoading && <div className="rounded-2xl bg-white p-4 text-sm text-gray-500">Checking the latest weather for this destination...</div>}
+                        {!weatherLoading && weatherError && (
+                          <div className="rounded-2xl bg-white p-4">
+                            <p className="text-sm font-semibold text-rose-600">Weather is temporarily unavailable.</p>
+                            <p className="mt-1 text-xs text-gray-500">{weatherError}</p>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setWeatherLoading(true);
+                                setWeatherError("");
+                                destinationsApi.weather(item.data.id)
+                                  .then((forecast) => setWeather(forecast))
+                                  .catch((err) => setWeatherError(err instanceof Error ? err.message : "Could not load weather"))
+                                  .finally(() => setWeatherLoading(false));
+                              }}
+                              className="mt-3 rounded-xl bg-gray-900 px-3 py-2 text-xs font-bold text-white transition hover:bg-gray-800"
+                            >
+                              Try again
+                            </button>
+                          </div>
+                        )}
                         {!weatherLoading && weather && <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                           {weather.forecast.slice(0, 4).map((day) => <div key={day.date} className="rounded-2xl bg-white p-4 shadow-sm">
                             <p className="text-xs font-bold text-gray-500">{formatWeatherDate(day.date)}</p>
@@ -245,7 +264,7 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
                             <div className="mt-2 flex items-center gap-2 text-xs text-gray-500"><Umbrella className="h-3.5 w-3.5" /> {day.precipitationProbability}% rain chance</div>
                           </div>)}
                         </div>}
-                        {weather && <p className="text-[11px] text-gray-400">Weather source: {weather.source} · {weather.location} · {weather.latitude.toFixed(3)}, {weather.longitude.toFixed(3)}</p>}
+                        {weather && <p className="text-[11px] text-gray-400">Weather via {weather.source} · {weather.location}</p>}
                       </div>
                     </div>
 
@@ -254,12 +273,32 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
                         <div className="flex flex-wrap items-start justify-between gap-4">
                           <div className="flex items-start gap-3">
                             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-emerald-600 shadow-sm"><Navigation className="h-5 w-5" /></div>
-                            <div><h2 className="text-xl font-bold text-gray-900">Nearby destinations</h2><p className="mt-1 text-sm text-gray-500">Geo-spatial search from this destination's resolved coordinates.</p></div>
+                            <div><h2 className="text-xl font-bold text-gray-900">Discover places nearby</h2><p className="mt-1 text-sm text-gray-500">Explore other active destinations within a selectable travel radius.</p></div>
                           </div>
                           <label className="flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-xs font-semibold text-gray-500 shadow-sm">Radius<select value={nearbyRadiusKm} onChange={(event) => setNearbyRadiusKm(Number(event.target.value))} className="bg-transparent font-bold text-gray-900 outline-none">{[25, 50, 100, 250].map((value) => <option key={value} value={value}>{value} km</option>)}</select></label>
                         </div>
                         {nearbyLoading && <div className="rounded-2xl bg-white p-4 text-sm text-gray-500">Finding destinations within {nearbyRadiusKm} km...</div>}
-                        {!nearbyLoading && nearbyError && <div className="rounded-2xl bg-white p-4 text-sm text-rose-600">{nearbyError}</div>}
+                        {!nearbyLoading && nearbyError && (
+                          <div className="rounded-2xl bg-white p-4">
+                            <p className="text-sm font-semibold text-rose-600">Nearby destinations could not be loaded.</p>
+                            <p className="mt-1 text-xs text-gray-500">{nearbyError}</p>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (!weather) return;
+                                setNearbyLoading(true);
+                                setNearbyError("");
+                                destinationsApi.nearby(weather.latitude, weather.longitude, nearbyRadiusKm)
+                                  .then((items) => setNearbyDestinations(items.filter((nearby) => nearby.destination.id !== weather.destinationId).slice(0, 6)))
+                                  .catch((err) => setNearbyError(err instanceof Error ? err.message : "Could not load nearby destinations"))
+                                  .finally(() => setNearbyLoading(false));
+                              }}
+                              className="mt-3 rounded-xl bg-gray-900 px-3 py-2 text-xs font-bold text-white transition hover:bg-gray-800"
+                            >
+                              Try again
+                            </button>
+                          </div>
+                        )}
                         {!nearbyLoading && !nearbyError && nearbyDestinations.length === 0 && <div className="rounded-2xl bg-white p-4 text-sm text-gray-500">No active destinations were found within {nearbyRadiusKm} km.</div>}
                         {!nearbyLoading && nearbyDestinations.length > 0 && <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                           {nearbyDestinations.map((nearby) => <Link key={nearby.destination.id} to={`/destinations/${nearby.destination.id}`} className="group overflow-hidden rounded-2xl bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
