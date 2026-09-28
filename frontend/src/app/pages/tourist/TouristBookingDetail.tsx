@@ -378,19 +378,40 @@ export default function TouristBookingDetail() {
             )}
 
             <section className="bg-white rounded-3xl border border-gray-200 p-6">
-              <h2 className="font-bold text-gray-900 mb-5">Status timeline</h2>
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between mb-5">
+                <div>
+                  <h2 className="font-bold text-gray-900">Booking status</h2>
+                  <p className="mt-1 text-xs text-gray-400">This timeline tracks the reservation itself. Payment status is shown separately above.</p>
+                </div>
+                <span className="inline-flex w-fit rounded-full bg-gray-50 px-3 py-1.5 text-xs font-bold text-gray-600">Payment: {booking.payment}</span>
+              </div>
               {booking.status === "Cancelled" ? (
                 <div className="rounded-2xl bg-red-50 p-4 text-sm font-semibold text-red-600">This booking has been cancelled.</div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   {timeline.map((step, index) => {
-                    const active = index <= timelineIndex;
+                    const completed = index < timelineIndex;
+                    const current = index === timelineIndex;
                     return (
-                      <div key={step} className="rounded-2xl border p-4" style={{ borderColor: active ? "#FF385C" : "#e5e7eb", background: active ? "#fff5f7" : "white" }}>
-                        <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold mb-3" style={{ background: active ? "#FF385C" : "#f3f4f6", color: active ? "white" : "#9ca3af" }}>
-                          {index + 1}
+                      <div
+                        key={step}
+                        className="rounded-2xl border p-4 transition"
+                        style={{
+                          borderColor: completed ? "#bbf7d0" : current ? "#FF385C" : "#e5e7eb",
+                          background: completed ? "#f0fdf4" : current ? "#fff5f7" : "white",
+                        }}
+                      >
+                        <div
+                          className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold mb-3"
+                          style={{
+                            background: completed ? "#16a34a" : current ? "#FF385C" : "#f3f4f6",
+                            color: completed || current ? "white" : "#9ca3af",
+                          }}
+                        >
+                          {completed ? <CheckCircle className="h-4 w-4" /> : index + 1}
                         </div>
                         <p className="text-sm font-semibold text-gray-800">{step}</p>
+                        <p className="mt-1 text-xs text-gray-400">{completed ? "Completed" : current ? "Current status" : "Upcoming"}</p>
                       </div>
                     );
                   })}
