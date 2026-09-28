@@ -57,7 +57,6 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 
 ### 3. Booking Management
 - [x] Preserve existing CRUD
-- [x] My Trip / Trip Command Center
 - [x] Trip readiness indicator
 - [x] Booking status timeline
 - [x] Action-oriented notifications
@@ -87,9 +86,7 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 - [x] Add-to-trip workflow
 - [x] Itinerary planning
 - [x] Connect destination, package, guide, vehicle and accommodation
-- [x] Plan My Trip experience
 - [x] Package customization → booking handoff
-- [x] My Trip → package customization handoff
 
 ### 8. Public Tourism Experience
 - [x] Tourism-focused navigation
@@ -115,12 +112,10 @@ Visitors can browse destinations, packages and local guides, inspect destination
 ### Plan
 **Plan a Trip** is an optional assisted-planning route for tourists who want recommendations based on destination, dates, travellers, budget, guide preferences, stay preferences and transport needs.
 
-Recommendations are saved into **My Trip**, which is the pre-booking planning workspace. The separate “Build My Trip” concept is not used.
 
 ### Book
 A tourist can either:
 - go directly from a known package to package customization, or
-- move from Plan a Trip → My Trip → package customization.
 
 Customization configures guests, dates, guide, accommodation, vehicle, driver/luggage and pickup/return times before creating the existing booking.
 
@@ -132,7 +127,6 @@ Completed bookings can be followed by the existing tourist review/feedback flow.
 
 ### Planning-state rule
 
-The current **My Trip** draft is intentionally a frontend planning workspace stored in browser local storage. It is not treated as a booking or payment record. The backend remains the source of truth for actual bookings, payments, provider decisions and trip-readiness data.
 
 ## Current Normal-Feature Backend Completion
 
@@ -257,8 +251,6 @@ The postponed advanced features remain postponed and are not included in this mi
 | 2026-09-24 | `c79fbb03c6b219e788ee229f9c55f5eab1a0c91d` | Remove stray literal newline escapes from trip planner source | Implemented; browser verification pending |
 | 2026-09-24 | `01e0a8ef7cd4841c295c61f5b2fbdfb1a3cd9a42` | Polish booking experience with responsive review summary and loading state | Implemented; browser verification pending |
 | 2026-09-24 | `1d5eeeed56c0d9d19a9f651ee10443639084ef2b` | Redesign destination and package detail experience around tourism discovery and booking | Implemented; browser verification pending |
-| 2026-09-24 | `35407a04ea38c2ebabe4554b5f8a09e443b67387` | Polish Plan My Trip visual consistency and recommendation sections | Implemented; browser verification pending |
-| 2026-09-24 | `2948cc5c360ddbcbfec5859bad6ea1a1fd5ba52e` | Polish My Trip itinerary experience and responsive controls | Implemented; browser verification pending |
 | 2026-09-24 | `12c35c103f427be233c227d044ef8758983126cd` | Polish public package comparison experience | Implemented; browser verification pending |
 
 | Date | Commit | Improvement | Status |
@@ -285,18 +277,9 @@ The postponed advanced features remain postponed and are not included in this mi
 | 2026-09-24 | `edac6b7f409f47de08f89f3549263a67a74d1be6` | Vehicle/accommodation frontend recommendation APIs | Implemented; final verification pending |
 | 2026-09-24 | `b130ef377f4e8aba16d7972175232d5065b7a0b7` | Smart matching integrated into booking flow | Implemented; final verification pending |
 | 2026-09-24 | `2fdd50b56d6041269da102078e918b8ffc56ed16` | Driver-service feature matching refinement | Implemented; final verification pending |
-| 2026-09-24 | `217b468f361541034699363e05f788c71aa8f64c` | Cross-module Plan My Trip page | Implemented; verified |
 | 2026-09-24 | `c111822c301096e808c12e5aecd34ad753edd497` | Trip planner component typing fix | Implemented; verified |
-| 2026-09-24 | `6f56d26ad5265dd1e89eb9a3843289e0648e106e` | Expose Plan My Trip tourist route | Implemented; verified |
-| 2026-09-24 | `3664e340e25e3d4c2164761649f1ee8e0b113112` | Add Plan My Trip landing-page entry point | Implemented; verified |
 
-| 2026-09-24 | `39e3b682fc80c5dd7612fd19a1b2d63aebb09574` | Verify Plan My Trip integration | Verified |
 | 2026-09-24 | `47f7da97f624042ffc1a05fb16e751c7c045cdf8` | Add local trip planning state | Implemented; verification pending |
-| 2026-09-24 | `73bf32d04debbe17ce31bd39b615fb465b97d908` | Add My Trip itinerary builder | Implemented; verification pending |
-| 2026-09-24 | `4159978f09da4894994beb54bcbf75301ccaf7d9` | Expose My Trip tourist route | Implemented; verification pending |
-| 2026-09-24 | `37a042b31b53a42344ea628a59b2fc64b36ff447` | Add destinations and packages to My Trip | Implemented; verification pending |
-| 2026-09-24 | `31afc6d1554c5a12e2b6f9296d73cedc4cb63791` | Add My Trip landing-page entry point | Implemented; verification pending |
-| 2026-09-24 | `7de2cdf99d8e0406e46320d8b30109bddb3e9bfe` | Save Plan My Trip recommendations | Verified |
 | 2026-09-24 | `ebc62bba01cd55051b1af48d82402eaff22b2cf7` | Add package comparison | Implemented; verification pending |
 | 2026-09-24 | `397aaf011a75309d104572932001fe3d756091bf` | Expose package comparison route | Implemented; verification pending |
 | 2026-09-24 | `23eb417ae9611750116f7a094d3d0874241b96c3` | Improve package discovery controls | Implemented; verification pending |
@@ -304,7 +287,6 @@ The postponed advanced features remain postponed and are not included in this mi
 | 2026-09-24 | `3eb7b283d53dd6eb4229fd125188d24a95e85bdf` | Add package customization flow | Implemented; verification pending |
 | 2026-09-24 | `5e46cdbb73b9c28c3faa817cc875c3cc2079c482` | Expose package customization route | Implemented; verification pending |
 | 2026-09-24 | `8e0d8dce2dcfd0b8521fc78c51a845dae7b05e4e` | Link package details to customization | Implemented; verification pending |
-| 2026-09-24 | `49a790adbcd945c8a5400aa1e2728007ab6471b3` | Connect My Trip to package customization | Implemented; verification pending |
 
 | 2026-09-24 | `8f1a45555b757a3964607dceeb5f936ed20d291c` | Rebuild footer navigation cleanly | Implemented; browser verification pending |
 | 2026-09-24 | `c72727e70fd90856ae87c6d88d564093806f3f25` | Remove stray navbar brace | Implemented; browser verification pending |
@@ -362,24 +344,18 @@ Run after the enhancement batch is complete:
 - [ ] Existing booking/login navigation remains functional.
 - [ ] Package detail pages and package routes remain functional.
 - [ ] Destination detail and package detail layouts are browser-verified after the tourism detail-page redesign.
-- [ ] Compare Packages, Plan My Trip and My Trip pages are browser-verified after the consistency polish.
 - [x] Destination discovery filters existing destination categories correctly.
 - [x] Package discovery sorting and comparison work without affecting existing browsing.
-- [x] Plan My Trip loads destination/package data and builds cross-module matches.
-- [x] Plan My Trip carries the selected destination into the booking flow.
-- [x] Plan My Trip package, guide, accommodation and vehicle matches are consistent with the existing recommendation APIs.
 - [x] Cross-module flows are checked after all enhancements are integrated.
 - [ ] Frontend production build completes successfully.\n- [ ] Public Explore page browser verification completes.\n- [ ] Public guide discovery browser verification completes.\n- [ ] Public package comparison browser verification completes.
 - [ ] Homepage search/category interactions scroll to the redesigned discovery results.
 - [ ] Homepage no longer presents unsupported static review, guarantee, certification or support claims.
-- [ ] Mobile navigation exposes Explore, Local Guides, Compare, My Trip and Plan a Trip for authenticated tourists.
 - [ ] Package detail page opens “Customize this package” for active packages.
 - [ ] Package customization loads the selected package and its existing destinations/duration/price.
 - [ ] Changing guests, dates, language, luggage or driver requirement refreshes guide/accommodation/vehicle recommendations.
 - [ ] Customization shows suitability reasons from the existing recommendation APIs.
 - [ ] Customized price estimate changes according to guests and selected guide/accommodation/vehicle daily rates.
 - [ ] Customized booking creates successfully and carries package, guide, accommodation, vehicle and trip details into the existing booking model.
-- [ ] My Trip with a saved package opens the customization flow instead of bypassing it.
 - [ ] Existing package booking still works independently.
 - [ ] No new database schema is required for the customization flow.
 - [ ] Existing recommendation APIs remain compatible.
@@ -414,9 +390,6 @@ The frontend price shown during customization is explicitly an estimate. The bac
 
 
 | 2026-09-28 | `0f004ef5f32e6a4058de12ed0627676b48cacf17` | Fix package customization pickup/return time validation | Implemented |
-| 2026-09-28 | `7f9905f86455b1b3cc42b8d48f58652662bc51f6` | Connect tourist navigation to My Trip | Implemented; browser verification pending |
-| 2026-09-28 | `9a22fbc77766e669156c14f6614847211f506f66` | Make My Trip the planning handoff from recommendations | Implemented; browser verification pending |
-| 2026-09-28 | `c5f74e2b9d379947fdd3311fe1007134e65f1b12` | Clarify My Trip as the pre-booking planning workspace | Implemented; browser verification pending |
 | 2026-09-28 | `d5038c21a191697da81bb5d36a5f09fa78e7971d` | Remove obsolete direct booking handoff from planner | Implemented; browser verification pending |
 | 2026-09-28 | `ab98a5a696a5606049e0a76612957fab80b8410a` | Preserve planning intent through login | Implemented; browser verification pending |
 | 2026-09-28 | `56ca9c18d339f1cae3f2232a318869f862a1b5ef` | Align homepage messaging with the tourist journey | Implemented; browser verification pending |
