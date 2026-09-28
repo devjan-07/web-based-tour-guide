@@ -386,7 +386,7 @@ export default function TouristBookingCreate() {
                 </Field>
               </div>
 
-              <details open className="group mt-6 rounded-2xl border border-gray-200 bg-gray-50/50 p-4 sm:p-5">
+              <details onToggle={(event) => { if ((event.currentTarget as HTMLDetailsElement).open) setBookingStep(2); }} className="group mt-6 rounded-2xl border border-gray-200 bg-gray-50/50 p-4 sm:p-5">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
                   <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-rose-500">Step 2</p><h3 className="mt-1 font-bold text-gray-900">Choose a local guide</h3><p className="mt-0.5 text-xs text-gray-400">Optional — expand to compare available guides.</p></div><span className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-gray-500 shadow-sm">View options</span>
                 </summary>
@@ -440,7 +440,7 @@ export default function TouristBookingCreate() {
                 </div>
               </details>
 
-              <details onToggle={(event) => { if ((event.currentTarget as HTMLDetailsElement).open) setBookingStep(2); }} className="group mt-4 rounded-2xl border border-gray-200 bg-gray-50/50 p-4 sm:p-5">
+              <details onToggle={(event) => { if ((event.currentTarget as HTMLDetailsElement).open) setBookingStep(4); }} className="group mt-4 rounded-2xl border border-gray-200 bg-gray-50/50 p-4 sm:p-5">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
                   <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-rose-500">Step 3</p><h3 className="mt-1 font-bold text-gray-900">Choose your stay</h3><p className="mt-0.5 text-xs text-gray-400">Set preferences first, then choose from matching stays.</p></div><span className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-gray-500 shadow-sm">View options</span>
                 </summary>
