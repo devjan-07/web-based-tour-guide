@@ -247,7 +247,7 @@ export default function PlanMyTrip() {
                   <p className="mt-1 text-xs text-gray-500">{travellers} traveller{travellers === 1 ? "" : "s"} · {driverRequired ? "Driver requested" : "Self drive"} · {luggage} luggage item{luggage === 1 ? "" : "s"}</p>
                 </div>
                 <button type="button" onClick={matchTrip} disabled={matching || !selectedDestination} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#FF385C] px-5 py-3 text-sm font-bold text-white disabled:opacity-60">
-                  {matching ? "Building your plan..." : "Build My Trip"} <ArrowRight className="h-4 w-4" />
+                  {matching ? "Building your plan..." : "Find my matches"} <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
             </section>
@@ -262,12 +262,12 @@ export default function PlanMyTrip() {
                     </div>
                     <p className="mt-3 text-sm font-extrabold text-gray-900">LKR {Number(item.price || 0).toLocaleString()}</p>
                     <p className="mt-1 line-clamp-2 text-xs text-gray-500">{item.description || "Tour package available for this destination."}</p>
-                    <div className="mt-3 grid grid-cols-2 gap-2"><button type="button" onClick={() => saveTripResource({ type: "package", id: item.id, title: item.name, subtitle: item.duration + " days · " + item.difficulty, destination: selectedDestination?.name, day: 1 })} className="rounded-xl border border-gray-200 px-3 py-2 text-xs font-bold text-gray-700">{savedTripKeys.has(`package-${item.id}`) ? "Added to My Trip" : "Add to My Trip"}</button><Link to={`/tourist/bookings/new?packageId=${item.id}`} className="inline-flex items-center justify-center rounded-xl bg-gray-900 px-3 py-2 text-xs font-bold text-white">Use package</Link></div>
+                    <div className="mt-3 grid grid-cols-2 gap-2"><button type="button" onClick={() => saveTripResource({ type: "package", id: item.id, title: item.name, subtitle: item.duration + " days · " + item.difficulty, destination: selectedDestination?.name, day: 1 })} className="rounded-xl border border-gray-200 px-3 py-2 text-xs font-bold text-gray-700">{savedTripKeys.has(`package-${item.id}`) ? "Added to My Trip" : "Add to My Trip"}</button><Link to={`/packages/${item.id}`} className="inline-flex items-center justify-center rounded-xl bg-gray-900 px-3 py-2 text-xs font-bold text-white">View package</Link></div>
                   </div>
                 ))}
               </RecommendationCard>
 
-              <RecommendationCard title="Guide matches" icon={Languages} empty="Run Build My Trip to match available guides.">
+              <RecommendationCard title="Guide matches" icon={Languages} empty="Find your matches above to see suitable guides.">
                 {guideRecommendations.map((item) => (
                   <div key={item.guide.id} className="rounded-2xl border border-gray-200 p-4">
                     <div className="flex items-start justify-between gap-3"><div><p className="font-bold text-gray-900">{item.guide.name}</p><p className="mt-1 text-xs text-gray-400">{item.guide.location || item.guide.country} · {item.guide.experience} years</p></div><Fit score={item.suitabilityScore} /></div>
@@ -277,7 +277,7 @@ export default function PlanMyTrip() {
                 ))}
               </RecommendationCard>
 
-              <RecommendationCard title="Stay matches" icon={BedDouble} empty="Run Build My Trip to match active accommodation.">
+              <RecommendationCard title="Stay matches" icon={BedDouble} empty="Find your matches above to see suitable stays.">
                 {accommodationRecommendations.map((item) => (
                   <div key={item.accommodation.id} className="rounded-2xl border border-gray-200 p-4">
                     <div className="flex items-start justify-between gap-3"><div><p className="font-bold text-gray-900">{item.accommodation.name}</p><p className="mt-1 text-xs text-gray-400">{item.accommodation.type} · {item.accommodation.location}</p></div><Fit score={item.suitabilityScore} /></div>
@@ -306,16 +306,16 @@ export default function PlanMyTrip() {
                   ))}
                 </div>
               ) : (
-                <div className="mt-5 rounded-2xl border border-dashed border-gray-200 p-5 text-sm text-gray-400">Run Build My Trip to match available transport.</div>
+                <div className="mt-5 rounded-2xl border border-dashed border-gray-200 p-5 text-sm text-gray-400">Find your matches above to see suitable transport.</div>
               )}
             </section>
 
             <section className="mt-6 flex flex-col gap-4 rounded-3xl bg-gray-900 p-6 text-white md:flex-row md:items-center md:justify-between">
               <div>
-                <div className="flex items-center gap-2 text-sm font-bold"><CheckCircle className="h-4 w-4 text-emerald-400" /> Ready to turn the plan into a booking?</div>
-                <p className="mt-2 max-w-2xl text-sm text-white/60">Start a custom trip with the destination and dates already carried into the booking form. You can review every resource before submitting.</p>
+                <div className="flex items-center gap-2 text-sm font-bold"><CheckCircle className="h-4 w-4 text-emerald-400" /> Your recommendations are ready</div>
+                <p className="mt-2 max-w-2xl text-sm text-white/60">Save the resources you want, review them together in My Trip, and only then move into customization and booking.</p>
               </div>
-              <Link to={customBookingLink} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#FF385C] px-5 py-3.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60">Continue to booking <ArrowRight className="h-4 w-4" /></Link>
+              <Link to="/tourist/my-trip" className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#FF385C] px-5 py-3.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90">Open My Trip <ArrowRight className="h-4 w-4" /></Link>
             </section>
           </>
         )}
