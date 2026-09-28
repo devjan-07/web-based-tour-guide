@@ -401,6 +401,9 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
                   </div>
                 )}
 
+                </>
+                )}
+
                 {item?.mode === "package" && (
                   <div className="mb-8 rounded-2xl border border-blue-100 bg-blue-50/60 p-5">
                     <div className="flex items-start gap-3">
