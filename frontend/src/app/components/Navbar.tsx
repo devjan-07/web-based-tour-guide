@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Compass, HelpCircle, LayoutDashboard, LogIn, LogOut, Menu, User, UserPlus } from "lucide-react";
+import { Compass, HelpCircle, LayoutDashboard, LogIn, LogOut, Menu, User, UserPlus, Sparkles } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
 import { NotificationBell } from "./NotificationBell";
@@ -79,7 +79,7 @@ export function Navbar() {
               to={planHref}
               className="ml-2 inline-flex items-center rounded-full bg-gray-950 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-gray-800"
             >
-              Plan a trip
+              <Sparkles className="mr-2 h-4 w-4" /> Build my trip
             </Link>
           </div>
 
@@ -135,7 +135,7 @@ export function Navbar() {
                       onClick={() => setMenuOpen(false)}
                       className="mx-3 my-2 flex items-center justify-center rounded-xl bg-gray-950 px-4 py-3 text-sm font-bold text-white hover:bg-gray-800"
                     >
-                      Plan a trip
+                      <Sparkles className="mr-2 h-4 w-4" /> Build my trip
                     </Link>
                   </div>
 
