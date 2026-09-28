@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Compass, HelpCircle, LayoutDashboard, LogIn, LogOut, Menu, User, UserPlus } from "lucide-react";
+import { Compass, HelpCircle, LayoutDashboard, LogIn, LogOut, Menu, User, UserPlus, BriefcaseBusiness } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
 import { NotificationBell } from "./NotificationBell";
@@ -74,6 +74,15 @@ export function Navbar() {
             >
               Compare
             </Link>
+            {isTourist && (
+              <Link
+                to="/tourist/my-trip"
+                aria-current={isActive("/tourist/my-trip") ? "page" : undefined}
+                className={isActive("/tourist/my-trip") ? "rounded-full bg-gray-100 px-4 py-2.5 text-sm font-semibold text-gray-950" : "rounded-full px-4 py-2.5 text-sm font-semibold text-gray-600 transition hover:bg-gray-50 hover:text-gray-950"}
+              >
+                My Trip
+              </Link>
+            )}
             <Link
               to="/tourist/plan"
               className="ml-2 inline-flex items-center rounded-full bg-gray-950 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-gray-800"
@@ -129,6 +138,16 @@ export function Navbar() {
                       <Compass className="h-4 w-4 text-gray-400" />
                       Compare packages
                     </Link>
+                    {isTourist && (
+                      <Link
+                        to="/tourist/my-trip"
+                        onClick={() => setMenuOpen(false)}
+                        className={isActive("/tourist/my-trip") ? "flex items-center gap-3 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700" : "flex items-center gap-3 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50"}
+                      >
+                        <BriefcaseBusiness className="h-4 w-4 text-gray-400" />
+                        My Trip
+                      </Link>
+                    )}
                     <Link
                       to="/tourist/plan"
                       onClick={() => setMenuOpen(false)}
