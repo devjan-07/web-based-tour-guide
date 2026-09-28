@@ -304,8 +304,7 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
                         {weather && <p className="text-[11px] text-gray-400">Search centre: {weather.latitude.toFixed(3)}, {weather.longitude.toFixed(3)} · Radius filtering is calculated by the Voyara backend.</p>}
                       </div>
                     </div>
-                  </>
-                )}
+
 
                 {item?.mode === "destination" && (
                   <div className="mb-8 rounded-2xl border border-rose-100 bg-rose-50/60 p-5">
