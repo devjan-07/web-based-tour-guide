@@ -114,7 +114,12 @@ public class DemoDataSeeder implements CommandLineRunner {
         );
 
         syncSeeded(tourPackages, tourPackageRepository.findAll(), TourPackage::getName,
-                (existing, seed) -> existing.setPrice(seed.getPrice()), tourPackageRepository::saveAll);
+                (existing, seed) -> {
+                    existing.setPrice(seed.getPrice());
+                    existing.setImage(seed.getImage());
+                    existing.setIncluded(seed.getIncluded());
+                    existing.setDescription(seed.getDescription());
+                }, tourPackageRepository::saveAll);
     }
 
     private void seedAccommodations(List<Destination> destinations) {
@@ -201,10 +206,26 @@ public class DemoDataSeeder implements CommandLineRunner {
         tourPackage.setRating(0);
         tourPackage.setReviews(0);
         tourPackage.setBookings(bookings);
-        tourPackage.setImage("https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=80");
+        tourPackage.setImage(packageImage(name));
         tourPackage.setIncluded(included);
         tourPackage.setDescription("Curated Sri Lanka itinerary with Voyara-managed planning, local support, and staff confirmation.");
         return tourPackage;
+    }
+
+    private String packageImage(String name) {
+        return switch (name) {
+            case "Sri Lanka Cultural Triangle" -> "https://images.unsplash.com/photo-1588598198321-9735fd52455b?auto=format&fit=crop&w=1200&q=80";
+            case "Ella Highlands Escape" -> "https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=1200&q=80";
+            case "South Coast Beach Break" -> "https://images.unsplash.com/photo-1586500036706-41963de24d8b?auto=format&fit=crop&w=1200&q=80";
+            case "Kandy Heritage Weekend" -> "https://images.unsplash.com/photo-1586089688878-28708d388c43?auto=format&fit=crop&w=1200&q=80";
+            case "Yala Safari Adventure" -> "https://images.unsplash.com/photo-1549366021-9f761d450615?auto=format&fit=crop&w=1200&q=80";
+            case "Tea Country Wellness Route" -> "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=80";
+            case "East Coast Snorkel Trip" -> "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80";
+            case "Ancient Cities Cycling Tour" -> "https://images.unsplash.com/photo-1588250583782-c1c130badf35?auto=format&fit=crop&w=1200&q=80";
+            case "Galle Food and Fort Walk" -> "https://images.unsplash.com/photo-1580889240911-53df20d9bd62?auto=format&fit=crop&w=1200&q=80";
+            case "Sri Lanka Family Highlights" -> "https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=1200&q=80";
+            default -> "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=80";
+        };
     }
 
     private Accommodation accommodation(String name, String type, String location, String price, int rooms, double rating,
