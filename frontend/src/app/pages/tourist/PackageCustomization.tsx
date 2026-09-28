@@ -85,11 +85,17 @@ export default function PackageCustomization() {
   const estimatedTotal = useMemo(() => {
     if (!pkg) return 0;
     const base = Number(pkg.price || 0) * Math.max(1, guests);
+    // Included services are already covered by the package price. An amount is
+    // added only when the tourist explicitly selects a replacement option.
     const guideCost = guide ? Number(guide.guide.pricePerDay || 0) * tripDays : 0;
     const stayCost = stay ? Number(stay.accommodation.price || 0) * tripDays : 0;
     const vehicleCost = vehicle ? Number(vehicle.vehicle.pricePerDay || 0) * tripDays : 0;
     return base + guideCost + stayCost + vehicleCost;
-  }, [pkg, guests, guide, stay, vehicle, tripDays, hasIncludedGuide, hasIncludedAccommodation, hasIncludedTransport]);
+  }, [pkg, guests, guide, stay, vehicle, tripDays]);
+
+  const includedSummary = included.length
+    ? included.join(", ")
+    : "The package inclusions are defined by the selected tour package.";
 
   const continueToBooking = async () => {
     if (!pkg) return;
@@ -105,13 +111,13 @@ export default function PackageCustomization() {
         packageId: pkg.id,
         languagePreference: language,
         destination: pkg.destinations?.join(", ") || "",
-        guideSelectionType: guide ? "VOYARA" : "OWN",
+        guideSelectionType: guide ? "VOYARA" : hasIncludedGuide ? "VOYARA" : "OWN",
         guideId: guide?.guide.id ?? null,
-        accommodationSelectionType: stay ? "VOYARA" : "OWN",
+        accommodationSelectionType: stay ? "VOYARA" : hasIncludedAccommodation ? "VOYARA" : "OWN",
         accommodationId: stay?.accommodation.id ?? null,
         rooms: 1,
         roomType: "Double",
-        vehicleSelectionType: vehicle ? "VOYARA" : "OWN",
+        vehicleSelectionType: vehicle ? "VOYARA" : hasIncludedTransport ? "VOYARA" : "OWN",
         vehicleId: vehicle?.vehicle.id ?? null,
         pickupLocation: pkg.destinations?.[0] || "",
         pickupTime,
@@ -122,7 +128,7 @@ export default function PackageCustomization() {
         checkIn,
         checkOut,
         guests,
-        notes: "Package: " + pkg.name + ". Included services: " + (pkg.included || "Not specified") + ". Optional guide: " + (guide?.guide.name || "None") + ". Optional stay: " + (stay?.accommodation.name || "None") + ". Optional vehicle: " + (vehicle?.vehicle.name || "None") + ".",
+        notes: "Package: " + pkg.name + ". Included services: " + includedSummary + ". Replacement guide: " + (guide?.guide.name || (hasIncludedGuide ? "Keep package guide" : "None")) + ". Replacement stay: " + (stay?.accommodation.name || (hasIncludedAccommodation ? "Keep package accommodation" : "None")) + ". Replacement vehicle: " + (vehicle?.vehicle.name || (hasIncludedTransport ? "Keep package transport" : "None")) + ".",
       });
       navigate("/tourist/bookings/" + booking.id);
     } catch (e) {
@@ -182,7 +188,7 @@ export default function PackageCustomization() {
             </section>
 
             <section className="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-gray-200 md:p-8">
-              <div><p className="text-xs font-black uppercase tracking-[0.2em] text-rose-500">03 · Personalise</p><h2 className="mt-2 text-3xl font-black text-[#10213b]">Change something only if you want to</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-gray-500">Voyara will keep the package intact unless you choose an alternative guide, stay or vehicle.</p></div>
+              <div><p className="text-xs font-black uppercase tracking-[0.2em] text-rose-500">03 · Personalise</p><h2 className="mt-2 text-3xl font-black text-[#10213b]">Change something only if you want to</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-gray-500">Your package is the source of truth. Included services stay included automatically; the cards below are optional replacements, not items you must add again.</p></div>
 
               <ChoiceSection title="Local guide" icon={Languages} included={hasIncludedGuide} selected={guide?.guide.name} loading={matching} open={openOption === "guide"} onToggle={() => setOpenOption(openOption === "guide" ? null : "guide")} onClear={() => setGuide(null)}>
                 {guideOptions.map((item) => <GuideCard key={item.guide.id} item={item} selected={guide?.guide.id === item.guide.id} onSelect={() => setGuide(item)} />)}
