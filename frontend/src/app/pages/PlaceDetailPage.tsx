@@ -524,8 +524,7 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
                         Book this trip
                       </button>
                     )}
-                  </>
-                )}
+
                 {!isAuthenticated && (
                   <Link
                     to={loginPath}
