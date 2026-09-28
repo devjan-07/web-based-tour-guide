@@ -85,9 +85,9 @@ export default function PackageCustomization() {
   const estimatedTotal = useMemo(() => {
     if (!pkg) return 0;
     const base = Number(pkg.price || 0) * Math.max(1, guests);
-    const guideCost = guide && !hasIncludedGuide ? Number(guide.guide.pricePerDay || 0) * tripDays : 0;
-    const stayCost = stay && !hasIncludedAccommodation ? Number(stay.accommodation.price || 0) * tripDays : 0;
-    const vehicleCost = vehicle && !hasIncludedTransport ? Number(vehicle.vehicle.pricePerDay || 0) * tripDays : 0;
+    const guideCost = guide ? Number(guide.guide.pricePerDay || 0) * tripDays : 0;
+    const stayCost = stay ? Number(stay.accommodation.price || 0) * tripDays : 0;
+    const vehicleCost = vehicle ? Number(vehicle.vehicle.pricePerDay || 0) * tripDays : 0;
     return base + guideCost + stayCost + vehicleCost;
   }, [pkg, guests, guide, stay, vehicle, tripDays, hasIncludedGuide, hasIncludedAccommodation, hasIncludedTransport]);
 
