@@ -69,6 +69,7 @@ export default function TouristBookingCreate() {
   const [vehiclesLoading, setVehiclesLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [bookingStep, setBookingStep] = useState(1);
 
   useEffect(() => {
     if (!packageId) return;
@@ -316,7 +317,7 @@ export default function TouristBookingCreate() {
         ) : (
           <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
             <section className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-              <div className="mb-6"><div className="mb-5 grid grid-cols-4 gap-2">{["Essentials", "Guide", "Stay", "Transport"].map((step, index) => <div key={step} className="flex items-center gap-2"><span className={"flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-black " + (index === 0 ? "bg-rose-500 text-white" : "bg-gray-100 text-gray-400")}>{index + 1}</span><span className={"hidden text-xs font-bold sm:block " + (index === 0 ? "text-gray-900" : "text-gray-400")}>{step}</span></div>)}</div><div className="flex items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-rose-500">Step 1</p><h2 className="mt-1 text-xl font-extrabold text-gray-900">Start with the essentials</h2><p className="mt-1 text-sm text-gray-500">Tell us when you are travelling and who is coming. Everything else is optional.</p></div><span className="hidden rounded-full bg-gray-50 px-3 py-1.5 text-xs font-semibold text-gray-500 sm:inline-flex">Required first</span></div>
+              <div className="mb-6"><div className="mb-5 grid grid-cols-4 gap-2">{["Essentials", "Guide", "Stay", "Transport"].map((step, index) => <div key={step} className="flex items-center gap-2"><span className={"flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-black " + (index + 1 <= bookingStep ? "bg-rose-500 text-white" : "bg-gray-100 text-gray-400")}>{index + 1}</span><span className={"hidden text-xs font-bold sm:block " + (index + 1 <= bookingStep ? "text-gray-900" : "text-gray-400")}>{step}</span></div>)}</div><div className="flex items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-rose-500">Step 1</p><h2 className="mt-1 text-xl font-extrabold text-gray-900">Start with the essentials</h2><p className="mt-1 text-sm text-gray-500">Tell us when you are travelling and who is coming. Everything else is optional.</p></div><span className="hidden rounded-full bg-gray-50 px-3 py-1.5 text-xs font-semibold text-gray-500 sm:inline-flex">Required first</span></div>
               </div>
 
               {error && (
@@ -439,7 +440,7 @@ export default function TouristBookingCreate() {
                 </div>
               </details>
 
-              <details open className="group mt-4 rounded-2xl border border-gray-200 bg-gray-50/50 p-4 sm:p-5">
+              <details onToggle={(event) => { if ((event.currentTarget as HTMLDetailsElement).open) setBookingStep(2); }} className="group mt-4 rounded-2xl border border-gray-200 bg-gray-50/50 p-4 sm:p-5">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
                   <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-rose-500">Step 3</p><h3 className="mt-1 font-bold text-gray-900">Choose your stay</h3><p className="mt-0.5 text-xs text-gray-400">Set preferences first, then choose from matching stays.</p></div><span className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-gray-500 shadow-sm">View options</span>
                 </summary>
@@ -542,7 +543,7 @@ export default function TouristBookingCreate() {
                 </div>
               </details>
 
-              <details open className="group mt-4 rounded-2xl border border-gray-200 bg-gray-50/50 p-4 sm:p-5">
+              <details onToggle={(event) => { if ((event.currentTarget as HTMLDetailsElement).open) setBookingStep(3); }} className="group mt-4 rounded-2xl border border-gray-200 bg-gray-50/50 p-4 sm:p-5">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
                   <div>
                     <p className="text-xs font-bold uppercase tracking-[0.18em] text-rose-500">Step 4</p>
