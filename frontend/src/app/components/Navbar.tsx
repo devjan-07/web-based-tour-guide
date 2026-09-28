@@ -19,6 +19,7 @@ export function Navbar() {
   const isAdmin = user?.roles.includes("ADMIN");
   const isTourist = user?.roles.includes("TOURIST");
   const firstName = user?.fullName?.trim().split(/\s+/)[0] || "Traveler";
+  const planHref = isTourist ? "/tourist/plan" : "/login?redirect=%2Ftourist%2Fplan";
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -84,7 +85,7 @@ export function Navbar() {
               </Link>
             )}
             <Link
-              to="/tourist/plan"
+              to={planHref}
               className="ml-2 inline-flex items-center rounded-full bg-gray-950 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-gray-800"
             >
               Plan a trip
@@ -149,7 +150,7 @@ export function Navbar() {
                       </Link>
                     )}
                     <Link
-                      to="/tourist/plan"
+                      to={planHref}
                       onClick={() => setMenuOpen(false)}
                       className="mx-3 my-2 flex items-center justify-center rounded-xl bg-gray-950 px-4 py-3 text-sm font-bold text-white hover:bg-gray-800"
                     >
