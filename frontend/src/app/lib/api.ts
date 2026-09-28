@@ -19,6 +19,35 @@ export interface Destination {
 
 
 export interface DestinationRecommendation { destination: Destination; suitabilityScore: number; reasons: string[]; }
+export interface WeatherDay {
+  date: string;
+  minimumTemperatureC: number;
+  maximumTemperatureC: number;
+  precipitationProbability: number;
+  weatherCode: number;
+  condition: string;
+  sunrise: string;
+  sunset: string;
+}
+export interface WeatherForecast {
+  destinationId: number;
+  destinationName: string;
+  location: string;
+  latitude: number;
+  longitude: number;
+  timezone: string;
+  currentTemperatureC: number;
+  currentWeatherCode: number;
+  currentCondition: string;
+  forecast: WeatherDay[];
+  source: string;
+}
+export interface NearbyDestination {
+  destination: Destination;
+  distanceKm: number;
+  latitude: number;
+  longitude: number;
+}
 
 export interface Route { id: number; destinationId: number; routeName: string; startLocation: string; endLocation: string; distanceKm?: number | null; estimatedDuration?: number | null; description?: string; status: "ACTIVE" | "INACTIVE"; }
 
@@ -265,6 +294,9 @@ function resource<T extends { id: Id }, Id extends string | number>(path: string
 export const destinationsApi = {
   ...resource<Destination, number>("/destinations"),
   similar: (id: number) => request<DestinationRecommendation[]>(`/destinations/${id}/similar`),
+  weather: (id: number) => request<WeatherForecast>(`/destinations/${id}/weather`),
+  nearby: (latitude: number, longitude: number, radiusKm: number) =>
+    request<NearbyDestination[]>(`/destinations/nearby?latitude=${encodeURIComponent(latitude)}&longitude=${encodeURIComponent(longitude)}&radiusKm=${encodeURIComponent(radiusKm)}`),
 };
 export const packagesApi = {
   ...resource<TourPackage, number>("/packages"),
@@ -377,6 +409,7 @@ export const accommodationRecommendationsApi = {
   },
 };
 export const accommodationSearchApi = {
+  get: (id: number) => request<Accommodation>(`/accommodations/${id}`),
   list: (params: { destinationId?: number; destination?: string } = {}) => {
     const query = new URLSearchParams();
     if (params.destinationId) query.set("destinationId", String(params.destinationId));
