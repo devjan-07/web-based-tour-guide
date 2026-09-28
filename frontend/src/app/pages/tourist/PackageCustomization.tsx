@@ -38,6 +38,8 @@ export default function PackageCustomization() {
   const [guests, setGuests] = useState(2);
   const [checkIn, setCheckIn] = useState(today());
   const [checkOut, setCheckOut] = useState("");
+  const [pickupTime, setPickupTime] = useState("09:00");
+  const [returnTime, setReturnTime] = useState("18:00");
   const [language, setLanguage] = useState("English");
   const [guide, setGuide] = useState<GuideRecommendation | null>(null);
   const [stay, setStay] = useState<AccommodationRecommendation | null>(null);
@@ -103,6 +105,10 @@ export default function PackageCustomization() {
       setError("Check-out must be after check-in.");
       return;
     }
+    if (!pickupTime || !returnTime) {
+      setError("Pickup and return times are required.");
+      return;
+    }
     setSaving(true);
     setError("");
     saveSelection();
@@ -121,7 +127,9 @@ export default function PackageCustomization() {
         vehicleSelectionType: vehicle ? "VOYARA" : "OWN",
         vehicleId: vehicle?.vehicle.id ?? null,
         pickupLocation: pkg.destinations?.[0] || "",
+        pickupTime,
         returnLocation: pkg.destinations?.[0] || "",
+        returnTime,
         driverRequired,
         luggageCount: luggage,
         checkIn,
@@ -167,6 +175,8 @@ export default function PackageCustomization() {
               <label className="text-sm font-semibold text-gray-700">Check-in<input type="date" min={today()} value={checkIn} onChange={e => setCheckIn(e.target.value)} className="mt-2 w-full rounded-xl border border-gray-200 p-3 outline-none" /></label>
               <label className="text-sm font-semibold text-gray-700">Check-out<input type="date" min={checkIn} value={checkOut} onChange={e => setCheckOut(e.target.value)} className="mt-2 w-full rounded-xl border border-gray-200 p-3 outline-none" /></label>
               <label className="text-sm font-semibold text-gray-700">Luggage pieces<input type="number" min="0" value={luggage} onChange={e => setLuggage(Math.max(0, Number(e.target.value)))} className="mt-2 w-full rounded-xl border border-gray-200 p-3 outline-none" /></label>
+              <label className="text-sm font-semibold text-gray-700">Pickup time<input type="time" value={pickupTime} onChange={e => setPickupTime(e.target.value)} required className="mt-2 w-full rounded-xl border border-gray-200 p-3 outline-none" /></label>
+              <label className="text-sm font-semibold text-gray-700">Return time<input type="time" value={returnTime} onChange={e => setReturnTime(e.target.value)} required className="mt-2 w-full rounded-xl border border-gray-200 p-3 outline-none" /></label>
               <label className="flex items-center gap-3 rounded-xl border border-gray-200 p-3 text-sm font-semibold text-gray-700"><input type="checkbox" checked={driverRequired} onChange={e => setDriverRequired(e.target.checked)} /> Driver required</label>
             </div>
           </div>
