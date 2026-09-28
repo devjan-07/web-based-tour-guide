@@ -67,8 +67,13 @@ export default function ComparePackages() {
               Three ways to experience Sri Lanka.
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-7 text-white/70 md:text-lg">
-              Shortlist the journeys that catch your eye, then compare what the experience actually includes.
+              Shortlist journeys visually, understand what is already included, and move directly into the package you want to personalise.
             </p>
+            <div className="mt-7 flex flex-wrap gap-2 text-xs font-bold text-white/80">
+              <span className="rounded-full bg-white/10 px-3 py-2">01 · Shortlist</span>
+              <span className="rounded-full bg-white/10 px-3 py-2">02 · Compare</span>
+              <span className="rounded-full bg-white/10 px-3 py-2">03 · Personalise</span>
+            </div>
           </div>
         </section>
 
