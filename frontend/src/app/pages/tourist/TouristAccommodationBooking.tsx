@@ -6,7 +6,7 @@ import { Navbar } from "../../components/Navbar";
 import { Footer } from "../../components/Footer";
 import { ResourceReviews, RatingStars } from "../../components/ResourceReviews";
 import { useAuth } from "../../context/AuthContext";
-import { accommodationsApi, touristBookingsApi, type Accommodation } from "../../lib/api";
+import { accommodationSearchApi, touristBookingsApi, type Accommodation } from "../../lib/api";
 
 function today() {
   return new Date().toISOString().slice(0, 10);
@@ -45,7 +45,7 @@ export default function TouristAccommodationBooking() {
   useEffect(() => {
     if (!id) return;
     let cancelled = false;
-    accommodationsApi
+    accommodationSearchApi
       .get(Number(id))
       .then((item) => {
         if (!cancelled) setAccommodation(item);
