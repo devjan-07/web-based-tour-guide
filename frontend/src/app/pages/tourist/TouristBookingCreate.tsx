@@ -331,7 +331,7 @@ export default function TouristBookingCreate() {
           </div>
         </section>
 
-        <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
           {loading ? (
             <div className="rounded-[2rem] bg-white p-12 text-center text-sm font-semibold text-gray-500 shadow-sm ring-1 ring-gray-200">Preparing your booking...</div>
           ) : (
@@ -437,7 +437,7 @@ export default function TouristBookingCreate() {
               </aside>
             </form>
           )}
-        </main>
+        </div>
       </main>
       <Footer />
     </div>
