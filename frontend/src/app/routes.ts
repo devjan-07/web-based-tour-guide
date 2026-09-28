@@ -16,7 +16,6 @@ import TouristBookingCreate from "./pages/tourist/TouristBookingCreate";
 import TouristAccommodationBooking from "./pages/tourist/TouristAccommodationBooking";
 import TouristVehicleBooking from "./pages/tourist/TouristVehicleBooking";
 import PlanMyTrip from "./pages/tourist/PlanMyTrip";
-import MyTrip from "./pages/tourist/MyTrip";
 import ComparePackages from "./pages/tourist/ComparePackages";
 import PackageCustomization from "./pages/tourist/PackageCustomization";
 import { DashboardLayout } from "./pages/dashboard/DashboardLayout";
@@ -56,7 +55,6 @@ export const router = createBrowserRouter([
         children: [
           { path: "/tourist/dashboard", Component: TouristDashboard },
           { path: "/tourist/plan", Component: PlanMyTrip },
-          { path: "/tourist/my-trip", Component: MyTrip },
           { path: "/tourist/packages/:id/customize", Component: PackageCustomization },
           { path: "/tourist/bookings/new", Component: TouristBookingCreate },
           { path: "/tourist/bookings/:id", Component: TouristBookingDetail },
