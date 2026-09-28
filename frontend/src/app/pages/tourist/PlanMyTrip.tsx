@@ -71,6 +71,10 @@ export default function PlanMyTrip() {
       .finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    if (plannerStep === 3) setPlannerStep(2);
+  }, [destinationId, startDate, endDate, travellers, dailyBudget, guideLanguage, guideSpecialty, preferences, driverRequired, luggage]);
+
   const selectedDestination = useMemo(
     () => destinations.find((item) => item.id === destinationId) || null,
     [destinations, destinationId]
@@ -159,13 +163,23 @@ export default function PlanMyTrip() {
           <>
             <section className="mt-6 rounded-[2rem] border border-gray-200 bg-white p-5 shadow-sm md:p-6">
               <div className="mb-6 grid grid-cols-3 gap-2">
-                {[["01", "Trip basics"], ["02", "Preferences"], ["03", "Matches"]].map(([step, label], index) => (
-                  <div key={step} className="flex items-center gap-2">
-                    <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-black ${index + 1 <= plannerStep ? "bg-rose-500 text-white" : "bg-gray-100 text-gray-400"}`}>{step}</div>
-                    <div className="hidden min-w-0 sm:block"><p className={`text-xs font-bold ${index + 1 <= plannerStep ? "text-gray-900" : "text-gray-400"}`}>{label}</p></div>
-                    {index < 2 && <div className="mx-1 h-px flex-1 bg-gray-200" />}
-                  </div>
-                ))}
+                {[["01", "Trip basics"], ["02", "Preferences"], ["03", "Matches"]].map(([step, label], index) => {
+                  const stepNumber = index + 1;
+                  const completed = stepNumber < plannerStep;
+                  const current = stepNumber === plannerStep;
+                  return (
+                    <div key={step} className="flex items-center gap-2" aria-current={current ? "step" : undefined}>
+                      <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-black ${completed ? "bg-emerald-500 text-white" : current ? "bg-rose-500 text-white ring-4 ring-rose-100" : "bg-gray-100 text-gray-400"}`}>
+                        {completed ? <CheckCircle className="h-4 w-4" /> : step}
+                      </div>
+                      <div className="hidden min-w-0 sm:block">
+                        <p className={`text-xs font-bold ${completed ? "text-emerald-700" : current ? "text-gray-900" : "text-gray-400"}`}>{label}</p>
+                        <p className={`mt-0.5 text-[10px] font-medium ${current ? "text-rose-500" : "text-gray-400"}`}>{completed ? "Completed" : current ? "Current step" : "Up next"}</p>
+                      </div>
+                      {index < 2 && <div className={`mx-1 h-px flex-1 ${completed ? "bg-emerald-200" : "bg-gray-200"}`} />}
+                    </div>
+                  );
+                })}
               </div>
 
               <div className="mb-5 flex items-center gap-3">
