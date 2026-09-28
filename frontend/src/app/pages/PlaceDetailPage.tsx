@@ -4,7 +4,6 @@ import { ArrowLeft, CalendarDays, CheckCircle, Clock, CreditCard, HelpCircle, Ma
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
-import { addTripItem } from "../lib/tripPlanner";
 
 type DetailMode = "destination" | "package";
 
@@ -37,7 +36,6 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
   const [nearbyDestinations, setNearbyDestinations] = useState<import("../lib/api").NearbyDestination[]>([]);
   const [nearbyRadiusKm, setNearbyRadiusKm] = useState(50);
   const [nearbyLoading, setNearbyLoading] = useState(false);
-  const [savedToTrip, setSavedToTrip] = useState(false);
   const isTourist = isAuthenticated && user?.roles.includes("TOURIST");
 
   useEffect(() => {
@@ -58,7 +56,6 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
     setWeatherError("");
     setNearbyDestinations([]);
     setNearbyError("");
-    setSavedToTrip(false);
 
     const request = mode === "destination"
       ? destinationsApi.get(numericId).then((data) => ({ mode: "destination" as const, data }))
