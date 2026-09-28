@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
-import { ArrowLeft, CalendarDays, CheckCircle, Clock, CreditCard, HelpCircle, MapPin, ShieldCheck, Tag, Users, Star, Sparkles, SlidersHorizontal, Share2 } from "lucide-react";
+import { ArrowLeft, CalendarDays, CheckCircle, Clock, CreditCard, HelpCircle, MapPin, ShieldCheck, Tag, Users, Star, Sparkles, SlidersHorizontal, Share2, CloudSun, CloudRain, Sun, Thermometer, Umbrella, Navigation } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
@@ -32,6 +32,13 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
   const [routesLoading, setRoutesLoading] = useState(false);
   const [guideRecommendations, setGuideRecommendations] = useState<GuideRecommendation[]>([]);
   const [similarDestinations, setSimilarDestinations] = useState<DestinationRecommendation[]>([]);
+  const [weather, setWeather] = useState<import("../lib/api").WeatherForecast | null>(null);
+  const [weatherLoading, setWeatherLoading] = useState(false);
+  const [weatherError, setWeatherError] = useState("");
+  const [nearbyDestinations, setNearbyDestinations] = useState<import("../lib/api").NearbyDestination[]>([]);
+  const [nearbyRadiusKm, setNearbyRadiusKm] = useState(50);
+  const [nearbyLoading, setNearbyLoading] = useState(false);
+  const [nearbyError, setNearbyError] = useState("");
   const [savedToTrip, setSavedToTrip] = useState(false);
   const isTourist = isAuthenticated && user?.roles.includes("TOURIST");
 
@@ -49,6 +56,10 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
     setPackageRoutes([]);
     setGuideRecommendations([]);
     setSimilarDestinations([]);
+    setWeather(null);
+    setWeatherError("");
+    setNearbyDestinations([]);
+    setNearbyError("");
     setSavedToTrip(false);
 
     const request = mode === "destination"
@@ -59,6 +70,18 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
       .then((data) => {
         if (data.mode === "destination") {
           const destination = data.data;
+          setWeatherLoading(true);
+          destinationsApi.weather(destination.id)
+            .then((forecast) => {
+              if (!cancelled) setWeather(forecast);
+            })
+            .catch((err) => {
+              if (!cancelled) setWeatherError(err instanceof Error ? err.message : "Could not load weather");
+            })
+            .finally(() => {
+              if (!cancelled) setWeatherLoading(false);
+            });
+
           guidesApi.recommendations({
             location: destination.country,
             specialty: destination.categories?.[0],
@@ -89,6 +112,29 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
   }, [id, mode]);
 
   const detail = useMemo(() => item ? toDetail(item) : null, [item]);
+
+  useEffect(() => {
+    if (mode !== "destination" || !weather) return;
+    let cancelled = false;
+    setNearbyLoading(true);
+    setNearbyError("");
+    destinationsApi.nearby(weather.latitude, weather.longitude, nearbyRadiusKm)
+      .then((items) => {
+        if (!cancelled) {
+          setNearbyDestinations(items.filter((item) => item.destination.id !== weather.destinationId).slice(0, 6));
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) setNearbyError(err instanceof Error ? err.message : "Could not load nearby destinations");
+      })
+      .finally(() => {
+        if (!cancelled) setNearbyLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [mode, nearbyRadiusKm, weather]);
   const bookingPath = detail && item?.mode === "package"
     ? `/book?packageId=${item.data.id}`
     : detail
@@ -177,6 +223,55 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
                     <p className="mt-1 text-sm font-bold text-gray-800">{item?.mode === "package" ? detail.groupLabel : `${detail.tags.length || 0} categories`}</p>
                   </div>
                 </div>
+
+                {item?.mode === "destination" && (
+                  <>
+                    <div className="mb-8 rounded-2xl border border-sky-100 bg-sky-50/60 p-5">
+                      <div className="flex flex-col gap-5">
+                        <div className="flex flex-wrap items-start justify-between gap-4">
+                          <div className="flex items-start gap-3">
+                            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-sky-600 shadow-sm"><CloudSun className="h-5 w-5" /></div>
+                            <div><h2 className="text-xl font-bold text-gray-900">Weather at {item.data.name}</h2><p className="mt-1 text-sm text-gray-500">Current conditions and the next 7 days, matched to this destination.</p></div>
+                          </div>
+                          {weather && <div className="rounded-2xl bg-white px-4 py-3 text-right shadow-sm"><p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Now</p><p className="mt-1 text-xl font-extrabold text-gray-900">{Math.round(weather.currentTemperatureC)}°C</p><p className="text-xs font-semibold text-gray-500">{weather.currentCondition}</p></div>}
+                        </div>
+                        {weatherLoading && <div className="rounded-2xl bg-white p-4 text-sm text-gray-500">Loading live weather...</div>}
+                        {!weatherLoading && weatherError && <div className="rounded-2xl bg-white p-4 text-sm text-rose-600">{weatherError}</div>}
+                        {!weatherLoading && weather && <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                          {weather.forecast.slice(0, 4).map((day) => <div key={day.date} className="rounded-2xl bg-white p-4 shadow-sm">
+                            <p className="text-xs font-bold text-gray-500">{formatWeatherDate(day.date)}</p>
+                            <div className="mt-3 flex items-center gap-2 text-sky-600">{weatherIcon(day.weatherCode)}<span className="text-xs font-semibold text-gray-500">{day.condition}</span></div>
+                            <div className="mt-3 flex items-center gap-2 text-sm font-bold text-gray-900"><Thermometer className="h-4 w-4 text-gray-400" /> {Math.round(day.minimumTemperatureC)}°–{Math.round(day.maximumTemperatureC)}°C</div>
+                            <div className="mt-2 flex items-center gap-2 text-xs text-gray-500"><Umbrella className="h-3.5 w-3.5" /> {day.precipitationProbability}% rain chance</div>
+                          </div>)}
+                        </div>}
+                        {weather && <p className="text-[11px] text-gray-400">Weather source: {weather.source} · {weather.location} · {weather.latitude.toFixed(3)}, {weather.longitude.toFixed(3)}</p>}
+                      </div>
+                    </div>
+
+                    <div className="mb-8 rounded-2xl border border-emerald-100 bg-emerald-50/50 p-5">
+                      <div className="flex flex-col gap-5">
+                        <div className="flex flex-wrap items-start justify-between gap-4">
+                          <div className="flex items-start gap-3">
+                            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-emerald-600 shadow-sm"><Navigation className="h-5 w-5" /></div>
+                            <div><h2 className="text-xl font-bold text-gray-900">Nearby destinations</h2><p className="mt-1 text-sm text-gray-500">Geo-spatial search from this destination's resolved coordinates.</p></div>
+                          </div>
+                          <label className="flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-xs font-semibold text-gray-500 shadow-sm">Radius<select value={nearbyRadiusKm} onChange={(event) => setNearbyRadiusKm(Number(event.target.value))} className="bg-transparent font-bold text-gray-900 outline-none">{[25, 50, 100, 250].map((value) => <option key={value} value={value}>{value} km</option>)}</select></label>
+                        </div>
+                        {nearbyLoading && <div className="rounded-2xl bg-white p-4 text-sm text-gray-500">Finding destinations within {nearbyRadiusKm} km...</div>}
+                        {!nearbyLoading && nearbyError && <div className="rounded-2xl bg-white p-4 text-sm text-rose-600">{nearbyError}</div>}
+                        {!nearbyLoading && !nearbyError && nearbyDestinations.length === 0 && <div className="rounded-2xl bg-white p-4 text-sm text-gray-500">No active destinations were found within {nearbyRadiusKm} km.</div>}
+                        {!nearbyLoading && nearbyDestinations.length > 0 && <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                          {nearbyDestinations.map((nearby) => <Link key={nearby.destination.id} to={`/destinations/${nearby.destination.id}`} className="group overflow-hidden rounded-2xl bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                            <div className="h-28 overflow-hidden bg-gray-100"><img src={nearby.destination.image || "https://images.unsplash.com/photo-1586500036706-41963de24d8b?w=600"} alt={nearby.destination.name} className="h-full w-full object-cover transition duration-300 group-hover:scale-105" /></div>
+                            <div className="p-4"><div className="flex items-start justify-between gap-3"><div><p className="font-bold text-gray-900">{nearby.destination.name}</p><p className="mt-1 text-xs text-gray-500">{nearby.destination.country}</p></div><span className="rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-bold text-emerald-700">{nearby.distanceKm} km</span></div></div>
+                          </Link>)}
+                        </div>}
+                        {weather && <p className="text-[11px] text-gray-400">Search centre: {weather.latitude.toFixed(3)}, {weather.longitude.toFixed(3)} · Radius filtering is calculated by the Voyara backend.</p>}
+                      </div>
+                    </div>
+                  </>
+                )}
 
                 {item?.mode === "destination" && (
                   <div className="mb-8 rounded-2xl border border-rose-100 bg-rose-50/60 p-5">
@@ -536,4 +631,17 @@ function splitList(value?: string) {
     .split(/[,;\n]/)
     .map((item) => item.trim())
     .filter(Boolean);
+}
+
+
+function formatWeatherDate(value: string) {
+  const date = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+}
+
+function weatherIcon(code: number) {
+  if ([61, 63, 65, 80, 81, 82, 95, 96, 97, 99].includes(code)) return <CloudRain className="h-5 w-5" />;
+  if ([0, 1].includes(code)) return <Sun className="h-5 w-5" />;
+  return <CloudSun className="h-5 w-5" />;
 }
