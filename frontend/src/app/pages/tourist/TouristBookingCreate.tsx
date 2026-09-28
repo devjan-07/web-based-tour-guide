@@ -295,28 +295,38 @@ export default function TouristBookingCreate() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <Link to="/" className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-900 mb-5">
           <ArrowLeft className="w-4 h-4" /> Back to explore
         </Link>
 
-        <section className="mb-6 overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#062a56] via-[#003580] to-[#0057B8] shadow-lg">
-          <div className="p-6 text-white md:p-8">
-              <div className="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-white/70"><span>Booking</span><span className="h-1 w-1 rounded-full bg-white/40" />{bookingTypeLabel(bookingType)}</div>
-              <h1 className="text-3xl md:text-4xl font-extrabold mb-2">
-              {bookingTitle(bookingType, destination, tourPackage, selectedAccommodation, selectedVehicle)}
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-white/75">
-              Submit your preferred dates, then open the booking details to complete payment.
-            </p>
+        <section className="mb-7 overflow-hidden rounded-[2rem] bg-[#071a33] text-white shadow-xl">
+          <div className="grid lg:grid-cols-[1fr_360px]">
+            <div className="relative min-h-[270px] overflow-hidden">
+              {tourPackage?.image ? <img src={tourPackage.image} alt={tourPackage.name} className="absolute inset-0 h-full w-full object-cover" /> : <div className="absolute inset-0 bg-gradient-to-br from-[#062a56] via-[#003580] to-[#0057B8]" />}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
+                <div className="flex flex-wrap items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-white/70"><span>Secure your journey</span><span className="h-1 w-1 rounded-full bg-white/50" />{bookingTypeLabel(bookingType)}</div>
+                <h1 className="mt-2 text-3xl font-black md:text-4xl">{bookingTitle(bookingType, destination, tourPackage, selectedAccommodation, selectedVehicle)}</h1>
+                <p className="mt-2 max-w-2xl text-sm text-white/75">Choose your travel essentials and optional services, then review the booking summary before submitting.</p>
+              </div>
+            </div>
+            <div className="bg-white p-6 text-[#10213b] md:p-7">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-500">Journey snapshot</p>
+              <div className="mt-5 space-y-4">
+                <div><p className="text-[11px] font-black uppercase tracking-wider text-gray-400">Destination</p><p className="mt-1 font-black">{destination || "Sri Lanka"}</p></div>
+                <div><p className="text-[11px] font-black uppercase tracking-wider text-gray-400">Travellers</p><p className="mt-1 font-black">{guests}</p></div>
+                <div><p className="text-[11px] font-black uppercase tracking-wider text-gray-400">Dates</p><p className="mt-1 font-black">{checkIn} → {checkOut}</p></div>
+              </div>
+            </div>
           </div>
         </section>
 
         {loading ? (
           <div className="rounded-3xl border border-gray-200 bg-white p-8 text-sm text-gray-400 shadow-sm">Loading booking details...</div>
         ) : (
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
-            <section className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
+            <section className="rounded-[2rem] border border-gray-200 bg-white p-6 shadow-sm md:p-8">
               <div className="mb-6">
                 <div className="mb-5 grid grid-cols-4 gap-2">
                   {["Essentials", "Guide", "Stay", "Transport"].map((step, index) => {
