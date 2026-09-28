@@ -293,466 +293,168 @@ export default function TouristBookingCreate() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#f6f7f5]">
       <Navbar />
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <Link to="/" className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-900 mb-5">
-          <ArrowLeft className="w-4 h-4" /> Back to explore
-        </Link>
-
-        <section className="mb-7 overflow-hidden rounded-[2rem] bg-[#071a33] text-white shadow-xl">
-          <div className="grid lg:grid-cols-[1fr_360px]">
-            <div className="relative min-h-[270px] overflow-hidden">
-              {tourPackage?.image ? <img src={tourPackage.image} alt={tourPackage.name} className="absolute inset-0 h-full w-full object-cover" /> : <div className="absolute inset-0 bg-gradient-to-br from-[#062a56] via-[#003580] to-[#0057B8]" />}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+      <main>
+        <section className="relative overflow-hidden bg-[#0b1f3a] text-white">
+          <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[1.25fr_.75fr] lg:px-8 lg:py-12">
+            <div className="relative min-h-[330px] overflow-hidden rounded-[2rem]">
+              {tourPackage?.image ? (
+                <img src={tourPackage.image} alt={tourPackage.name} className="absolute inset-0 h-full w-full object-cover" />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-[#183d68] via-[#0b1f3a] to-[#07111f]" />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+              <div className="absolute left-5 top-5"><Link to="/explore" className="inline-flex items-center gap-2 rounded-full bg-black/35 px-4 py-2 text-xs font-black text-white backdrop-blur"><ArrowLeft className="h-4 w-4" /> Back to exploring</Link></div>
               <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
-                <div className="flex flex-wrap items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-white/70"><span>Secure your journey</span><span className="h-1 w-1 rounded-full bg-white/50" />{bookingTypeLabel(bookingType)}</div>
-                <h1 className="mt-2 text-3xl font-black md:text-4xl">{bookingTitle(bookingType, destination, tourPackage, selectedAccommodation, selectedVehicle)}</h1>
-                <p className="mt-2 max-w-2xl text-sm text-white/75">Choose your travel essentials and optional services, then review the booking summary before submitting.</p>
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-rose-300">Secure your journey</p>
+                <h1 className="mt-2 text-3xl font-black md:text-5xl">{bookingTitle(bookingType, destination, tourPackage, selectedAccommodation, selectedVehicle)}</h1>
+                <div className="mt-3 flex flex-wrap gap-3 text-sm text-white/75">
+                  <span>{destination || "Sri Lanka"}</span>
+                  <span>·</span><span>{tripDays(checkIn, checkOut)} days</span>
+                  <span>·</span><span>{guests} traveller{guests === 1 ? "" : "s"}</span>
+                </div>
               </div>
             </div>
-            <div className="bg-white p-6 text-[#10213b] md:p-7">
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-500">Journey snapshot</p>
+            <div className="rounded-[2rem] bg-white p-6 text-[#10213b] shadow-2xl md:p-7">
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-rose-500">Booking at a glance</p>
               <div className="mt-5 space-y-4">
-                <div><p className="text-[11px] font-black uppercase tracking-wider text-gray-400">Destination</p><p className="mt-1 font-black">{destination || "Sri Lanka"}</p></div>
-                <div><p className="text-[11px] font-black uppercase tracking-wider text-gray-400">Travellers</p><p className="mt-1 font-black">{guests}</p></div>
-                <div><p className="text-[11px] font-black uppercase tracking-wider text-gray-400">Dates</p><p className="mt-1 font-black">{checkIn} → {checkOut}</p></div>
+                <BookingHeroStat icon={MapPin} label="Destination" value={destination || "Sri Lanka"} />
+                <BookingHeroStat icon={CalendarDays} label="Travel dates" value={checkIn + " → " + checkOut} />
+                <BookingHeroStat icon={Users} label="Travellers" value={String(guests)} />
+              </div>
+              <div className="mt-6 rounded-2xl bg-[#f7f8fa] p-4">
+                <p className="text-xs font-black text-gray-500">One clear checkout</p>
+                <p className="mt-1 text-sm leading-5 text-gray-600">Choose only the services you need, review the journey, then create the reservation.</p>
               </div>
             </div>
           </div>
         </section>
 
-        {loading ? (
-          <div className="rounded-3xl border border-gray-200 bg-white p-8 text-sm text-gray-400 shadow-sm">Loading booking details...</div>
-        ) : (
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
-            <section className="rounded-[2rem] border border-gray-200 bg-white p-6 shadow-sm md:p-8">
-              <div className="mb-6">
-                <div className="mb-5 grid grid-cols-4 gap-2">
-                  {["Essentials", "Guide", "Stay", "Transport"].map((step, index) => {
-                    const stepNumber = index + 1;
-                    const completed = stepNumber < bookingStep;
-                    const current = stepNumber === bookingStep;
-                    return (
-                      <div key={step} className="flex items-center gap-2" aria-current={current ? "step" : undefined}>
-                        <span className={"flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-black " + (completed ? "bg-emerald-500 text-white" : current ? "bg-rose-500 text-white ring-4 ring-rose-100" : "bg-gray-100 text-gray-400")}>
-                          {completed ? <CheckCircle className="h-4 w-4" /> : index + 1}
-                        </span>
-                        <span className={"hidden text-xs font-bold sm:block " + (completed ? "text-emerald-700" : current ? "text-gray-900" : "text-gray-400")}>{step}</span>
-                        {index < 3 && <span className={"mx-1 h-px flex-1 " + (completed ? "bg-emerald-200" : "bg-gray-200")} />}
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-rose-500">Step 1</p>
-                    <h2 className="mt-1 text-xl font-extrabold text-gray-900">Start with the essentials</h2>
-                    <p className="mt-1 text-sm text-gray-500">Tell us when you are travelling and who is coming. Everything else is optional.</p>
+        <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+          {loading ? (
+            <div className="rounded-[2rem] bg-white p-12 text-center text-sm font-semibold text-gray-500 shadow-sm ring-1 ring-gray-200">Preparing your booking...</div>
+          ) : (
+            <form onSubmit={handleSubmit} className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_360px]">
+              <div className="space-y-7">
+                {error && <div className="rounded-2xl border border-rose-100 bg-rose-50 px-5 py-4 text-sm font-bold text-rose-700">{error}</div>}
+
+                <section className="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-gray-200 md:p-8">
+                  <div className="flex items-end justify-between gap-4">
+                    <div><p className="text-xs font-black uppercase tracking-[0.2em] text-rose-500">01 · Trip basics</p><h2 className="mt-2 text-3xl font-black text-[#10213b]">When are you travelling?</h2><p className="mt-2 text-sm text-gray-500">These are the only details we need before choosing services.</p></div>
+                    <span className="hidden rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-black text-emerald-700 sm:inline-flex">Required</span>
                   </div>
-                  <span className="hidden rounded-full bg-gray-50 px-3 py-1.5 text-xs font-semibold text-gray-500 sm:inline-flex">Required first</span>
-                </div>
+                  <div className="mt-7 grid gap-4 sm:grid-cols-2">
+                    <Field icon={MapPin} label="Destination"><input value={destination} onChange={(e) => setDestination(e.target.value)} className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none" placeholder="Ella, Yala, Kandy..." /></Field>
+                    <Field icon={Package} label="Journey type"><input value={bookingTypeLabel(bookingType)} readOnly className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none" /></Field>
+                    <Field icon={CalendarDays} label="Check-in"><input type="date" value={checkIn} onChange={(e) => { setCheckIn(e.target.value); if (new Date(checkOut) <= new Date(e.target.value)) setCheckOut(addDays(e.target.value, 1)); }} className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none" /></Field>
+                    <Field icon={CalendarDays} label="Check-out"><input type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none" /></Field>
+                    <Field icon={Users} label="Travellers"><input type="number" min="1" value={guests} onChange={(e) => setGuests(Math.max(1, Number(e.target.value)))} className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none" /></Field>
+                    <Field icon={Languages} label="Guide language"><select value={languagePreference} onChange={(e) => setLanguagePreference(e.target.value)} className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none">{TOUR_GUIDE_LANGUAGES.map((language) => <option key={language}>{language}</option>)}</select></Field>
+                  </div>
+                </section>
+
+                <section className="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-gray-200 md:p-8">
+                  <SectionHeading step="02" title="Choose your local guide" subtitle="Pick a guide when you want a personal local perspective." />
+                  <div className="mt-6">
+                    <OptionSection title="Available guides" description="Matched around your destination" loading={guidesLoading} loadingText="Finding guides..." emptyText="No guides are available right now. Staff can assign one after reviewing the booking.">
+                      {nearbyGuides.slice(0, 6).map((guide) => {
+                        const selected = guide.id === selectedGuideId;
+                        return <button type="button" key={guide.id} onClick={() => setSelectedGuideId(selected ? null : guide.id)} className={"overflow-hidden rounded-2xl border bg-white text-left transition hover:-translate-y-0.5 hover:shadow-md " + (selected ? "border-rose-400 ring-2 ring-rose-100" : "border-gray-200")}>
+                          <div className="flex items-center gap-4 p-4">
+                            <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-100 font-black text-gray-500">{guide.profilePhoto ? <img src={guide.profilePhoto} alt={guide.name} className="h-full w-full object-cover" /> : guide.initials}</div>
+                            <div className="min-w-0 flex-1"><div className="flex items-center justify-between gap-2"><p className="truncate font-black text-[#10213b]">{guide.name}</p>{selected && <CheckCircle className="h-5 w-5 shrink-0 text-rose-500" />}</div><p className="mt-1 text-xs text-gray-500">{guide.location} · {guide.experience} years</p></div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 border-t border-gray-100 px-4 py-3 text-xs"><span className="font-bold text-gray-500">★ {Number(guide.rating || 0).toFixed(1)} · {guide.reviews} reviews</span><span className="text-right font-black text-gray-800">LKR {Number(guide.pricePerDay || 0).toLocaleString()} / day</span></div>
+                        </button>;
+                      })}
+                    </OptionSection>
+                    {selectedGuide && <ResourceReviews targetType="GUIDE" targetId={selectedGuide.id} title={selectedGuide.name + " reviews"} />}
+                  </div>
+                </section>
+
+                <section className="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-gray-200 md:p-8">
+                  <SectionHeading step="03" title="Choose your stay" subtitle="Find a place that fits your destination, group and preferences." />
+                  <div className="mt-6 grid gap-4 sm:grid-cols-3">
+                    <Field icon={CreditCard} label="Max nightly budget"><input type="number" min="0" value={accommodationBudget || ""} onChange={(e) => setAccommodationBudget(Number(e.target.value))} placeholder="Any budget" className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none" /></Field>
+                    <Field icon={BedDouble} label="Stay type"><select value={accommodationType} onChange={(e) => setAccommodationType(e.target.value)} className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none"><option value="">Any type</option><option>Hotel</option><option>Villa</option><option>Resort</option><option>Hostel</option><option>Apartment</option></select></Field>
+                    <Field icon={CheckCircle} label="Preferences"><input value={accommodationPreferences} onChange={(e) => setAccommodationPreferences(e.target.value)} placeholder="wifi, breakfast" className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none" /></Field>
+                  </div>
+                  <div className="mt-6 grid gap-4 md:grid-cols-2">
+                    {accommodationsLoading ? <div className="rounded-2xl border border-dashed border-gray-200 p-8 text-sm text-gray-400">Finding stays...</div> : nearbyAccommodations.slice(0, 6).map((accommodation) => {
+                      const selected = accommodation.id === selectedAccommodationId;
+                      const match = accommodationRecommendations.find((item) => item.accommodation.id === accommodation.id);
+                      return <button type="button" key={accommodation.id} onClick={() => setSelectedAccommodationId(selected ? null : accommodation.id)} className={"overflow-hidden rounded-2xl border bg-white text-left transition hover:-translate-y-0.5 hover:shadow-md " + (selected ? "border-rose-400 ring-2 ring-rose-100" : "border-gray-200")}>
+                        <div className="h-32 overflow-hidden bg-gray-100"><img src={accommodation.image} alt={accommodation.name} className="h-full w-full object-cover" /></div>
+                        <div className="p-4"><div className="flex items-start justify-between gap-3"><div><p className="font-black text-[#10213b]">{accommodation.name}</p><p className="mt-1 text-xs text-gray-500">{accommodation.type} · {accommodation.location}</p></div>{selected && <CheckCircle className="h-5 w-5 text-rose-500" />}</div><div className="mt-3 flex items-center justify-between text-xs"><span className="font-bold text-gray-500">★ {Number(accommodation.rating || 0).toFixed(1)}</span><span className="font-black text-gray-800">LKR {Number(accommodation.price || 0).toLocaleString()} / night</span></div>{match && <div className="mt-3 flex flex-wrap gap-1.5"><span className="rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-black text-emerald-700">{Math.round(match.suitabilityScore)}% fit</span>{match.reasons.slice(0, 2).map((reason) => <span key={reason} className="rounded-full bg-gray-50 px-2 py-1 text-[10px] font-bold text-gray-500">{reason}</span>)}</div>}</div>
+                      </button>;
+                    })}
+                  </div>
+                  {selectedAccommodation && <div className="mt-5 grid gap-4 rounded-2xl bg-gray-50 p-4 sm:grid-cols-2"><Field icon={BedDouble} label="Rooms"><input type="number" min="1" value={rooms} onChange={(e) => setRooms(Math.max(1, Number(e.target.value)))} className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none" /></Field><Field icon={BedDouble} label="Room type"><select value={roomType} onChange={(e) => setRoomType(e.target.value)} className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none">{roomTypes.map((item) => <option key={item}>{item}</option>)}</select></Field></div>}
+                  {selectedAccommodation && <ResourceReviews targetType="ACCOMMODATION" targetId={selectedAccommodation.id} title={selectedAccommodation.name + " reviews"} />}
+                </section>
+
+                <section className="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-gray-200 md:p-8">
+                  <SectionHeading step="04" title="Choose your transport" subtitle="Match a vehicle to your group, luggage and driver preference." />
+                  <div className="mt-6 grid gap-4 md:grid-cols-2">
+                    {vehiclesLoading ? <div className="rounded-2xl border border-dashed border-gray-200 p-8 text-sm text-gray-400">Finding transport...</div> : vehicles.slice(0, 6).map((vehicle) => {
+                      const selected = vehicle.id === selectedVehicleId;
+                      const match = vehicleRecommendations.find((item) => item.vehicle.id === vehicle.id);
+                      return <button type="button" key={vehicle.id} onClick={() => setSelectedVehicleId(selected ? null : vehicle.id)} className={"overflow-hidden rounded-2xl border bg-white text-left transition hover:-translate-y-0.5 hover:shadow-md " + (selected ? "border-rose-400 ring-2 ring-rose-100" : "border-gray-200")}>
+                        <div className="h-32 overflow-hidden bg-gray-100"><img src={vehicle.image} alt={vehicle.name} className="h-full w-full object-cover" /></div>
+                        <div className="p-4"><div className="flex items-start justify-between gap-3"><div><p className="font-black text-[#10213b]">{vehicle.name}</p><p className="mt-1 text-xs text-gray-500">{vehicle.type} · {vehicle.capacity} seats</p></div>{selected && <CheckCircle className="h-5 w-5 text-rose-500" />}</div><div className="mt-3 flex items-center justify-between text-xs"><span className="font-bold text-gray-500">{vehicle.transmission} · {vehicle.fuel}</span><span className="font-black text-gray-800">LKR {Number(vehicle.pricePerDay || 0).toLocaleString()} / day</span></div>{match && <div className="mt-3 flex flex-wrap gap-1.5"><span className="rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-black text-emerald-700">{Math.round(match.suitabilityScore)}% fit</span>{match.reasons.slice(0, 2).map((reason) => <span key={reason} className="rounded-full bg-gray-50 px-2 py-1 text-[10px] font-bold text-gray-500">{reason}</span>)}</div>}</div>
+                      </button>;
+                    })}
+                  </div>
+                  {selectedVehicle && <div className="mt-5 grid gap-4 rounded-2xl bg-gray-50 p-4 md:grid-cols-2"><Field icon={MapPin} label="Pickup location"><input value={pickupLocation} onChange={(e) => setPickupLocation(e.target.value)} className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none" /></Field><Field icon={CalendarDays} label="Pickup time"><input type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none" /></Field><Field icon={MapPin} label="Return location"><input value={returnLocation} onChange={(e) => setReturnLocation(e.target.value)} className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none" /></Field><Field icon={CalendarDays} label="Return time"><input type="time" value={returnTime} onChange={(e) => setReturnTime(e.target.value)} className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none" /></Field><Field icon={Car} label="Driver"><select value={driverRequired ? "Yes" : "No"} onChange={(e) => setDriverRequired(e.target.value === "Yes")} className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none"><option>Yes</option><option>No</option></select></Field><Field icon={Package} label="Luggage"><input type="number" min="0" value={luggageCount} onChange={(e) => setLuggageCount(Math.max(0, Number(e.target.value)))} className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none" /></Field></div>}
+                  {selectedVehicle && <ResourceReviews targetType="VEHICLE" targetId={selectedVehicle.id} title={selectedVehicle.name + " reviews"} />}
+                </section>
+
+                <section className="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-gray-200 md:p-8">
+                  <SectionHeading step="05" title="Anything we should know?" subtitle="Optional notes for the Voyara team." />
+                  <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={4} className="mt-5 w-full resize-none rounded-2xl bg-gray-50 p-4 text-sm font-medium text-gray-700 outline-none ring-1 ring-gray-200 focus:ring-2 focus:ring-rose-200" placeholder="Arrival details, dietary needs, special requests..." />
+                </section>
               </div>
 
-              {error && (
-                <div className="mb-5 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600">
-                  {error}
-                </div>
-              )}
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Field icon={MapPin} label="Destination">
-                  <input
-                    value={destination}
-                    onChange={(e) => setDestination(e.target.value)}
-                    className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none"
-                    placeholder="Ella, Sigiriya, Kandy..."
-                  />
-                </Field>
-
-                <Field icon={Package} label="Booking type">
-                  <input
-                    value={bookingTypeLabel(bookingType)}
-                    readOnly
-                    className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none"
-                  />
-                </Field>
-
-                <Field icon={CalendarDays} label="Start date">
-                  <input
-                    type="date"
-                    value={checkIn}
-                    onChange={(e) => {
-                      setCheckIn(e.target.value);
-                      if (new Date(checkOut) <= new Date(e.target.value)) setCheckOut(addDays(e.target.value, 1));
-                    }}
-                    className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none"
-                  />
-                </Field>
-
-                <Field icon={CalendarDays} label="End date">
-                  <input
-                    type="date"
-                    value={checkOut}
-                    onChange={(e) => setCheckOut(e.target.value)}
-                    className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none"
-                  />
-                </Field>
-
-                <Field icon={Users} label="Travelers">
-                  <input
-                    type="number"
-                    value={guests}
-                    onChange={(e) => setGuests(Number(e.target.value))}
-                    className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none"
-                  />
-                </Field>
-
-
-                <Field icon={Languages} label="Preferred guide language">
-                  <select
-                    value={languagePreference}
-                    onChange={(event) => setLanguagePreference(event.target.value)}
-                    className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none"
-                  >
-                    {TOUR_GUIDE_LANGUAGES.map((language) => <option key={language}>{language}</option>)}
-                  </select>
-                </Field>
-              </div>
-
-              <details onToggle={(event) => { if ((event.currentTarget as HTMLDetailsElement).open) setBookingStep(2); }} className="group mt-6 rounded-2xl border border-gray-200 bg-gray-50/50 p-4 sm:p-5">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-1 py-1 [&::-webkit-details-marker]:hidden">
-                  <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-rose-500">Step 2</p><h3 className="mt-1 font-bold text-gray-900">Choose a local guide</h3><p className="mt-0.5 text-xs text-gray-400">Optional · choose a guide for this journey.</p></div><span className="rounded-full bg-gray-100 px-3 py-1.5 text-xs font-black text-gray-600">View options</span>
-                </summary>
-                <div className="mt-4">
-              <OptionSection
-                title="Guide options"
-                description={`Available guides ${nearbyGuides.length ? "near this destination" : "for your trip request"}`}
-                loading={guidesLoading}
-                loadingText="Loading guides..."
-                emptyText="No available guides are listed right now. Staff can assign a guide after reviewing your booking."
-              >
-                {nearbyGuides.map((guide) => {
-                  const selected = guide.id === selectedGuideId;
-                  return (
-                    <button
-                      type="button"
-                      key={guide.id}
-                      onClick={() => setSelectedGuideId(guide.id)}
-                      className="text-left rounded-2xl border p-4 transition-colors"
-                      style={{
-                        borderColor: selected ? "#FF385C" : "#e5e7eb",
-                        background: selected ? "#fff5f7" : "#fff",
-                      }}
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className="font-bold text-gray-900">{guide.name}</p>
-                          <p className="text-xs text-gray-400 mt-0.5">{guide.location || "Sri Lanka"} · {guide.experience} years experience</p>
-                        </div>
-                        <ChoiceBadge selected={selected} />
-                      </div>
-                      <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-gray-500">
-                        <RatingStars rating={Number(guide.rating || 0)} reviews={Number(guide.reviews || 0)} compact />
-                        <span className="font-semibold text-gray-800">LKR {Number(guide.pricePerDay || 0).toLocaleString()} / day</span>
-                        <span className="inline-flex items-center gap-1.5"><Languages className="w-3.5 h-3.5" /> {guide.languages?.slice(0, 2).join(", ") || "Languages pending"}</span>
-                        <span>{guide.specialties?.slice(0, 2).join(", ") || "General tours"}</span>
-                      </div>
-                      {guide.bio && <p className="mt-2 line-clamp-2 text-xs text-gray-400">{guide.bio}</p>}
-                    </button>
-                  );
-                })}
-              </OptionSection>
-
-              {selectedGuide && (
-                <ResourceReviews
-                  targetType="GUIDE"
-                  targetId={selectedGuide.id}
-                  title={`${selectedGuide.name} reviews`}
-                />
-              )}
-                </div>
-              </details>
-
-              <details onToggle={(event) => { if ((event.currentTarget as HTMLDetailsElement).open) setBookingStep(3); }} className="group mt-4 rounded-2xl border border-gray-200 bg-gray-50/50 p-4 sm:p-5">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-1 py-1 [&::-webkit-details-marker]:hidden">
-                  <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-rose-500">Step 3</p><h3 className="mt-1 font-bold text-gray-900">Choose your stay</h3><p className="mt-0.5 text-xs text-gray-400">Set preferences first, then choose from matching stays.</p></div><span className="rounded-full bg-gray-100 px-3 py-1.5 text-xs font-black text-gray-600">View options</span>
-                </summary>
-                <div className="mt-4">
-
-              {selectedAccommodation && (
-                <div className="mt-5 rounded-2xl border border-gray-200 p-4">
-                  <h3 className="font-bold text-gray-900">Accommodation details</h3>
-                  <p className="mt-0.5 text-xs text-gray-400">These details are saved with the selected stay.</p>
-                  <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <Field icon={BedDouble} label="Rooms">
-                      <input type="number" value={rooms} onChange={(event) => setRooms(Number(event.target.value))} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
-                    </Field>
-                    <Field icon={BedDouble} label="Room type">
-                      <select value={roomType} onChange={(event) => setRoomType(event.target.value)} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none">
-                        {roomTypes.map((item) => <option key={item}>{item}</option>)}
-                      </select>
-                    </Field>
+              <aside className="h-fit lg:sticky lg:top-24">
+                <div className="overflow-hidden rounded-[2rem] bg-[#0b1f3a] text-white shadow-xl">
+                  <div className="p-6"><p className="text-xs font-black uppercase tracking-[0.2em] text-rose-300">Your booking</p><h2 className="mt-2 text-2xl font-black">{bookingTitle(bookingType, destination, tourPackage, selectedAccommodation, selectedVehicle)}</h2></div>
+                  <div className="space-y-4 border-y border-white/10 p-6 text-sm">
+                    <SummaryLine label="Dates" value={checkIn + " → " + checkOut} />
+                    <SummaryLine label="Travellers" value={String(guests)} />
+                    <SummaryLine label="Guide" value={selectedGuide ? guideLabel(selectedGuide) : "Staff assignment"} />
+                    <SummaryLine label="Stay" value={selectedAccommodation ? accommodationLabel(selectedAccommodation) : "Staff assignment"} />
+                    <SummaryLine label="Vehicle" value={selectedVehicle ? vehicleLabel(selectedVehicle) : OWN_VEHICLE_LABEL} />
+                    {selectedVehicle && <SummaryLine label="Driver" value={driverRequired ? "Required" : "Not required"} />}
+                  </div>
+                  <div className="bg-white p-6 text-[#10213b]">
+                    <p className="text-[10px] font-black uppercase tracking-wider text-gray-400">Estimated total</p>
+                    <p className="mt-1 text-3xl font-black">LKR {total.toLocaleString()}</p>
+                    <p className="mt-2 text-xs leading-5 text-gray-500">Final booking total is confirmed by the backend after the reservation is created.</p>
+                    <button type="submit" disabled={submitting} className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-[#ff385c] px-5 py-4 text-sm font-black text-white transition hover:bg-[#e91f47] disabled:opacity-60">{submitting ? "Creating booking..." : "Create booking"} <CheckCircle className="h-4 w-4" /></button>
                   </div>
                 </div>
-              )}
-
-              <div className="mt-5 rounded-2xl border border-gray-200 p-4">
-                <h3 className="font-bold text-gray-900">Stay preferences</h3>
-                <p className="mt-0.5 text-xs text-gray-400">These preferences improve the accommodation matches shown below.</p>
-                <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
-                  <Field icon={CreditCard} label="Max nightly budget">
-                    <input type="number" min="0" value={accommodationBudget || ""} onChange={(event) => setAccommodationBudget(Number(event.target.value))} placeholder="Optional" className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
-                  </Field>
-                  <Field icon={BedDouble} label="Stay type">
-                    <select value={accommodationType} onChange={(event) => setAccommodationType(event.target.value)} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none">
-                      <option value="">Any type</option><option>Hotel</option><option>Villa</option><option>Resort</option><option>Hostel</option><option>Apartment</option>
-                    </select>
-                  </Field>
-                  <Field icon={CheckCircle} label="Preferences">
-                    <input value={accommodationPreferences} onChange={(event) => setAccommodationPreferences(event.target.value)} placeholder="pool, wifi, breakfast" className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
-                  </Field>
-                </div>
-              </div>
-
-              <OptionSection
-                title="Accommodation options"
-                description={`Active stays near ${primaryDestinationName(destination) || "this destination"}`}
-                loading={accommodationsLoading}
-                loadingText="Loading stays..."
-                emptyText={`No active accommodations are linked near ${primaryDestinationName(destination) || "this destination"}. Staff can assign a suitable stay after reviewing your booking.`}
-              >
-                {nearbyAccommodations.map((accommodation) => {
-                  const selected = accommodation.id === selectedAccommodationId;
-                  return (
-                    <button
-                      type="button"
-                      key={accommodation.id}
-                      onClick={() => setSelectedAccommodationId(accommodation.id)}
-                      className="text-left rounded-2xl border p-4 transition-colors"
-                      style={{
-                        borderColor: selected ? "#FF385C" : "#e5e7eb",
-                        background: selected ? "#fff5f7" : "#fff",
-                      }}
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className="font-bold text-gray-900">{accommodation.name}</p>
-                          <p className="text-xs text-gray-400 mt-0.5">{accommodation.type} · {accommodation.location || "Sri Lanka"}</p>
-                        </div>
-                        <ChoiceBadge selected={selected} />
-                      </div>
-                      <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-gray-500">
-                        <RatingStars rating={Number(accommodation.rating || 0)} reviews={Number(accommodation.reviews || 0)} compact />
-                        <span className="font-semibold text-gray-800">LKR {Number(accommodation.price || 0).toLocaleString()} / night</span>
-                        <span>{accommodation.rooms} rooms</span>
-                        <span>{accommodation.status}</span>
-                      </div>
-                      {accommodationRecommendations.find((item) => item.accommodation.id === accommodation.id) && (
-                        <div className="mt-2 flex flex-wrap gap-1.5">
-                          {(() => {
-                            const match = accommodationRecommendations.find((item) => item.accommodation.id === accommodation.id)!;
-                            return <>
-                              <span className="rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-bold text-emerald-700">{match.suitabilityScore}% fit</span>
-                              {match.reasons.slice(0, 2).map((reason) => <span key={reason} className="rounded-full bg-gray-100 px-2 py-1 text-[11px] font-semibold text-gray-600">{reason}</span>)}
-                            </>;
-                          })()}
-                        </div>
-                      )}
-                      {accommodation.amenities?.length > 0 && (
-                        <p className="mt-2 text-xs text-gray-400">{accommodation.amenities.slice(0, 4).join(" · ")}</p>
-                      )}
-                    </button>
-                  );
-                })}
-              </OptionSection>
-
-              {selectedAccommodation && (
-                <ResourceReviews
-                  targetType="ACCOMMODATION"
-                  targetId={selectedAccommodation.id}
-                  title={`${selectedAccommodation.name} reviews`}
-                />
-              )}
-                </div>
-              </details>
-
-              <details onToggle={(event) => { if ((event.currentTarget as HTMLDetailsElement).open) setBookingStep(4); }} className="group mt-4 rounded-2xl border border-gray-200 bg-gray-50/50 p-4 sm:p-5">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-1 py-1 [&::-webkit-details-marker]:hidden">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-rose-500">Step 4</p>
-                    <h3 className="mt-1 font-bold text-gray-900">Choose your transport</h3>
-                    <p className="mt-0.5 text-xs text-gray-400">Choose how you want to get around.</p>
-                  </div>
-                  <span className="rounded-full bg-gray-100 px-3 py-1.5 text-xs font-black text-gray-600">View options</span>
-                </summary>
-
-                <div className="mt-4">
-                  <p className="text-xs text-gray-400">Choose the transport option for this package request</p>
-
-                  {vehiclesLoading && <span className="mt-2 inline-block text-xs text-gray-400">Loading vehicles...</span>}
-
-                  <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
-                    <OwnOptionCard
-                      selected={selectedVehicleId === null}
-                      title={OWN_VEHICLE_LABEL}
-                      description="You will use your own transport for this trip."
-                      detail="No vehicle charge"
-                      icon={Fuel}
-                      onClick={() => setSelectedVehicleId(null)}
-                    />
-
-                    {!vehiclesLoading && vehicles.length === 0 ? (
-                      <div className="rounded-2xl border border-dashed border-gray-200 p-5 text-sm text-gray-400">
-                        No available Voyara vehicles are listed right now.
-                      </div>
-                    ) : (
-                      vehicles.map((vehicle) => {
-                        const selected = vehicle.id === selectedVehicleId;
-                        const match = vehicleRecommendations.find((item) => item.vehicle.id === vehicle.id);
-
-                        return (
-                          <button
-                            type="button"
-                            key={vehicle.id}
-                            onClick={() => setSelectedVehicleId(vehicle.id)}
-                            className="rounded-2xl border p-4 text-left transition-colors"
-                            style={{
-                              borderColor: selected ? "#FF385C" : "#e5e7eb",
-                              background: selected ? "#fff5f7" : "#fff",
-                            }}
-                          >
-                            <div className="flex items-start justify-between gap-3">
-                              <div>
-                                <p className="font-bold text-gray-900">{vehicle.name}</p>
-                                <p className="mt-0.5 text-xs text-gray-400">{vehicle.brand} {vehicle.model} · {vehicle.type}</p>
-                              </div>
-                              <ChoiceBadge selected={selected} />
-                            </div>
-
-                            <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-gray-500">
-                              <span className="inline-flex items-center gap-1.5"><Users className="h-3.5 w-3.5" /> {vehicle.capacity} seats</span>
-                              <span className="inline-flex items-center gap-1.5"><Fuel className="h-3.5 w-3.5" /> {vehicle.fuel}</span>
-                              <RatingStars rating={Number(vehicle.rating || 0)} reviews={Number(vehicle.reviews || 0)} compact />
-                              <span>{vehicle.transmission}</span>
-                              <span className="font-semibold text-gray-800">LKR {Number(vehicle.pricePerDay || 0).toLocaleString()} / day</span>
-                            </div>
-
-                            {match && (
-                              <div className="mt-2 flex flex-wrap gap-1.5">
-                                <span className="rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-bold text-emerald-700">{match.suitabilityScore}% fit</span>
-                                {match.reasons.slice(0, 2).map((reason) => (
-                                  <span key={reason} className="rounded-full bg-gray-100 px-2 py-1 text-[11px] font-semibold text-gray-600">{reason}</span>
-                                ))}
-                              </div>
-                            )}
-
-                            {vehicle.location && <p className="mt-2 text-xs text-gray-400">{vehicle.location}</p>}
-                          </button>
-                        );
-                      })
-                    )}
-                  </div>
-
-                  {selectedVehicle && (
-                    <div className="mt-5 rounded-2xl border border-gray-200 p-4">
-                      <h3 className="font-bold text-gray-900">Vehicle details</h3>
-                      <p className="mt-0.5 text-xs text-gray-400">These pickup and return details are saved with the selected vehicle.</p>
-
-                      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-                        <Field icon={MapPin} label="Pickup location">
-                          <input value={pickupLocation} onChange={(event) => setPickupLocation(event.target.value)} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
-                        </Field>
-                        <Field icon={CalendarDays} label="Pickup time">
-                          <input type="time" value={pickupTime} onChange={(event) => setPickupTime(event.target.value)} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
-                        </Field>
-                        <Field icon={MapPin} label="Return location">
-                          <input value={returnLocation} onChange={(event) => setReturnLocation(event.target.value)} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
-                        </Field>
-                        <Field icon={CalendarDays} label="Return time">
-                          <input type="time" value={returnTime} onChange={(event) => setReturnTime(event.target.value)} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
-                        </Field>
-                        <Field icon={Car} label="Driver">
-                          <select value={driverRequired ? "Yes" : "No"} onChange={(event) => setDriverRequired(event.target.value === "Yes")} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none">
-                            <option>Yes</option>
-                            <option>No</option>
-                          </select>
-                        </Field>
-                        <Field icon={Package} label="Luggage count">
-                          <input type="number" value={luggageCount} onChange={(event) => setLuggageCount(Number(event.target.value))} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
-                        </Field>
-                      </div>
-                    </div>
-                  )}
-
-                  {selectedVehicle && (
-                    <ResourceReviews
-                      targetType="VEHICLE"
-                      targetId={selectedVehicle.id}
-                      title={`${selectedVehicle.name} reviews`}
-                    />
-                  )}
-                </div>
-              </details>
-
-              <details className="group mt-4 rounded-2xl border border-gray-200 bg-gray-50/50 p-4 sm:p-5">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-1 py-1 [&::-webkit-details-marker]:hidden">
-                  <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-gray-400">Optional</p><h3 className="mt-1 font-bold text-gray-900">Special requests</h3><p className="mt-0.5 text-xs text-gray-400">Anything staff should know about your trip.</p></div><span className="rounded-full bg-gray-100 px-3 py-1.5 text-xs font-black text-gray-600">Add note</span>
-                </summary>
-                <div className="mt-4 rounded-2xl bg-white p-4">
-                <label className="block text-xs font-semibold uppercase tracking-wide text-gray-400 mb-2">Special requests</label>
-                <textarea
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  rows={4}
-                  className="w-full bg-transparent text-sm text-gray-700 outline-none resize-none"
-                  placeholder="Pickup location, dietary needs, preferred guide language, or anything staff should know..."
-                />
-              </div>
-              </details>
-            </section>
-
-            <aside className="h-fit rounded-3xl border border-gray-200 bg-white p-6 shadow-sm lg:sticky lg:top-24">
-              <div className="mb-5"><p className="text-xs font-bold uppercase tracking-[0.16em] text-rose-500">Your trip</p><h2 className="mt-1 text-xl font-extrabold text-gray-900">Review & book</h2><p className="mt-1 text-xs leading-5 text-gray-400">Your selections can be reviewed after this request is created.</p></div>
-              <div className="space-y-3 text-sm">
-                <SummaryRow label="Tourist" value={user?.fullName || "Current user"} />
-                <SummaryRow label="Email" value={user?.email || "Signed-in account"} />
-                <SummaryRow label="Type" value={bookingTypeLabel(bookingType)} />
-                <SummaryRow label="Duration" value={`${tripDays(checkIn, checkOut)} day${tripDays(checkIn, checkOut) === 1 ? "" : "s"}`} />
-                <SummaryRow label="Guide" value={selectedGuide ? guideLabel(selectedGuide) : "Staff assignment"} />
-                <SummaryRow label="Language" value={languagePreference} />
-                <SummaryRow label="Stay" value={selectedAccommodation ? accommodationLabel(selectedAccommodation) : "Staff assignment"} />
-                {selectedAccommodation && <SummaryRow label="Room details" value={`${rooms} ${roomType}`} />}
-                <SummaryRow label="Vehicle" value={selectedVehicle ? vehicleLabel(selectedVehicle) : OWN_VEHICLE_LABEL} />
-                {selectedVehicle && <SummaryRow label="Pickup" value={`${pickupLocation} ${pickupTime}`} />}
-                {selectedVehicle && <SummaryRow label="Return" value={`${returnLocation} ${returnTime}`} />}
-                <div className="rounded-2xl bg-gray-50 px-4 py-3"><div className="flex items-end justify-between gap-4"><span className="text-xs font-semibold uppercase tracking-wide text-gray-400">Estimated total</span><span className="text-lg font-extrabold text-gray-900">{total ? `LKR ${total.toLocaleString()}` : "Pending quote"}</span></div><p className="mt-1 text-[11px] leading-4 text-gray-400">Final booking total is determined by the backend.</p></div>
-                <SummaryRow label="Status" value="Pending" />
-                <SummaryRow label="Payment" value="Pending" />
-              </div>
-
-              <div className="mt-5 rounded-2xl bg-rose-50 p-4 text-sm text-rose-700">
-                <div className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                  <p>Your booking will be saved in the database and visible in My Bookings immediately.</p>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={submitting}
-                className="mt-5 w-full rounded-xl px-4 py-3 text-sm font-semibold text-white disabled:opacity-60"
-                style={{ background: "linear-gradient(135deg, #FF385C, #E31C5F)" }}
-              >
-                {submitting ? "Creating booking..." : "Continue with booking"}
-              </button>
-            </aside>
-          </form>
-        )}
+              </aside>
+            </form>
+          )}
+        </main>
       </main>
       <Footer />
     </div>
   );
+
+}
+
+function BookingHeroStat({ icon: Icon, label, value }: { icon: ComponentType<{ className?: string }>; label: string; value: string }) {
+  return <div className="flex items-start gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-500"><Icon className="h-4 w-4" /></span><div><p className="text-[10px] font-black uppercase tracking-wider text-gray-400">{label}</p><p className="mt-1 text-sm font-black text-[#10213b]">{value}</p></div></div>;
+}
+
+function SectionHeading({ step, title, subtitle }: { step: string; title: string; subtitle: string }) {
+  return <div><p className="text-xs font-black uppercase tracking-[0.2em] text-rose-500">{step} ·</p><h2 className="mt-2 text-3xl font-black text-[#10213b]">{title}</h2><p className="mt-2 text-sm leading-6 text-gray-500">{subtitle}</p></div>;
+}
+
+function SummaryLine({ label, value }: { label: string; value: string }) {
+  return <div className="flex items-start justify-between gap-4"><span className="text-white/50">{label}</span><span className="text-right font-bold">{value}</span></div>;
 }
 
 function vehicleLabel(vehicle: Vehicle) {
