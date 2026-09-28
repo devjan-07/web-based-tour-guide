@@ -4,7 +4,6 @@ import { ArrowLeft, CalendarDays, CheckCircle, Clock, CreditCard, HelpCircle, Ma
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
-import { destinationsApi, guidesApi, packagesApi, type Destination, type DestinationRecommendation, type GuideRecommendation, type TourPackage, type Route } from "../lib/api";
 import { addTripItem } from "../lib/tripPlanner";
 
 type DetailMode = "destination" | "package";
@@ -38,7 +37,6 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
   const [nearbyDestinations, setNearbyDestinations] = useState<import("../lib/api").NearbyDestination[]>([]);
   const [nearbyRadiusKm, setNearbyRadiusKm] = useState(50);
   const [nearbyLoading, setNearbyLoading] = useState(false);
-  const [nearbyError, setNearbyError] = useState("");
   const [savedToTrip, setSavedToTrip] = useState(false);
   const isTourist = isAuthenticated && user?.roles.includes("TOURIST");
 
@@ -513,26 +511,6 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
                       </div>
                     </div>
                   ))}
-                </div>
-                {isTourist && (
-                  <>
-                    <button
-                      onClick={() => {
-                        if (!item) return;
-                        const next = addTripItem({
-                          type: item.mode,
-                          id: item.data.id,
-                          title: detail.title,
-                          subtitle: detail.location,
-                          destination: detail.location,
-                          day: 1,
-                        });
-                        setSavedToTrip(next.some((tripItem) => tripItem.type === item.mode && tripItem.id === item.data.id));
-                      }}
-                      className="mt-5 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-800 transition hover:bg-gray-100"
-                    >
-                      {savedToTrip ? "Added to My Trip" : "Add to My Trip"}
-                    </button>
                     {item.mode === "package" ? (
                       <Link
                         to={`/tourist/packages/${item.data.id}/customize`}
