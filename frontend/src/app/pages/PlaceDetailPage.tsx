@@ -533,21 +533,23 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
                     >
                       {savedToTrip ? "Added to My Trip" : "Add to My Trip"}
                     </button>
-                    {item.mode === "package" && (
+                    {item.mode === "package" ? (
                       <Link
                         to={`/tourist/packages/${item.data.id}/customize`}
-                        className="mt-3 flex w-full items-center justify-center rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-700 transition hover:bg-blue-100"
+                        className="mt-3 flex w-full items-center justify-center rounded-xl px-4 py-3.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90"
+                        style={{ background: "linear-gradient(135deg, #FF385C, #E31C5F)" }}
                       >
-                        Customize this package
+                        Customize & continue
                       </Link>
+                    ) : (
+                      <button
+                        onClick={() => navigate(bookingPath)}
+                        className="mt-3 w-full rounded-xl px-4 py-3.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90"
+                        style={{ background: "linear-gradient(135deg, #FF385C, #E31C5F)" }}
+                      >
+                        Book this trip
+                      </button>
                     )}
-                    <button
-                      onClick={() => navigate(bookingPath)}
-                      className="mt-3 w-full rounded-xl px-4 py-3.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90"
-                      style={{ background: "linear-gradient(135deg, #FF385C, #E31C5F)" }}
-                    >
-                      Book this trip
-                    </button>
                   </>
                 )}
                 {!isAuthenticated && (
