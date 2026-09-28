@@ -421,8 +421,8 @@ export default function TouristBookingCreate() {
               </div>
 
               <details onToggle={(event) => { if ((event.currentTarget as HTMLDetailsElement).open) setBookingStep(2); }} className="group mt-6 rounded-2xl border border-gray-200 bg-gray-50/50 p-4 sm:p-5">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
-                  <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-rose-500">Step 2</p><h3 className="mt-1 font-bold text-gray-900">Choose a local guide</h3><p className="mt-0.5 text-xs text-gray-400">Optional — expand to compare available guides.</p></div><span className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-gray-500 shadow-sm">View options</span>
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-1 py-1 [&::-webkit-details-marker]:hidden">
+                  <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-rose-500">Step 2</p><h3 className="mt-1 font-bold text-gray-900">Choose a local guide</h3><p className="mt-0.5 text-xs text-gray-400">Optional · choose a guide for this journey.</p></div><span className="rounded-full bg-gray-100 px-3 py-1.5 text-xs font-black text-gray-600">View options</span>
                 </summary>
                 <div className="mt-4">
               <OptionSection
@@ -475,8 +475,8 @@ export default function TouristBookingCreate() {
               </details>
 
               <details onToggle={(event) => { if ((event.currentTarget as HTMLDetailsElement).open) setBookingStep(3); }} className="group mt-4 rounded-2xl border border-gray-200 bg-gray-50/50 p-4 sm:p-5">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
-                  <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-rose-500">Step 3</p><h3 className="mt-1 font-bold text-gray-900">Choose your stay</h3><p className="mt-0.5 text-xs text-gray-400">Set preferences first, then choose from matching stays.</p></div><span className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-gray-500 shadow-sm">View options</span>
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-1 py-1 [&::-webkit-details-marker]:hidden">
+                  <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-rose-500">Step 3</p><h3 className="mt-1 font-bold text-gray-900">Choose your stay</h3><p className="mt-0.5 text-xs text-gray-400">Set preferences first, then choose from matching stays.</p></div><span className="rounded-full bg-gray-100 px-3 py-1.5 text-xs font-black text-gray-600">View options</span>
                 </summary>
                 <div className="mt-4">
 
@@ -578,13 +578,13 @@ export default function TouristBookingCreate() {
               </details>
 
               <details onToggle={(event) => { if ((event.currentTarget as HTMLDetailsElement).open) setBookingStep(4); }} className="group mt-4 rounded-2xl border border-gray-200 bg-gray-50/50 p-4 sm:p-5">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-1 py-1 [&::-webkit-details-marker]:hidden">
                   <div>
                     <p className="text-xs font-bold uppercase tracking-[0.18em] text-rose-500">Step 4</p>
                     <h3 className="mt-1 font-bold text-gray-900">Choose your transport</h3>
-                    <p className="mt-0.5 text-xs text-gray-400">Use your own vehicle or select an available Voyara option.</p>
+                    <p className="mt-0.5 text-xs text-gray-400">Choose how you want to get around.</p>
                   </div>
-                  <span className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-gray-500 shadow-sm">View options</span>
+                  <span className="rounded-full bg-gray-100 px-3 py-1.5 text-xs font-black text-gray-600">View options</span>
                 </summary>
 
                 <div className="mt-4">
@@ -696,8 +696,8 @@ export default function TouristBookingCreate() {
               </details>
 
               <details className="group mt-4 rounded-2xl border border-gray-200 bg-gray-50/50 p-4 sm:p-5">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
-                  <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-gray-400">Optional</p><h3 className="mt-1 font-bold text-gray-900">Special requests</h3><p className="mt-0.5 text-xs text-gray-400">Anything staff should know about your trip.</p></div><span className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-gray-500 shadow-sm">Add note</span>
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-1 py-1 [&::-webkit-details-marker]:hidden">
+                  <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-gray-400">Optional</p><h3 className="mt-1 font-bold text-gray-900">Special requests</h3><p className="mt-0.5 text-xs text-gray-400">Anything staff should know about your trip.</p></div><span className="rounded-full bg-gray-100 px-3 py-1.5 text-xs font-black text-gray-600">Add note</span>
                 </summary>
                 <div className="mt-4 rounded-2xl bg-white p-4">
                 <label className="block text-xs font-semibold uppercase tracking-wide text-gray-400 mb-2">Special requests</label>
