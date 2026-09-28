@@ -317,7 +317,31 @@ export default function TouristBookingCreate() {
         ) : (
           <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
             <section className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-              <div className="mb-6"><div className="mb-5 grid grid-cols-4 gap-2">{["Essentials", "Guide", "Stay", "Transport"].map((step, index) => <div key={step} className="flex items-center gap-2"><span className={"flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-black " + (index + 1 <= bookingStep ? "bg-rose-500 text-white" : "bg-gray-100 text-gray-400")}>{index + 1}</span><span className={"hidden text-xs font-bold sm:block " + (index + 1 <= bookingStep ? "text-gray-900" : "text-gray-400")}>{step}</span></div>)}</div><div className="flex items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-rose-500">Step 1</p><h2 className="mt-1 text-xl font-extrabold text-gray-900">Start with the essentials</h2><p className="mt-1 text-sm text-gray-500">Tell us when you are travelling and who is coming. Everything else is optional.</p></div><span className="hidden rounded-full bg-gray-50 px-3 py-1.5 text-xs font-semibold text-gray-500 sm:inline-flex">Required first</span></div>
+              <div className="mb-6">
+                <div className="mb-5 grid grid-cols-4 gap-2">
+                  {["Essentials", "Guide", "Stay", "Transport"].map((step, index) => {
+                    const stepNumber = index + 1;
+                    const completed = stepNumber < bookingStep;
+                    const current = stepNumber === bookingStep;
+                    return (
+                      <div key={step} className="flex items-center gap-2" aria-current={current ? "step" : undefined}>
+                        <span className={"flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-black " + (completed ? "bg-emerald-500 text-white" : current ? "bg-rose-500 text-white ring-4 ring-rose-100" : "bg-gray-100 text-gray-400")}>
+                          {completed ? <CheckCircle className="h-4 w-4" /> : index + 1}
+                        </span>
+                        <span className={"hidden text-xs font-bold sm:block " + (completed ? "text-emerald-700" : current ? "text-gray-900" : "text-gray-400")}>{step}</span>
+                        {index < 3 && <span className={"mx-1 h-px flex-1 " + (completed ? "bg-emerald-200" : "bg-gray-200")} />}
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-rose-500">Step 1</p>
+                    <h2 className="mt-1 text-xl font-extrabold text-gray-900">Start with the essentials</h2>
+                    <p className="mt-1 text-sm text-gray-500">Tell us when you are travelling and who is coming. Everything else is optional.</p>
+                  </div>
+                  <span className="hidden rounded-full bg-gray-50 px-3 py-1.5 text-xs font-semibold text-gray-500 sm:inline-flex">Required first</span>
+                </div>
               </div>
 
               {error && (
