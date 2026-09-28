@@ -100,33 +100,29 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 
 ## Target Tourist Journey
 
-The tourist experience is now organized around a single lifecycle rather than separate disconnected features:
+The tourist experience is organized around a direct travel lifecycle:
 
 ```
-DISCOVER → PLAN → BOOK → TRAVEL → REVIEW
+DISCOVER → PLAN/EXPLORE → CUSTOMIZE → BOOK → TRAVEL → REVIEW
 ```
 
 ### Discover
 Visitors can browse destinations, packages and local guides, inspect destination information, weather, nearby/similar destinations, and compare packages.
 
-### Plan
-**Plan a Trip** is an optional assisted-planning route for tourists who want recommendations based on destination, dates, travellers, budget, guide preferences, stay preferences and transport needs.
+### Plan / Explore
+**Plan a Trip** is an optional assisted-planning route for tourists who want recommendations based on destination, dates, travellers, budget, guide language, stay preferences and transport needs. When a package matches, the tourist can move directly into package customization.
 
+### Customize
+Package customization is the main personalization workspace. The package remains the primary travel experience while included services are clearly separated from optional changes such as alternative accommodation, guides or vehicles.
 
 ### Book
-A tourist can either:
-- go directly from a known package to package customization, or
-
-Customization configures guests, dates, guide, accommodation, vehicle, driver/luggage and pickup/return times before creating the existing booking.
+A tourist can either start from a known package or use Plan a Trip to discover one. The existing booking backend remains the source of truth for reservation details, pricing, provider decisions, payment status and booking state.
 
 ### Travel
 After booking, the tourist uses My Bookings / the Tourist Dashboard for booking status, payment status and trip-readiness information.
 
 ### Review
 Completed bookings can be followed by the existing tourist review/feedback flow.
-
-### Planning-state rule
-
 
 ## Current Normal-Feature Backend Completion
 
