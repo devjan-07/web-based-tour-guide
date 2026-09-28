@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import type { ComponentType, ReactNode } from "react";
 import { Link } from "react-router";
-import { ArrowRight, BedDouble, CalendarDays, Car, CheckCircle, Compass, Languages, MapPin, Package, Sparkles, Users } from "lucide-react";
+import { ArrowRight, BedDouble, CalendarDays, Car, Check, Compass, Languages, Sparkles, Users } from "lucide-react";
 import { Navbar } from "../../components/Navbar";
 import { Footer } from "../../components/Footer";
-import { addTripItem, loadTripItems, type TripItem } from "../../lib/tripPlanner";
 import {
   accommodationRecommendationsApi,
   destinationsApi,
@@ -18,22 +17,18 @@ import {
   type VehicleRecommendation,
 } from "../../lib/api";
 
-function today() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function addDays(value: string, days: number) {
-  const date = new Date(value);
-  date.setDate(date.getDate() + days);
-  return date.toISOString().slice(0, 10);
-}
-
+function today() { return new Date().toISOString().slice(0, 10); }
+function addDays(value: string, days: number) { const date = new Date(value); date.setDate(date.getDate() + days); return date.toISOString().slice(0, 10); }
 function tripDays(start: string, end: string) {
-  const from = new Date(start);
-  const to = new Date(end);
+  const from = new Date(start); const to = new Date(end);
   if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) return 1;
   return Math.max(1, Math.ceil((to.getTime() - from.getTime()) / 86400000));
 }
+
+const experiences = [
+  ["Nature", "🌿"], ["Beach", "🏖️"], ["Culture", "🏛️"], ["Wildlife", "🐘"],
+  ["Food", "🍜"], ["Adventure", "🥾"], ["Wellness", "🍃"], ["Family", "👨‍👩‍👧"],
+];
 
 export default function PlanMyTrip() {
   const [destinations, setDestinations] = useState<Destination[]>([]);
@@ -43,8 +38,8 @@ export default function PlanMyTrip() {
   const [endDate, setEndDate] = useState(addDays(today(), 3));
   const [travellers, setTravellers] = useState(2);
   const [dailyBudget, setDailyBudget] = useState(0);
+  const [experience, setExperience] = useState("");
   const [guideLanguage, setGuideLanguage] = useState("English");
-  const [guideSpecialty, setGuideSpecialty] = useState("");
   const [preferences, setPreferences] = useState("wifi, breakfast");
   const [driverRequired, setDriverRequired] = useState(true);
   const [luggage, setLuggage] = useState(2);
@@ -53,11 +48,8 @@ export default function PlanMyTrip() {
   const [vehicleRecommendations, setVehicleRecommendations] = useState<VehicleRecommendation[]>([]);
   const [loading, setLoading] = useState(true);
   const [matching, setMatching] = useState(false);
+  const [matched, setMatched] = useState(false);
   const [error, setError] = useState("");
-  const [plannerStep, setPlannerStep] = useState(1);
-  const [savedTripKeys, setSavedTripKeys] = useState<Set<string>>(
-    () => new Set(loadTripItems().map((item) => item.key))
-  );
 
   useEffect(() => {
     Promise.all([destinationsApi.list(), packagesApi.list()])
@@ -71,47 +63,33 @@ export default function PlanMyTrip() {
       .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
-    if (plannerStep === 3) setPlannerStep(2);
-  }, [destinationId, startDate, endDate, travellers, dailyBudget, guideLanguage, guideSpecialty, preferences, driverRequired, luggage]);
-
-  const selectedDestination = useMemo(
-    () => destinations.find((item) => item.id === destinationId) || null,
-    [destinations, destinationId]
-  );
-
+  const selectedDestination = useMemo(() => destinations.find((item) => item.id === destinationId) || null, [destinations, destinationId]);
   const duration = tripDays(startDate, endDate);
 
   const matchingPackages = useMemo(() => {
     if (!selectedDestination) return [];
-    const name = selectedDestination.name.toLowerCase();
+    const destinationName = selectedDestination.name.toLowerCase();
     return packages
       .filter((item) => item.maxGroup <= 0 || item.maxGroup >= travellers)
-      .filter((item) => item.destinations?.some((itemDestination) => itemDestination.toLowerCase().includes(name) || name.includes(itemDestination.toLowerCase())))
+      .filter((item) => item.destinations?.some((d) => d.toLowerCase().includes(destinationName) || destinationName.includes(d.toLowerCase())))
       .filter((item) => !dailyBudget || Number(item.price || 0) <= dailyBudget * duration * Math.max(1, travellers))
-      .filter((item) => duration <= 0 || Number(item.duration || 1) <= Math.max(duration + 2, duration * 2))
+      .filter((item) => !experience || item.category.toLowerCase().includes(experience.toLowerCase()))
       .sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0) || Number(a.price || 0) - Number(b.price || 0))
       .slice(0, 3);
-  }, [dailyBudget, duration, packages, selectedDestination, travellers]);
+  }, [dailyBudget, duration, experience, packages, selectedDestination, travellers]);
 
-  async function matchTrip() {
+  async function findMatches() {
     if (!selectedDestination) return;
-    setMatching(true);
-    setPlannerStep(2);
-    setError("");
+    setMatching(true); setError("");
     try {
       const [guides, stays, vehicles] = await Promise.all([
-        guidesApi.recommendations({
-          language: guideLanguage,
-          specialty: guideSpecialty || undefined,
-          location: selectedDestination.name,
-        }),
+        guidesApi.recommendations({ language: guideLanguage, location: selectedDestination.name }),
         accommodationRecommendationsApi.list({
           destinationId: selectedDestination.id,
           destination: selectedDestination.name,
           travellers,
-          maxDailyBudget: dailyBudget || undefined,
           preferences: preferences || undefined,
+          maxDailyBudget: dailyBudget || undefined,
         }),
         vehicleRecommendationsApi.list({
           passengers: travellers,
@@ -124,7 +102,7 @@ export default function PlanMyTrip() {
       setGuideRecommendations(guides.slice(0, 3));
       setAccommodationRecommendations(stays.slice(0, 3));
       setVehicleRecommendations(vehicles.slice(0, 3));
-      setPlannerStep(3);
+      setMatched(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not build recommendations");
     } finally {
@@ -132,219 +110,92 @@ export default function PlanMyTrip() {
     }
   }
 
-  const saveTripResource = (item: Omit<TripItem, "key">) => {
-    const next = addTripItem(item);
-    setSavedTripKeys(new Set(next.map((tripItem) => tripItem.key)));
-  };
+  if (loading) return <PageShell><div className="mx-auto max-w-7xl px-4 py-20 text-center text-gray-500">Loading your travel options...</div></PageShell>;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 md:py-10">
-        <section className="overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#003580] to-[#0057B8] text-white shadow-lg">
-          <div className="p-7 md:p-10">
-            <div className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-[0.18em] text-white/70">
-              <Sparkles className="h-4 w-4" /> Voyara trip planner
-            </div>
-            <h1 className="max-w-3xl text-3xl font-extrabold md:text-5xl">Plan a trip around the way you actually travel.</h1>
-            <p className="mt-4 max-w-2xl text-sm leading-6 text-white/80 md:text-base">
-              Choose a destination, dates, group size and preferences. Voyara then connects packages, guides, stays and transport into one practical starting plan.
-            </p>
+    <PageShell>
+      <section className="relative overflow-hidden bg-[#071a33] text-white">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.05fr_.95fr] lg:px-8 lg:py-20">
+          <div className="self-center">
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-rose-300"><Sparkles className="mr-2 inline h-4 w-4" /> Travel planner</p>
+            <h1 className="mt-4 text-4xl font-black tracking-tight md:text-6xl">Tell us what kind of Sri Lanka escape you want.</h1>
+            <p className="mt-5 max-w-xl text-base leading-7 text-white/70 md:text-lg">Choose a place, dates and the feeling you want from the trip. Voyara will surface packages and local travel services that fit.</p>
+          </div>
+          {selectedDestination && <div className="relative min-h-[320px] overflow-hidden rounded-[2rem] shadow-2xl ring-1 ring-white/20">
+            <img src={selectedDestination.image} alt={selectedDestination.name} className="absolute inset-0 h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+            <div className="absolute bottom-0 p-6"><p className="text-xs font-black uppercase tracking-wider text-white/70">Start here</p><h2 className="mt-1 text-3xl font-black">{selectedDestination.name}</h2><p className="mt-1 max-w-md text-sm text-white/80">{selectedDestination.description}</p></div>
+          </div>}
+        </div>
+      </section>
+
+      <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        {error && <div className="mb-6 rounded-2xl bg-rose-50 p-4 text-sm font-bold text-rose-700">{error}</div>}
+
+        <section className="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-gray-200 md:p-8">
+          <div className="flex items-end justify-between gap-4">
+            <div><p className="text-xs font-black uppercase tracking-[0.18em] text-rose-500">01 · Choose your place</p><h2 className="mt-1 text-2xl font-black text-[#10213b]">Where do you want to wake up?</h2></div>
+            <span className="hidden text-xs font-bold text-gray-400 sm:block">Your answers shape the recommendations</span>
+          </div>
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+            {destinations.slice(0, 10).map((destination) => {
+              const active = destination.id === destinationId;
+              return <button key={destination.id} type="button" onClick={() => { setDestinationId(destination.id); setMatched(false); }} className={"group relative h-40 overflow-hidden rounded-2xl text-left " + (active ? "ring-4 ring-rose-400" : "ring-1 ring-gray-200")}>
+                <img src={destination.image} alt={destination.name} className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-3 text-white"><p className="text-sm font-black">{destination.name}</p><p className="mt-1 text-[10px] font-bold text-white/70">{destination.categories?.slice(0, 2).join(" · ")}</p></div>
+                {active && <span className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-rose-500 text-white"><Check className="h-4 w-4" /></span>}
+              </button>;
+            })}
           </div>
         </section>
 
-        {loading ? (
-          <div className="mt-6 rounded-3xl border border-gray-200 bg-white p-8 text-sm text-gray-500">Loading destinations and tour packages...</div>
-        ) : (
-          <>
-            <section className="mt-6 rounded-[2rem] border border-gray-200 bg-white p-5 shadow-sm md:p-6">
-              <div className="mb-6 grid grid-cols-3 gap-2">
-                {[["01", "Trip basics"], ["02", "Preferences"], ["03", "Matches"]].map(([step, label], index) => {
-                  const stepNumber = index + 1;
-                  const completed = stepNumber < plannerStep;
-                  const current = stepNumber === plannerStep;
-                  return (
-                    <div key={step} className="flex items-center gap-2" aria-current={current ? "step" : undefined}>
-                      <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-black ${completed ? "bg-emerald-500 text-white" : current ? "bg-rose-500 text-white ring-4 ring-rose-100" : "bg-gray-100 text-gray-400"}`}>
-                        {completed ? <CheckCircle className="h-4 w-4" /> : step}
-                      </div>
-                      <div className="hidden min-w-0 sm:block">
-                        <p className={`text-xs font-bold ${completed ? "text-emerald-700" : current ? "text-gray-900" : "text-gray-400"}`}>{label}</p>
-                        <p className={`mt-0.5 text-[10px] font-medium ${current ? "text-rose-500" : "text-gray-400"}`}>{completed ? "Completed" : current ? "Current step" : "Up next"}</p>
-                      </div>
-                      {index < 2 && <div className={`mx-1 h-px flex-1 ${completed ? "bg-emerald-200" : "bg-gray-200"}`} />}
-                    </div>
-                  );
-                })}
-              </div>
+        <section className="mt-6 grid gap-6 lg:grid-cols-[1.15fr_.85fr]">
+          <div className="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-gray-200 md:p-8">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-500">02 · Shape the experience</p>
+            <h2 className="mt-1 text-2xl font-black text-[#10213b]">What sounds like you?</h2>
+            <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {experiences.map(([label, emoji]) => <button key={label} type="button" onClick={() => setExperience(experience === label ? "" : label)} className={"rounded-2xl border p-4 text-left transition " + (experience === label ? "border-rose-400 bg-rose-50" : "border-gray-200 hover:border-gray-300 hover:bg-gray-50")}><span className="text-2xl">{emoji}</span><p className="mt-2 text-sm font-black text-[#10213b]">{label}</p></button>)}
+            </div>
+          </div>
+          <div className="rounded-[2rem] bg-[#fff8f3] p-6 ring-1 ring-orange-100 md:p-8">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-orange-600">Trip snapshot</p>
+            <div className="mt-5 space-y-4">
+              <Snapshot icon={CalendarDays} label="Dates"><div className="flex gap-2"><input type="date" value={startDate} onChange={e=>{setStartDate(e.target.value);setMatched(false)}} className="min-w-0 flex-1 rounded-xl bg-white p-3 text-sm font-bold outline-none ring-1 ring-orange-100" /><input type="date" min={startDate} value={endDate} onChange={e=>{setEndDate(e.target.value);setMatched(false)}} className="min-w-0 flex-1 rounded-xl bg-white p-3 text-sm font-bold outline-none ring-1 ring-orange-100" /></div></Snapshot>
+              <Snapshot icon={Users} label="Travellers"><input type="number" min="1" value={travellers} onChange={e=>{setTravellers(Math.max(1,Number(e.target.value)));setMatched(false)}} className="w-full rounded-xl bg-white p-3 text-sm font-bold outline-none ring-1 ring-orange-100" /></Snapshot>
+              <Snapshot icon={Compass} label="Budget per traveller / day"><input type="number" min="0" value={dailyBudget || ""} placeholder="Any budget" onChange={e=>{setDailyBudget(Math.max(0,Number(e.target.value)));setMatched(false)}} className="w-full rounded-xl bg-white p-3 text-sm font-bold outline-none ring-1 ring-orange-100" /></Snapshot>
+              <Snapshot icon={Languages} label="Guide language"><select value={guideLanguage} onChange={e=>{setGuideLanguage(e.target.value);setMatched(false)}} className="w-full rounded-xl bg-white p-3 text-sm font-bold outline-none ring-1 ring-orange-100"><option>English</option><option>French</option><option>Spanish</option><option>Japanese</option><option>Korean</option><option>Chinese</option><option>German</option></select></Snapshot>
+            </div>
+          </div>
+        </section>
 
-              <div className="mb-5 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-rose-50 text-rose-500"><Compass className="h-5 w-5" /></div>
-                <div>
-                  <h2 className="font-extrabold text-gray-900">Tell us about the trip</h2>
-                  <p className="text-xs text-gray-400">These inputs are used to match existing Voyara resources. No new booking is created yet.</p>
-                </div>
-              </div>
+        <section className="mt-6 rounded-[2rem] bg-[#10213b] p-6 text-white shadow-xl md:p-8">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div><p className="text-xs font-black uppercase tracking-[0.18em] text-rose-300">03 · Let Voyara match it</p><h2 className="mt-1 text-2xl font-black">Build my travel options</h2><p className="mt-2 max-w-2xl text-sm text-white/65">We'll use your dates, group size, destination and preferences to surface practical options. Nothing is booked yet.</p></div>
+            <button type="button" onClick={findMatches} disabled={matching || !selectedDestination} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#FF385C] px-6 py-3.5 text-sm font-black text-white disabled:opacity-60">{matching ? "Finding options..." : "Find my options"} <ArrowRight className="h-4 w-4" /></button>
+          </div>
+        </section>
 
-              {error && <div className="mb-5 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600">{error}</div>}
+        {matched && <section className="mt-10">
+          <div className="mb-5"><p className="text-xs font-black uppercase tracking-[0.18em] text-rose-500">Your options</p><h2 className="mt-1 text-3xl font-black text-[#10213b]">Trips that fit your brief</h2><p className="mt-2 text-sm text-gray-500">Start with a package when one matches. The other services are there when you want to build a custom booking.</p></div>
+          <div className="grid gap-6 lg:grid-cols-3">
+            {matchingPackages.length ? matchingPackages.map((pkg) => <article key={pkg.id} className="overflow-hidden rounded-[1.75rem] bg-white shadow-sm ring-1 ring-gray-200">
+              <div className="relative h-52"><img src={pkg.image} alt={pkg.name} className="h-full w-full object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" /><div className="absolute bottom-0 p-5 text-white"><p className="text-xs font-bold uppercase tracking-wider text-white/70">{pkg.category}</p><h3 className="mt-1 text-xl font-black">{pkg.name}</h3></div></div>
+              <div className="p-5"><div className="flex items-center justify-between"><span className="text-sm text-gray-500">{pkg.duration} days · {pkg.difficulty}</span><span className="font-black text-[#10213b]">LKR {Number(pkg.price || 0).toLocaleString()}</span></div><p className="mt-3 line-clamp-3 text-sm leading-6 text-gray-500">{pkg.description}</p><div className="mt-4 flex flex-wrap gap-2">{(pkg.included||"").split(",").slice(0,4).map(x=><span key={x} className="rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700">{x.trim()}</span>)}</div><div className="mt-5 flex gap-2"><Link to={"/packages/" + pkg.id} className="flex-1 rounded-xl border border-gray-200 px-3 py-3 text-center text-xs font-black text-gray-700">Explore</Link><Link to={"/tourist/packages/" + pkg.id + "/customize?guests=" + travellers + "&checkIn=" + startDate + "&checkOut=" + endDate + "&language=" + encodeURIComponent(guideLanguage) + "&luggage=" + luggage + "&driver=" + driverRequired} className="flex-1 rounded-xl bg-[#FF385C] px-3 py-3 text-center text-xs font-black text-white">Customize</Link></div></div>
+            </article>) : <div className="rounded-[1.75rem] bg-white p-8 text-center ring-1 ring-gray-200 lg:col-span-3"><p className="font-black text-[#10213b]">No package matches these preferences.</p><p className="mt-2 text-sm text-gray-500">You can still continue with a custom trip for this destination.</p><Link to={"/tourist/bookings/new?destinationId=" + (selectedDestination?.id || "") + "&destination=" + encodeURIComponent(selectedDestination?.name || "")} className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#FF385C] px-5 py-3 text-sm font-black text-white">Build a custom trip <ArrowRight className="h-4 w-4" /></Link></div>}
+          </div>
 
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <PlannerField icon={MapPin} label="Destination">
-                  <select value={destinationId ?? ""} onChange={(event) => setDestinationId(Number(event.target.value))} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none">
-                    {destinations.map((item) => <option key={item.id} value={item.id}>{item.name}{item.country ? `, ${item.country}` : ""}</option>)}
-                  </select>
-                </PlannerField>
-
-                <PlannerField icon={CalendarDays} label="Start date">
-                  <input type="date" min={today()} value={startDate} onChange={(event) => { setStartDate(event.target.value); if (new Date(endDate) <= new Date(event.target.value)) setEndDate(addDays(event.target.value, 1)); }} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
-                </PlannerField>
-
-                <PlannerField icon={CalendarDays} label="End date">
-                  <input type="date" min={startDate} value={endDate} onChange={(event) => setEndDate(event.target.value)} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
-                </PlannerField>
-
-                <PlannerField icon={Users} label="Travellers">
-                  <input type="number" min={1} value={travellers} onChange={(event) => setTravellers(Math.max(1, Number(event.target.value)))} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
-                </PlannerField>
-
-                <PlannerField icon={Package} label="Daily budget (LKR)">
-                  <input type="number" min={0} value={dailyBudget || ""} placeholder="Any budget" onChange={(event) => setDailyBudget(Math.max(0, Number(event.target.value)))} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
-                </PlannerField>
-
-                <PlannerField icon={Languages} label="Guide language">
-                  <select value={guideLanguage} onChange={(event) => setGuideLanguage(event.target.value)} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none">
-                    {["English", "French", "Spanish", "Japanese", "Korean", "Chinese", "Arabic", "German", "Italian", "Indonesian", "Greek", "Swahili", "Portuguese"].map((item) => <option key={item}>{item}</option>)}
-                  </select>
-                </PlannerField>
-
-                <PlannerField icon={Compass} label="Guide specialty">
-                  <input value={guideSpecialty} onChange={(event) => setGuideSpecialty(event.target.value)} placeholder="Culture, hiking, food..." className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
-                </PlannerField>
-
-                <PlannerField icon={BedDouble} label="Stay preferences">
-                  <input value={preferences} onChange={(event) => setPreferences(event.target.value)} placeholder="wifi, pool, breakfast" className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
-                </PlannerField>
-
-                <PlannerField icon={Car} label="Transport">
-                  <select value={driverRequired ? "Driver required" : "Self drive"} onChange={(event) => setDriverRequired(event.target.value === "Driver required")} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none">
-                    <option>Driver required</option>
-                    <option>Self drive</option>
-                  </select>
-                </PlannerField>
-
-                <PlannerField icon={Package} label="Luggage">
-                  <input type="number" min={0} value={luggage} onChange={(event) => setLuggage(Math.max(0, Number(event.target.value)))} className="w-full bg-transparent text-sm font-semibold text-gray-800 outline-none" />
-                </PlannerField>
-              </div>
-
-              <div className="mt-5 flex flex-col gap-4 rounded-2xl border border-gray-100 bg-gray-50 p-4 md:flex-row md:items-center md:justify-between">
-                <div>
-                  <p className="text-sm font-bold text-gray-900">{selectedDestination?.name || "Choose a destination"} · {duration} day{duration === 1 ? "" : "s"}</p>
-                  <p className="mt-1 text-xs text-gray-500">{travellers} traveller{travellers === 1 ? "" : "s"} · {driverRequired ? "Driver requested" : "Self drive"} · {luggage} luggage item{luggage === 1 ? "" : "s"}</p>
-                </div>
-                <button type="button" onClick={matchTrip} disabled={matching || !selectedDestination} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#FF385C] px-5 py-3 text-sm font-bold text-white disabled:opacity-60">
-                  {matching ? "Building your plan..." : "Find my matches"} <ArrowRight className="h-4 w-4" />
-                </button>
-              </div>
-            </section>
-
-            <section className="mt-6 grid scroll-mt-24 grid-cols-1 gap-5 lg:grid-cols-3">
-              <RecommendationCard title="Tour packages" icon={Package} empty="No matching package was found. A custom trip can still use the matched resources below.">
-                {matchingPackages.map((item) => (
-                  <div key={item.id} className="rounded-2xl border border-gray-200 p-4">
-                    <div className="flex items-start justify-between gap-3">
-                      <div><p className="font-bold text-gray-900">{item.name}</p><p className="mt-1 text-xs text-gray-400">{item.duration} days · {item.difficulty}</p></div>
-                      <span className="rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-bold text-emerald-700">{Number(item.rating || 0).toFixed(1)}★</span>
-                    </div>
-                    <p className="mt-3 text-sm font-extrabold text-gray-900">LKR {Number(item.price || 0).toLocaleString()}</p>
-                    <p className="mt-1 line-clamp-2 text-xs text-gray-500">{item.description || "Tour package available for this destination."}</p>
-                    <div className="mt-3 grid grid-cols-2 gap-2"><button type="button" onClick={() => saveTripResource({ type: "package", id: item.id, title: item.name, subtitle: item.duration + " days · " + item.difficulty, destination: selectedDestination?.name, day: 1 })} className="rounded-xl border border-gray-200 px-3 py-2 text-xs font-bold text-gray-700">{savedTripKeys.has(`package-${item.id}`) ? "Added to My Trip" : "Add to My Trip"}</button><Link to={`/packages/${item.id}`} className="inline-flex items-center justify-center rounded-xl bg-gray-900 px-3 py-2 text-xs font-bold text-white">View package</Link></div>
-                  </div>
-                ))}
-              </RecommendationCard>
-
-              <RecommendationCard title="Guide matches" icon={Languages} empty="Find your matches above to see suitable guides.">
-                {guideRecommendations.map((item) => (
-                  <div key={item.guide.id} className="rounded-2xl border border-gray-200 p-4">
-                    <div className="flex items-start justify-between gap-3"><div><p className="font-bold text-gray-900">{item.guide.name}</p><p className="mt-1 text-xs text-gray-400">{item.guide.location || item.guide.country} · {item.guide.experience} years</p></div><Fit score={item.suitabilityScore} /></div>
-                    <p className="mt-3 text-xs text-gray-500">{item.reasons.slice(0, 2).join(" · ")}</p>
-                    <button type="button" onClick={() => saveTripResource({ type: "guide", id: item.guide.id, title: item.guide.name, subtitle: "Guide · " + (item.guide.location || item.guide.country), destination: selectedDestination?.name, day: 1 })} className="mt-3 w-full rounded-xl border border-gray-200 px-3 py-2 text-xs font-bold text-gray-700">{savedTripKeys.has(`guide-${item.guide.id}`) ? "Added to My Trip" : "Add to My Trip"}</button>
-                  </div>
-                ))}
-              </RecommendationCard>
-
-              <RecommendationCard title="Stay matches" icon={BedDouble} empty="Find your matches above to see suitable stays.">
-                {accommodationRecommendations.map((item) => (
-                  <div key={item.accommodation.id} className="rounded-2xl border border-gray-200 p-4">
-                    <div className="flex items-start justify-between gap-3"><div><p className="font-bold text-gray-900">{item.accommodation.name}</p><p className="mt-1 text-xs text-gray-400">{item.accommodation.type} · {item.accommodation.location}</p></div><Fit score={item.suitabilityScore} /></div>
-                    <p className="mt-3 text-sm font-extrabold text-gray-900">LKR {Number(item.accommodation.price || 0).toLocaleString()} / night</p>
-                    <p className="mt-1 text-xs text-gray-500">{item.reasons.slice(0, 2).join(" · ")}</p>
-                    <button type="button" onClick={() => saveTripResource({ type: "accommodation", id: item.accommodation.id, title: item.accommodation.name, subtitle: item.accommodation.type + " · " + item.accommodation.location, destination: selectedDestination?.name, day: 1 })} className="mt-3 w-full rounded-xl border border-gray-200 px-3 py-2 text-xs font-bold text-gray-700">{savedTripKeys.has(`accommodation-${item.accommodation.id}`) ? "Added to My Trip" : "Add to My Trip"}</button>
-                  </div>
-                ))}
-              </RecommendationCard>
-            </section>
-
-            <section className="mt-5 rounded-[2rem] border border-gray-200 bg-white p-5 shadow-sm md:p-6">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-50 text-orange-600"><Car className="h-5 w-5" /></div>
-                <div><h2 className="font-extrabold text-gray-900">Transport matches</h2><p className="text-xs text-gray-400">Vehicles are matched using group size, luggage, driver preference and destination.</p></div>
-              </div>
-              {vehicleRecommendations.length ? (
-                <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-3">
-                  {vehicleRecommendations.map((item) => (
-                    <div key={item.vehicle.id} className="rounded-2xl border border-gray-200 p-4">
-                      <div className="flex items-start justify-between gap-3"><div><p className="font-bold text-gray-900">{item.vehicle.name}</p><p className="mt-1 text-xs text-gray-400">{item.vehicle.type} · {item.vehicle.capacity} seats · {item.vehicle.transmission}</p></div><Fit score={item.suitabilityScore} /></div>
-                      <p className="mt-3 text-sm font-extrabold text-gray-900">LKR {Number(item.vehicle.pricePerDay || 0).toLocaleString()} / day</p>
-                      <p className="mt-1 text-xs text-gray-500">{item.reasons.slice(0, 2).join(" · ")}</p>
-                      <button type="button" onClick={() => saveTripResource({ type: "vehicle", id: item.vehicle.id, title: item.vehicle.name, subtitle: item.vehicle.type + " · " + item.vehicle.capacity + " seats", destination: selectedDestination?.name, day: 1 })} className="mt-3 w-full rounded-xl border border-gray-200 px-3 py-2 text-xs font-bold text-gray-700">{savedTripKeys.has(`vehicle-${item.vehicle.id}`) ? "Added to My Trip" : "Add to My Trip"}</button>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="mt-5 rounded-2xl border border-dashed border-gray-200 p-5 text-sm text-gray-400">Find your matches above to see suitable transport.</div>
-              )}
-            </section>
-
-            <section className="mt-6 flex flex-col gap-4 rounded-3xl bg-gray-900 p-6 text-white md:flex-row md:items-center md:justify-between">
-              <div>
-                <div className="flex items-center gap-2 text-sm font-bold"><CheckCircle className="h-4 w-4 text-emerald-400" /> Your recommendations are ready</div>
-                <p className="mt-2 max-w-2xl text-sm text-white/60">Save the resources you want, review them together in My Trip, and only then move into customization and booking.</p>
-              </div>
-              <Link to="/tourist/my-trip" className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#FF385C] px-5 py-3.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90">Open My Trip <ArrowRight className="h-4 w-4" /></Link>
-            </section>
-          </>
-        )}
+          <div className="mt-8 grid gap-5 md:grid-cols-3">
+            <ResourceStrip title="Local guides" icon={Languages} items={guideRecommendations.map((item) => ({ title: item.guide.name, subtitle: (item.guide.location || item.guide.country) + " · " + item.guide.experience + " yrs", score: item.suitabilityScore }))} />
+            <ResourceStrip title="Places to stay" icon={BedDouble} items={accommodationRecommendations.map((item) => ({ title: item.accommodation.name, subtitle: item.accommodation.type + " · LKR " + Number(item.accommodation.price || 0).toLocaleString() + "/night", score: item.suitabilityScore }))} />
+            <ResourceStrip title="Getting around" icon={Car} items={vehicleRecommendations.map((item) => ({ title: item.vehicle.name, subtitle: item.vehicle.type + " · " + item.vehicle.capacity + " seats", score: item.suitabilityScore }))} />
+          </div>
+        </section>}
       </main>
-      <Footer />
-    </div>
+    </PageShell>
   );
 }
 
-function PlannerField({ icon: Icon, label, children }: { icon: ComponentType<{ className?: string }>; label: string; children: ReactNode }) {
-  return (
-    <label className="block rounded-2xl bg-gray-50 p-4">
-      <span className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-gray-400"><Icon className="h-4 w-4" /> {label}</span>
-      {children}
-    </label>
-  );
-}
-
-function RecommendationCard({ title, icon: Icon, empty, children }: { title: string; icon: ComponentType<{ className?: string }>; empty: string; children: ReactNode }) {
-  const hasChildren = Array.isArray(children) ? children.length > 0 : !!children;
-  return (
-    <section className="rounded-[2rem] border border-gray-200 bg-white p-5 shadow-sm md:p-6">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gray-50 text-gray-600"><Icon className="h-5 w-5" /></div>
-          <div><h2 className="font-extrabold text-gray-900">{title}</h2><p className="mt-0.5 text-xs text-gray-400">Matched from your trip preferences</p></div>
-        </div>
-      </div>
-      <div className="mt-4 space-y-3">{hasChildren ? children : <div className="rounded-2xl border border-dashed border-gray-200 p-5 text-sm text-gray-400">{empty}</div>}</div>
-    </section>
-  );
-}
-
-function Fit({ score }: { score: number }) {
-  return <span className="rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-bold text-emerald-700">{score}% fit</span>;
-}
+function PageShell({ children }: { children: ReactNode }) { return <div className="min-h-screen bg-[#f7f8fa]"><Navbar />{children}<Footer /></div>; }
+function Snapshot({ icon: Icon, label, children }: { icon: ComponentType<{className?: string}>; label: string; children: ReactNode }) { return <div><p className="mb-2 flex items-center gap-2 text-xs font-black uppercase tracking-wider text-orange-700"><Icon className="h-4 w-4"/>{label}</p>{children}</div>; }
+function ResourceStrip({ title, icon: Icon, items }: { title:string; icon:ComponentType<{className?: string}>; items:Array<{title:string;subtitle:string;score:number}> }) { return <section className="rounded-[1.75rem] bg-white p-5 shadow-sm ring-1 ring-gray-200"><div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-50"><Icon className="h-5 w-5 text-gray-600"/></div><div><h3 className="font-black text-[#10213b]">{title}</h3><p className="text-xs text-gray-400">Available for your trip</p></div></div><div className="mt-4 space-y-3">{items.length ? items.slice(0,3).map((item)=><div key={item.title} className="rounded-xl bg-gray-50 p-3"><div className="flex items-center justify-between gap-2"><p className="text-sm font-bold text-gray-800">{item.title}</p><span className="text-[11px] font-black text-emerald-600">{item.score}%</span></div><p className="mt-1 text-xs text-gray-500">{item.subtitle}</p></div>) : <p className="rounded-xl border border-dashed border-gray-200 p-4 text-xs text-gray-400">No matches right now.</p>}</div></section>; }
