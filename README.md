@@ -101,6 +101,39 @@ The branch `baseline/pre-major-function-enhancements` also points to that exact 
 - [x] Mobile-friendly tourism navigation
 - [x] Real internal footer navigation
 
+## Target Tourist Journey
+
+The tourist experience is now organized around a single lifecycle rather than separate disconnected features:
+
+```
+DISCOVER → PLAN → BOOK → TRAVEL → REVIEW
+```
+
+### Discover
+Visitors can browse destinations, packages and local guides, inspect destination information, weather, nearby/similar destinations, and compare packages.
+
+### Plan
+**Plan a Trip** is an optional assisted-planning route for tourists who want recommendations based on destination, dates, travellers, budget, guide preferences, stay preferences and transport needs.
+
+Recommendations are saved into **My Trip**, which is the pre-booking planning workspace. The separate “Build My Trip” concept is not used.
+
+### Book
+A tourist can either:
+- go directly from a known package to package customization, or
+- move from Plan a Trip → My Trip → package customization.
+
+Customization configures guests, dates, guide, accommodation, vehicle, driver/luggage and pickup/return times before creating the existing booking.
+
+### Travel
+After booking, the tourist uses My Bookings / the Tourist Dashboard for booking status, payment status and trip-readiness information.
+
+### Review
+Completed bookings can be followed by the existing tourist review/feedback flow.
+
+### Planning-state rule
+
+The current **My Trip** draft is intentionally a frontend planning workspace stored in browser local storage. It is not treated as a booking or payment record. The backend remains the source of truth for actual bookings, payments, provider decisions and trip-readiness data.
+
 ## Current Normal-Feature Backend Completion
 
 The current backend-first stage is now implemented as follows:
@@ -339,7 +372,7 @@ Run after the enhancement batch is complete:
 - [ ] Frontend production build completes successfully.\n- [ ] Public Explore page browser verification completes.\n- [ ] Public guide discovery browser verification completes.\n- [ ] Public package comparison browser verification completes.
 - [ ] Homepage search/category interactions scroll to the redesigned discovery results.
 - [ ] Homepage no longer presents unsupported static review, guarantee, certification or support claims.
-- [ ] Mobile navigation exposes Explore, Local Guides, Plan a Trip and Compare packages.
+- [ ] Mobile navigation exposes Explore, Local Guides, Compare, My Trip and Plan a Trip for authenticated tourists.
 - [ ] Package detail page opens “Customize this package” for active packages.
 - [ ] Package customization loads the selected package and its existing destinations/duration/price.
 - [ ] Changing guests, dates, language, luggage or driver requirement refreshes guide/accommodation/vehicle recommendations.
@@ -378,3 +411,12 @@ The package customization flow intentionally reuses the existing APIs rather tha
 - POST /tourist/bookings — creates the final customized booking.
 
 The frontend price shown during customization is explicitly an estimate. The backend remains the source of truth for the final booking total. This avoids inventing a new pricing policy that is not present in the approved requirements.
+
+
+| 2026-09-28 | `0f004ef5f32e6a4058de12ed0627676b48cacf17` | Fix package customization pickup/return time validation | Implemented |
+| 2026-09-28 | `7f9905f86455b1b3cc42b8d48f58652662bc51f6` | Connect tourist navigation to My Trip | Implemented; browser verification pending |
+| 2026-09-28 | `9a22fbc77766e669156c14f6614847211f506f66` | Make My Trip the planning handoff from recommendations | Implemented; browser verification pending |
+| 2026-09-28 | `c5f74e2b9d379947fdd3311fe1007134e65f1b12` | Clarify My Trip as the pre-booking planning workspace | Implemented; browser verification pending |
+| 2026-09-28 | `d5038c21a191697da81bb5d36a5f09fa78e7971d` | Remove obsolete direct booking handoff from planner | Implemented; browser verification pending |
+| 2026-09-28 | `ab98a5a696a5606049e0a76612957fab80b8410a` | Preserve planning intent through login | Implemented; browser verification pending |
+| 2026-09-28 | `56ca9c18d339f1cae3f2232a318869f862a1b5ef` | Align homepage messaging with the tourist journey | Implemented; browser verification pending |
