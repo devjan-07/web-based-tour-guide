@@ -5,7 +5,6 @@ import { Navbar } from "../../components/Navbar";
 import { Footer } from "../../components/Footer";
 import { packagesApi, type TourPackage } from "../../lib/api";
 
-const STORAGE_KEY = "voyara_package_compare_v1";
 const fallbackImages = [
   "https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=1400&q=85",
   "https://images.unsplash.com/photo-1586500036706-41963de24d8b?auto=format&fit=crop&w=1400&q=85",
@@ -27,19 +26,13 @@ function hasInclusion(pkg: TourPackage, terms: string[]) {
 
 export default function ComparePackages() {
   const [packages, setPackages] = useState<TourPackage[]>([]);
-  const [selected, setSelected] = useState<number[]>(() => {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); } catch { return []; }
-  });
+  const [selected, setSelected] = useState<number[]>([]);
 
   useEffect(() => {
     packagesApi.list()
       .then((items) => setPackages(items.filter((item) => item.status === "Active")))
       .catch(() => setPackages([]));
   }, []);
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(selected));
-  }, [selected]);
 
   const selectedPackages = useMemo(
     () => selected.map((id) => packages.find((pkg) => pkg.id === id)).filter(Boolean) as TourPackage[],
