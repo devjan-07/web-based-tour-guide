@@ -54,7 +54,6 @@ export const router = createBrowserRouter([
         Component: TouristRoute,
         children: [
           { path: "/tourist/dashboard", Component: TouristDashboard },
-          { path: "/tourist/plan", Component: PlanMyTrip },
           { path: "/tourist/packages/:id/customize", Component: PackageCustomization },
           { path: "/tourist/bookings/new", Component: TouristBookingCreate },
           { path: "/tourist/bookings/:id", Component: TouristBookingDetail },
