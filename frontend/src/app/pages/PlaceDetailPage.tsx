@@ -512,15 +512,34 @@ function PlaceDetailPage({ mode }: { mode: DetailMode }) {
                   {item?.mode === "package" && <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-gray-700">{detail.priceLabel}</span>}
                 </div>
                 <div className="mt-4 space-y-3">
-                  {detail.facts.map(({ icon: Icon, label, value }) => (
-                    <div key={label} className="flex items-start gap-3 rounded-xl bg-white p-3">
-                      <Icon className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
-                      <div>
-                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">{label}</p>
-                        <p className="mt-0.5 text-sm font-semibold text-gray-800">{value}</p>
+                  {item?.mode === "package" ? (
+                    <>
+                      <div className="flex items-start gap-3 rounded-xl bg-white p-3">
+                        <Tag className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Difficulty</p>
+                          <p className="mt-0.5 text-sm font-semibold text-gray-800">{item.data.difficulty || "Easy"}</p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                      <div className="flex items-start gap-3 rounded-xl bg-white p-3">
+                        <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Destinations</p>
+                          <p className="mt-0.5 text-sm font-semibold text-gray-800">{item.data.destinations.length} places</p>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    detail.facts.map(({ icon: Icon, label, value }) => (
+                      <div key={label} className="flex items-start gap-3 rounded-xl bg-white p-3">
+                        <Icon className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">{label}</p>
+                          <p className="mt-0.5 text-sm font-semibold text-gray-800">{value}</p>
+                        </div>
+                      </div>
+                    ))
+                  )}
                     {item?.mode === "package" ? (
                       <Link
                         to={`/tourist/packages/${item.data.id}/customize`}
