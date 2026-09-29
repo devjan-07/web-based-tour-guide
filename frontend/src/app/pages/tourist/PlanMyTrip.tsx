@@ -145,7 +145,7 @@ export default function PlanMyTrip() {
           </div>
           {selectedDestination && (
             <div className="relative min-h-[330px] overflow-hidden rounded-[2rem] shadow-2xl ring-1 ring-white/20">
-              <img src={imageFor(selectedDestination)} alt={selectedDestination.name} className="absolute inset-0 h-full w-full object-cover" />
+              <img src={imageFor(selectedDestination)} alt={selectedDestination.name} onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=80"; }} className="absolute inset-0 h-full w-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
               <div className="absolute bottom-0 p-7">
                 <p className="text-xs font-black uppercase tracking-widest text-white/60">Your starting point</p>
@@ -170,7 +170,7 @@ export default function PlanMyTrip() {
               const active = destination.id === destinationId;
               return (
                 <button key={destination.id} type="button" onClick={() => { setDestinationId(destination.id); setMatched(false); }} className={"group relative h-44 overflow-hidden rounded-2xl text-left transition duration-300 " + (active ? "ring-4 ring-rose-400 ring-offset-2" : "ring-1 ring-gray-200 hover:-translate-y-1 hover:shadow-lg")}>
-                  <img src={imageFor(destination)} alt={destination.name} className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+                  <img src={imageFor(destination)} alt={destination.name} onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=80"; }} className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
                   <div className="absolute inset-x-0 bottom-0 p-4 text-white">
                     <p className="font-black">{destination.name}</p>
