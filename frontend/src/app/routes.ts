@@ -46,6 +46,7 @@ export const router = createBrowserRouter([
   { path: "/list-tour", Component: ListTourPage },
   { path: "/destinations/:id", Component: DestinationDetailPage },
   { path: "/packages/:id", Component: PackageDetailPage },
+  { path: "/tourist/plan", Component: PlanMyTrip },
   { path: "/unauthorized", Component: UnauthorizedPage },
   {
     Component: ProtectedRoute,
