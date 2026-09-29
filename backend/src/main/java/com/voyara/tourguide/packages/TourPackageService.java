@@ -121,14 +121,45 @@ public class TourPackageService {
     @Transactional(readOnly = true)
     public List<Route> routesForPackage(Long id) {
         TourPackage tourPackage = findById(id);
-        List<String> destinationNames = tourPackage.getDestinations() == null ? List.of() : tourPackage.getDestinations();
+        List<String> destinationNames = tourPackage.getDestinations() == null
+                ? List.of()
+                : tourPackage.getDestinations().stream()
+                        .filter(name -> name != null && !name.isBlank())
+                        .toList();
+
         if (destinationNames.isEmpty()) return List.of();
+
+        /*
+         * Package destinations are stored as names in the existing package model,
+         * while routes reference DestinationID. Resolve that existing relationship
+         * through the destination name without introducing another database table
+         * or changing the approved schema.
+         *
+         * The comparison normalises case and repeated whitespace so an admin-entered
+         * value such as "  Ella  " still resolves to the existing "Ella" destination.
+         * Routes are returned in the same destination order as the package.
+         */
+        java.util.Map<String, Destination> destinationsByName = destinationRepository.findAll().stream()
+                .filter(destination -> destination.getName() != null && !destination.getName().isBlank())
+                .collect(java.util.stream.Collectors.toMap(
+                        destination -> normalizeDestinationName(destination.getName()),
+                        destination -> destination,
+                        (first, ignored) -> first
+                ));
+
         List<Route> routes = new ArrayList<>();
-        for (Destination destination : destinationRepository.findAll()) {
-            boolean included = destinationNames.stream().anyMatch(name -> name != null && name.trim().equalsIgnoreCase(destination.getName()));
-            if (included) routes.addAll(routeRepository.findByDestinationIdAndStatusIgnoreCase(destination.getId(), "ACTIVE"));
+        for (String destinationName : destinationNames) {
+            Destination destination = destinationsByName.get(normalizeDestinationName(destinationName));
+            if (destination != null) {
+                routes.addAll(routeRepository.findByDestinationIdAndStatusIgnoreCase(destination.getId(), "ACTIVE"));
+            }
         }
+
         return routes;
+    }
+
+    private String normalizeDestinationName(String value) {
+        return value.trim().replaceAll("\\s+", " ").toLowerCase(java.util.Locale.ROOT);
     }
 
     @Transactional
