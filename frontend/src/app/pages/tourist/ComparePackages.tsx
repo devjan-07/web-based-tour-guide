@@ -64,7 +64,7 @@ export default function ComparePackages() {
               <GitCompare className="h-4 w-4" /> Compare journeys
             </p>
             <h1 className="mt-4 max-w-4xl text-4xl font-black tracking-tight md:text-6xl">
-              Three ways to experience Sri Lanka.
+              Find your way around Sri Lanka.
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-7 text-white/70 md:text-lg">
               Shortlist journeys visually, understand what is already included, and move directly into the package you want to personalise.
@@ -96,7 +96,7 @@ export default function ComparePackages() {
               <Link to="/explore?tab=tours" className="mt-4 inline-flex rounded-full bg-[#ff385c] px-5 py-3 text-sm font-black text-white">Explore tours</Link>
             </div>
           ) : (
-            <div className="mt-7 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-7 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {packages.map((pkg, index) => {
                 const active = selected.includes(pkg.id);
                 return (
