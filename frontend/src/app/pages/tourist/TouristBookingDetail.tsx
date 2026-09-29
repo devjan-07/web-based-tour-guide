@@ -397,14 +397,14 @@ export default function TouristBookingDetail() {
                         key={step}
                         className="rounded-2xl border p-4 transition"
                         style={{
-                          borderColor: completed ? "#bbf7d0" : current ? "#FF385C" : "#e5e7eb",
-                          background: completed ? "#f0fdf4" : current ? "#fff5f7" : "white",
+                          borderColor: completed ? "#bbf7d0" : current ? statusStyle[step].color : "#e5e7eb",
+                          background: completed ? "#f0fdf4" : current ? statusStyle[step].bg : "white",
                         }}
                       >
                         <div
                           className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold mb-3"
                           style={{
-                            background: completed ? "#16a34a" : current ? "#FF385C" : "#f3f4f6",
+                            background: completed ? "#16a34a" : current ? statusStyle[step].color : "#f3f4f6",
                             color: completed || current ? "white" : "#9ca3af",
                           }}
                         >
