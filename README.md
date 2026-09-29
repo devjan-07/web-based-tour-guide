@@ -389,3 +389,8 @@ The frontend price shown during customization is explicitly an estimate. The bac
 | 2026-09-28 | `d5038c21a191697da81bb5d36a5f09fa78e7971d` | Remove obsolete direct booking handoff from planner | Implemented; browser verification pending |
 | 2026-09-28 | `ab98a5a696a5606049e0a76612957fab80b8410a` | Preserve planning intent through login | Implemented; browser verification pending |
 | 2026-09-28 | `56ca9c18d339f1cae3f2232a318869f862a1b5ef` | Align homepage messaging with the tourist journey | Implemented; browser verification pending |
+| 2026-09-29 | `021cd08d4c113aff4c4115a46b9ca6b6af9b5837` | Attach tourist authentication to recommendation requests | Implemented; Find My Journey browser verification pending |
+| 2026-09-29 | `17d0ea5fbe09d327c46ae7c6580c1a9f2ab7b690` | Remove duplicate package detail facts | Implemented |
+| 2026-09-29 | `86461de5bac4d03f6066acc3df16ad8b8ed0be09` | Use semantic booking timeline status colours | Implemented |
+| 2026-09-29 | `fcd3b32b8a8974b1752368b3fe00be1ad484e2f5` | Resolve package routes through normalized destination names | Implemented; API/browser verification pending |
+| 2026-09-29 | `cdee6fb253258488878686ff94ae744666898cfe` | Remove package comparison local storage state | Implemented |
