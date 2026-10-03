@@ -10,6 +10,8 @@ import com.voyara.tourguide.tourguides.TourGuide;
 import com.voyara.tourguide.tourguides.TourGuideRepository;
 import com.voyara.tourguide.vehiclerental.Vehicle;
 import com.voyara.tourguide.vehiclerental.VehicleRepository;
+import com.voyara.tourguide.routes.Route;
+import com.voyara.tourguide.routes.RouteRepository;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Locale;
@@ -34,6 +36,7 @@ public class DemoDataSeeder implements CommandLineRunner {
     private final AccommodationRepository accommodationRepository;
     private final TourGuideRepository tourGuideRepository;
     private final VehicleRepository vehicleRepository;
+    private final RouteRepository routeRepository;
 
     @Value("${app.demo-data.enabled:true}")
     private boolean enabled;
@@ -45,6 +48,7 @@ public class DemoDataSeeder implements CommandLineRunner {
         }
 
         List<Destination> destinations = seedDestinations();
+        seedRoutes(destinations);
         seedTourPackages();
         seedAccommodations(destinations);
         seedTourGuides();
@@ -97,6 +101,56 @@ public class DemoDataSeeder implements CommandLineRunner {
 
         saveMissing(destinations, destinationRepository.findAll(), Destination::getName, destinationRepository::saveAll);
         return destinationRepository.findAll();
+    }
+
+    private void seedRoutes(List<Destination> destinations) {
+        List<Route> routes = List.of(
+                route("Sigiriya Heritage Trail", "Sigiriya Rock Fortress", "Sigiriya Village", "Sigiriya Rock Fortress", 2.80, 15, "Scenic approach to the ancient rock fortress."),
+                route("Sigiriya Village Loop", "Sigiriya Rock Fortress", "Sigiriya Rock Fortress", "Pidurangala Viewpoint", 4.50, 30, "Short scenic loop linking the fortress area with a panoramic viewpoint."),
+                route("Ella Highlands Walk", "Ella Highlands", "Ella Town", "Nine Arch Bridge", 3.20, 45, "Scenic walking route through the tea-country hills."),
+                route("Ella Peak Trail", "Ella Highlands", "Ella Town", "Little Adam's Peak", 2.90, 50, "Popular hill trail with wide valley views."),
+                route("Mirissa Coastal Route", "Mirissa Beach", "Mirissa Beach", "Coconut Tree Hill", 2.40, 20, "Relaxed coastal route connecting the beach with the sunset viewpoint."),
+                route("Galle Fort Walk", "Galle Fort", "Galle Railway Station", "Galle Fort", 2.00, 25, "Walking route into the historic fort area."),
+                route("Yala Safari Route", "Yala National Park", "Yala Entrance", "Yala National Park", 12.00, 60, "Wildlife route through the national park area."),
+                route("Kandy Heritage Route", "Kandy", "Kandy Lake", "Temple of the Tooth", 4.50, 30, "City route connecting Kandy's principal heritage sights."),
+                route("Nuwara Eliya Tea Route", "Nuwara Eliya", "Nuwara Eliya Town", "Tea Estate Area", 8.00, 35, "Scenic route through the hill-country tea estates."),
+                route("Anuradhapura Ancient City Route", "Anuradhapura", "Anuradhapura Railway Station", "Ancient City", 6.00, 35, "Route into the ancient city and major archaeological sites."),
+                route("Trincomalee Coast Route", "Trincomalee", "Nilaveli", "Pigeon Island Boat Point", 14.00, 30, "Coastal route for beach and marine experiences."),
+                route("Polonnaruwa Heritage Cycle", "Polonnaruwa", "Ancient City Entrance", "Gal Vihara", 5.50, 30, "Cycling route through the ancient city ruins.")
+        );
+        Map<String, Long> destinationIds = destinations.stream()
+                .collect(Collectors.toMap(destination -> seedKey(destination.getName()), Destination::getId));
+        List<Route> resolved = routes.stream()
+                .filter(route -> destinationIds.containsKey(seedKey(route.getRouteName().split("::", 2)[0])))
+                .map(route -> {
+                    String destinationName = route.getRouteName().split("::", 2)[0];
+                    route.setRouteName(route.getRouteName().split("::", 2)[1]);
+                    route.setDestinationId(destinationIds.get(seedKey(destinationName)));
+                    return route;
+                }).toList();
+        syncSeeded(resolved, routeRepository.findAll(), Route::getRouteName,
+                (existing, seed) -> {
+                    existing.setDestinationId(seed.getDestinationId());
+                    existing.setStartLocation(seed.getStartLocation());
+                    existing.setEndLocation(seed.getEndLocation());
+                    existing.setDistanceKm(seed.getDistanceKm());
+                    existing.setEstimatedDuration(seed.getEstimatedDuration());
+                    existing.setDescription(seed.getDescription());
+                    existing.setStatus(seed.getStatus());
+                }, routeRepository::saveAll);
+    }
+
+    private Route route(String routeName, String destination, String start, String end, double distanceKm,
+                        int durationMinutes, String description) {
+        Route route = new Route();
+        route.setRouteName(destination + "::" + routeName);
+        route.setStartLocation(start);
+        route.setEndLocation(end);
+        route.setDistanceKm(distanceKm);
+        route.setEstimatedDuration(durationMinutes);
+        route.setDescription(description);
+        route.setStatus("ACTIVE");
+        return route;
     }
 
     private void seedTourPackages() {
