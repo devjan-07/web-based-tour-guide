@@ -263,7 +263,28 @@ public class TourPackageService {
             tourPackage.getDestinations().size();
         }
         if (tourPackage.getEligibleGuides() != null) {
-            tourPackage.getEligibleGuides().size();
+            tourPackage.getEligibleGuides().forEach(guide -> {
+                if (guide.getSpecialties() != null) {
+                    guide.getSpecialties().size();
+                }
+                if (guide.getLanguages() != null) {
+                    guide.getLanguages().size();
+                }
+            });
+        }
+        if (tourPackage.getEligibleAccommodations() != null) {
+            tourPackage.getEligibleAccommodations().forEach(accommodation -> {
+                if (accommodation.getAmenities() != null) {
+                    accommodation.getAmenities().size();
+                }
+            });
+        }
+        if (tourPackage.getEligibleVehicles() != null) {
+            tourPackage.getEligibleVehicles().forEach(vehicle -> {
+                if (vehicle.getFeatures() != null) {
+                    vehicle.getFeatures().size();
+                }
+            });
         }
         if (tourPackage.getEligibleAccommodations() != null) {
             tourPackage.getEligibleAccommodations().size();
