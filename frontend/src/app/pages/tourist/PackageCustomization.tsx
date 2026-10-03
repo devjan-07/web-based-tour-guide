@@ -169,12 +169,12 @@ export default function PackageCustomization() {
         <section className="mx-auto grid max-w-7xl gap-7 px-4 py-10 sm:px-6 lg:grid-cols-[1fr_360px] lg:px-8">
           <div className="space-y-7">
             <section className="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-gray-200 md:p-8">
-              <div className="flex items-end justify-between gap-4"><div><p className="text-xs font-black uppercase tracking-[0.2em] text-rose-500">01 · Your dates</p><h2 className="mt-2 text-3xl font-black text-[#10213b]">Make the journey yours</h2></div><span className="rounded-full bg-gray-50 px-3 py-1.5 text-xs font-black text-gray-500">{tripDays} days</span></div>
+              <div className="flex items-end justify-between gap-4"><div><p className="text-xs font-black uppercase tracking-[0.2em] text-rose-500">01 · Your dates</p><h2 className="mt-2 text-3xl font-black text-[#10213b]">Make the journey yours</h2><p className="mt-2 text-sm text-gray-500">Choose your start date. Check-out follows the package's fixed {pkg.duration}-day duration.</p></div><span className="rounded-full bg-gray-50 px-3 py-1.5 text-xs font-black text-gray-500">{tripDays} days</span></div>
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
                 <Field label="Travellers"><input type="number" min="1" max={pkg.maxGroup || 99} value={guests} onChange={(e) => setGuests(Math.max(1, Number(e.target.value)))} /></Field>
                 <Field label="Guide language"><select value={language} onChange={(e) => setLanguage(e.target.value)}><option>English</option><option>French</option><option>Spanish</option><option>Japanese</option><option>Korean</option><option>Chinese</option><option>German</option></select></Field>
-                <Field label="Check-in"><input type="date" min={today()} value={checkIn} onChange={(e) => { setCheckIn(e.target.value); if (new Date(e.target.value) >= new Date(checkOut)) setCheckOut(addDays(e.target.value, Math.max(1, pkg.duration))); }} /></Field>
-                <Field label="Check-out"><input type="date" min={checkIn} value={checkOut} onChange={(e) => setCheckOut(e.target.value)} /></Field>
+                <Field label="Check-in"><input type="date" min={today()} value={checkIn} onChange={(e) => { const nextCheckIn = e.target.value; setCheckIn(nextCheckIn); setCheckOut(addDays(nextCheckIn, Math.max(1, pkg.duration))); }} /></Field>
+                <Field label="Check-out (package duration)"><input type="date" min={addDays(checkIn, Math.max(1, pkg.duration))} max={addDays(checkIn, Math.max(1, pkg.duration))} value={checkOut} readOnly /></Field>
                 <Field label="Luggage"><input type="number" min="0" value={luggage} onChange={(e) => setLuggage(Math.max(0, Number(e.target.value)))} /></Field>
                 <Field label="Driver preference"><select value={driverRequired ? "Driver preferred" : "No driver"} onChange={(e) => setDriverRequired(e.target.value === "Driver preferred")}><option>Driver preferred</option><option>No driver</option></select></Field>
               </div>
