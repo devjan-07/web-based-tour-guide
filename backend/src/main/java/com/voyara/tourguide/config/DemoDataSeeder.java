@@ -53,6 +53,7 @@ public class DemoDataSeeder implements CommandLineRunner {
         seedAccommodations(destinations);
         seedTourGuides();
         seedVehicles();
+        seedPackageResources();
     }
 
     private List<Destination> seedDestinations() {
@@ -151,6 +152,109 @@ public class DemoDataSeeder implements CommandLineRunner {
         route.setDescription(description);
         route.setStatus("ACTIVE");
         return route;
+    }
+
+    private void seedPackageResources() {
+        Map<String, TourPackage> packages = tourPackageRepository.findAll().stream()
+                .collect(Collectors.toMap(TourPackage::getName, Function.identity(), (first, second) -> first));
+        Map<String, TourGuide> guides = tourGuideRepository.findAll().stream()
+                .collect(Collectors.toMap(TourGuide::getName, Function.identity(), (first, second) -> first));
+        Map<String, Accommodation> accommodations = accommodationRepository.findAll().stream()
+                .collect(Collectors.toMap(Accommodation::getName, Function.identity(), (first, second) -> first));
+        Map<String, Vehicle> vehicles = vehicleRepository.findAll().stream()
+                .collect(Collectors.toMap(Vehicle::getName, Function.identity(), (first, second) -> first));
+
+        assignPackageResources(packages, guides, accommodations, vehicles,
+                "Sri Lanka Cultural Triangle",
+                List.of("Tharindu Jayasuriya", "Ruwini De Silva", "Ishara Wijesinghe"),
+                List.of("Sigiriya Garden Lodge", "Anuradhapura Heritage Stay", "Polonnaruwa Ruins Guesthouse"),
+                List.of("Toyota Hiace Van", "Toyota KDH High Roof", "Toyota Coaster Bus"));
+
+        assignPackageResources(packages, guides, accommodations, vehicles,
+                "Ella Highlands Escape",
+                List.of("Nethmi Fernando", "Sanjaya Bandara"),
+                List.of("Ella Tea Valley Villa", "Nuwara Eliya Tea Bungalow"),
+                List.of("Mitsubishi Montero SUV", "Honda Vezel SUV", "Toyota Hiace Van"));
+
+        assignPackageResources(packages, guides, accommodations, vehicles,
+                "South Coast Beach Break",
+                List.of("Kasun Silva", "Hiruni Samarasinghe"),
+                List.of("Mirissa Bay Resort", "Galle Fort Heritage Inn"),
+                List.of("Suzuki Wagon R", "Nissan Caravan", "Toyota KDH High Roof"));
+
+        assignPackageResources(packages, guides, accommodations, vehicles,
+                "Kandy Heritage Weekend",
+                List.of("Amal Perera"),
+                List.of("Kandy Lake Boutique Hotel"),
+                List.of("Toyota Hiace Van", "Toyota Coaster Bus"));
+
+        assignPackageResources(packages, guides, accommodations, vehicles,
+                "Yala Safari Adventure",
+                List.of("Dilan Madushanka"),
+                List.of("Yala Safari Camp"),
+                List.of("Mitsubishi Montero SUV", "Toyota Hiace Van"));
+
+        assignPackageResources(packages, guides, accommodations, vehicles,
+                "Tea Country Wellness Route",
+                List.of("Nethmi Fernando", "Sanjaya Bandara"),
+                List.of("Nuwara Eliya Tea Bungalow", "Ella Tea Valley Villa"),
+                List.of("Mitsubishi Montero SUV", "Honda Vezel SUV"));
+
+        assignPackageResources(packages, guides, accommodations, vehicles,
+                "East Coast Snorkel Trip",
+                List.of("Mohan Raj"),
+                List.of("Trinco Coral Beach Hotel"),
+                List.of("Nissan Caravan", "Honda Vezel SUV"));
+
+        assignPackageResources(packages, guides, accommodations, vehicles,
+                "Ancient Cities Cycling Tour",
+                List.of("Ruwini De Silva", "Ishara Wijesinghe"),
+                List.of("Anuradhapura Heritage Stay", "Polonnaruwa Ruins Guesthouse"),
+                List.of("Tuk Tuk City Ride", "Toyota Hiace Van", "Toyota Coaster Bus"));
+
+        assignPackageResources(packages, guides, accommodations, vehicles,
+                "Galle Food and Fort Walk",
+                List.of("Hiruni Samarasinghe"),
+                List.of("Galle Fort Heritage Inn"),
+                List.of("Suzuki Wagon R", "Nissan Caravan"));
+
+        assignPackageResources(packages, guides, accommodations, vehicles,
+                "Sri Lanka Family Highlights",
+                List.of("Amal Perera", "Nethmi Fernando", "Kasun Silva"),
+                List.of("Kandy Lake Boutique Hotel", "Sigiriya Garden Lodge", "Mirissa Bay Resort"),
+                List.of("Toyota Hiace Van", "Toyota KDH High Roof", "Toyota Coaster Bus", "Luxury Mercedes Vito"));
+    }
+
+    private void assignPackageResources(
+            Map<String, TourPackage> packages,
+            Map<String, TourGuide> guides,
+            Map<String, Accommodation> accommodations,
+            Map<String, Vehicle> vehicles,
+            String packageName,
+            List<String> guideNames,
+            List<String> accommodationNames,
+            List<String> vehicleNames) {
+
+        TourPackage tourPackage = required(packages, packageName, "package");
+        tourPackage.setEligibleGuides(guideNames.stream()
+                .map(name -> required(guides, name, "guide"))
+                .toList());
+        tourPackage.setEligibleAccommodations(accommodationNames.stream()
+                .map(name -> required(accommodations, name, "accommodation"))
+                .toList());
+        tourPackage.setEligibleVehicles(vehicleNames.stream()
+                .map(name -> required(vehicles, name, "vehicle"))
+                .toList());
+
+        tourPackageRepository.save(tourPackage);
+    }
+
+    private <T> T required(Map<String, T> values, String key, String type) {
+        T value = values.get(key);
+        if (value == null) {
+            throw new IllegalStateException("Demo data is missing " + type + ": " + key);
+        }
+        return value;
     }
 
     private void seedTourPackages() {
