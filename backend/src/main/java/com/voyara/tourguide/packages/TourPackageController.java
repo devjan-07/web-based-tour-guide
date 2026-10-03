@@ -40,6 +40,11 @@ public class TourPackageController {
         return service.comparePackages(ids);
     }
 
+    @PutMapping("/{id}/resources")
+    public TourPackage updateResources(@PathVariable Long id, @RequestBody PackageResourceAssignmentRequest request) {
+        return service.updateResources(id, request);
+    }
+
     @GetMapping("/{id}/routes")
     public List<com.voyara.tourguide.routes.Route> routes(@PathVariable Long id) {
         return service.routesForPackage(id);
