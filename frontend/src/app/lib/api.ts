@@ -231,19 +231,6 @@ const AUTH_REQUIRED_WRITE_PATHS = [
 function isPublicGetRequest(path: string, method: string) {
   if (method.toUpperCase() !== "GET") return false;
 
-  // Recommendation endpoints are consumed by the authenticated trip-planning
-  // flow, so allow the request layer to attach the logged-in tourist token.
-  const authenticatedRecommendationPaths = [
-    "/tour-guides/recommendations",
-    "/accommodations/recommendations",
-    "/vehicles/recommendations",
-  ];
-  if (authenticatedRecommendationPaths.some((recommendationPath) =>
-    path === recommendationPath || path.startsWith(`${recommendationPath}?`)
-  )) {
-    return false;
-  }
-
   return PUBLIC_GET_PATHS.some((publicPath) => path === publicPath || path.startsWith(`${publicPath}/`) || path.startsWith(`${publicPath}?`));
 }
 
