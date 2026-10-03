@@ -103,6 +103,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/auth/me").authenticated()
                         .requestMatchers("/api/stakeholder/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/tour-guides/recommendations").permitAll()
+                        // Keep the package catalogue explicitly public. Package discovery is required
+                        // before a tourist chooses to authenticate or book.
+                        .requestMatchers(HttpMethod.GET, "/api/packages", "/api/packages/**").permitAll()
                         .requestMatchers(HttpMethod.GET, PUBLIC_CATALOG_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/bookings", "/api/bookings/**").hasAnyRole("ADMIN", "TRAVEL_STAFF")
                         .requestMatchers(HttpMethod.POST, "/api/ai-chat").permitAll()
@@ -130,6 +133,7 @@ public class SecurityConfig {
                                                 authentication.get() != null
                                                         && authentication.get().isAuthenticated()
                                                         && authentication.get().getAuthorities().stream().anyMatch(authority ->
+                                                        authority.getAuthority().equals("ROLE_ADMIN") || authority.get().getAuthorities().stream().anyMatch(authority ->
                                                         authority.getAuthority().equals("ROLE_ADMIN") || authority.getAuthority().equals("ROLE_TRAVEL_STAFF")))
                                         : new org.springframework.security.authorization.AuthorizationDecision(true))
                         .requestMatchers(HttpMethod.DELETE, MANAGEMENT_ENDPOINTS).access((authentication, context) ->
