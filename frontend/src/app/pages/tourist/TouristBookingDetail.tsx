@@ -209,9 +209,9 @@ export default function TouristBookingDetail() {
                   {bookingType(booking) === "VEHICLE" && booking.returnTime && <Info icon={CalendarDays} label="Return time" value={booking.returnTime} />}
                   {bookingType(booking) === "VEHICLE" && <Info icon={Car} label="Driver" value={booking.driverRequired === false ? "Self-drive" : "Required"} />}
                   {bookingType(booking) === "VEHICLE" && <Info icon={Package} label="Luggage" value={`${booking.luggageCount || 0}`} />}
-                  {(bookingType(booking) === "PACKAGE" || bookingType(booking) === "CUSTOM") && <Info icon={UserRoundCheck} label="Assigned guide" value={booking.guide || "Pending assignment"} />}
-                  {bookingType(booking) !== "VEHICLE" && <Info icon={Hotel} label="Accommodation" value={accommodationName(booking.accommodation) || "Pending assignment"} />}
-                  {bookingType(booking) !== "ACCOMMODATION" && <Info icon={Car} label="Vehicle" value={booking.vehicle || "Pending assignment"} />}
+                  {(bookingType(booking) === "PACKAGE" || bookingType(booking) === "CUSTOM") && <Info icon={UserRoundCheck} label="Assigned guide" value={booking.guide || (booking.packageId && booking.guideSelectionType === "VOYARA" ? "Included in package · pending assignment" : "Pending assignment")} />}
+                  {bookingType(booking) !== "VEHICLE" && <Info icon={Hotel} label="Accommodation" value={accommodationName(booking.accommodation) || (booking.packageId && booking.accommodationSelectionType === "VOYARA" ? "Included in package · pending assignment" : "Pending assignment")} />}
+                  {bookingType(booking) !== "ACCOMMODATION" && <Info icon={Car} label="Vehicle" value={booking.vehicle || (booking.packageId && booking.vehicleSelectionType === "VOYARA" ? "Included in package · pending assignment" : "Pending assignment")} />}
                   <Info icon={CreditCard} label="Payment" value={`${booking.payment} · LKR ${Number(booking.total || 0).toLocaleString()}`} />
                   <Info icon={Package} label="Created" value={formatDate(booking.createdAt)} />
                 </div>
