@@ -39,6 +39,7 @@ public class BookingService {
     private final ReviewRepository reviewRepository;
     private final ReviewRatingService reviewRatingService;
     private final NotificationService notificationService;
+    private final PackageResourceAllocationService packageResourceAllocationService;
 
     public BookingService(
             BookingRepository repository,
@@ -50,7 +51,8 @@ public class BookingService {
             PaymentRepository paymentRepository,
             ReviewRepository reviewRepository,
             ReviewRatingService reviewRatingService,
-            NotificationService notificationService
+            NotificationService notificationService,
+            PackageResourceAllocationService packageResourceAllocationService
     ) {
         this.repository = repository;
         this.userRepository = userRepository;
@@ -62,6 +64,7 @@ public class BookingService {
         this.reviewRepository = reviewRepository;
         this.reviewRatingService = reviewRatingService;
         this.notificationService = notificationService;
+        this.packageResourceAllocationService = packageResourceAllocationService;
     }
 
     public List<Booking> findAll() {
@@ -440,6 +443,11 @@ public class BookingService {
         boolean pricedFromResources = false;
 
         TourPackage tourPackage = selectedPackage(candidate);
+        boolean packageBooking = tourPackage != null && "PACKAGE".equalsIgnoreCase(candidate.getBookingType());
+        boolean guideExplicitlySelected = candidate.getGuideId() != null;
+        boolean accommodationExplicitlySelected = candidate.getAccommodationId() != null;
+        boolean vehicleExplicitlySelected = candidate.getVehicleId() != null;
+
         if (tourPackage != null) {
             validateActive("Package", tourPackage.getStatus(), "Active");
             if (tourPackage.getMaxGroup() > 0 && candidate.getGuests() > tourPackage.getMaxGroup()) {
@@ -450,6 +458,11 @@ public class BookingService {
             if (candidate.getDestination() == null || candidate.getDestination().isBlank()) {
                 candidate.setDestination(String.join(", ", tourPackage.getDestinations()));
             }
+
+            if (packageBooking) {
+                packageResourceAllocationService.allocate(tourPackage, candidate, updatingId);
+            }
+
             total = total.add(nonNull(tourPackage.getPrice()).multiply(BigDecimal.valueOf(candidate.getGuests())));
             pricedFromResources = true;
         } else if (strictCustomerBooking && "PACKAGE".equalsIgnoreCase(candidate.getBookingType())) {
@@ -463,8 +476,10 @@ public class BookingService {
         if (guide != null) {
             validateActive("Tour guide", guide.getStatus(), "Available");
             candidate.setGuide(label(guide.getName(), guide.getLocation()));
-            total = total.add(nonNull(guide.getPricePerDay()).multiply(BigDecimal.valueOf(days)));
-            pricedFromResources = true;
+            if (!packageBooking || guideExplicitlySelected) {
+                total = total.add(nonNull(guide.getPricePerDay()).multiply(BigDecimal.valueOf(days)));
+                pricedFromResources = true;
+            }
         }
 
         Accommodation accommodation = selectedAccommodation(candidate);
@@ -482,8 +497,10 @@ public class BookingService {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "The selected accommodation does not have enough rooms for these dates");
             }
             candidate.setAccommodation(accommodation.getName());
-            total = total.add(nonNull(accommodation.getPrice()).multiply(BigDecimal.valueOf(days)).multiply(BigDecimal.valueOf(requestedRooms)));
-            pricedFromResources = true;
+            if (!packageBooking || accommodationExplicitlySelected) {
+                total = total.add(nonNull(accommodation.getPrice()).multiply(BigDecimal.valueOf(days)).multiply(BigDecimal.valueOf(requestedRooms)));
+                pricedFromResources = true;
+            }
         } else if (strictCustomerBooking && "ACCOMMODATION".equalsIgnoreCase(candidate.getBookingType())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "An accommodation booking requires a valid accommodation");
         }
@@ -498,8 +515,10 @@ public class BookingService {
             if ("VEHICLE".equalsIgnoreCase(candidate.getBookingType())) {
                 candidate.setDestination(candidate.getPickupLocation());
             }
-            total = total.add(nonNull(vehicle.getPricePerDay()).multiply(BigDecimal.valueOf(days)));
-            pricedFromResources = true;
+            if (!packageBooking || vehicleExplicitlySelected) {
+                total = total.add(nonNull(vehicle.getPricePerDay()).multiply(BigDecimal.valueOf(days)));
+                pricedFromResources = true;
+            }
         } else if (strictCustomerBooking && "VEHICLE".equalsIgnoreCase(candidate.getBookingType())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A vehicle booking requires a valid vehicle");
         }
