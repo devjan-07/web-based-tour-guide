@@ -2,6 +2,12 @@ package com.voyara.tourguide.packages;
 
 import com.voyara.tourguide.common.ResourceNotFoundException;
 import com.voyara.tourguide.bookings.BookingRepository;
+import com.voyara.tourguide.accommodations.Accommodation;
+import com.voyara.tourguide.accommodations.AccommodationRepository;
+import com.voyara.tourguide.tourguides.TourGuide;
+import com.voyara.tourguide.tourguides.TourGuideRepository;
+import com.voyara.tourguide.vehiclerental.Vehicle;
+import com.voyara.tourguide.vehiclerental.VehicleRepository;
 import com.voyara.tourguide.destinations.Destination;
 import com.voyara.tourguide.destinations.DestinationRepository;
 import com.voyara.tourguide.routes.Route;
@@ -22,13 +28,21 @@ public class TourPackageService {
     private final BookingRepository bookingRepository;
     private final DestinationRepository destinationRepository;
     private final RouteRepository routeRepository;
+    private final TourGuideRepository tourGuideRepository;
+    private final AccommodationRepository accommodationRepository;
+    private final VehicleRepository vehicleRepository;
 
     public TourPackageService(TourPackageRepository repository, BookingRepository bookingRepository,
-            DestinationRepository destinationRepository, RouteRepository routeRepository) {
+            DestinationRepository destinationRepository, RouteRepository routeRepository,
+            TourGuideRepository tourGuideRepository, AccommodationRepository accommodationRepository,
+            VehicleRepository vehicleRepository) {
         this.repository = repository;
         this.bookingRepository = bookingRepository;
         this.destinationRepository = destinationRepository;
         this.routeRepository = routeRepository;
+        this.tourGuideRepository = tourGuideRepository;
+        this.accommodationRepository = accommodationRepository;
+        this.vehicleRepository = vehicleRepository;
     }
 
     @Transactional(readOnly = true)
@@ -116,6 +130,50 @@ public class TourPackageService {
         }
         initializeCollections(existing);
         return existing;
+    }
+
+    @Transactional
+    public TourPackage updateResources(Long id, PackageResourceAssignmentRequest request) {
+        TourPackage tourPackage = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Package", id));
+
+        tourPackage.setEligibleGuides(resolveGuides(request == null ? null : request.guideIds()));
+        tourPackage.setEligibleAccommodations(resolveAccommodations(
+                request == null ? null : request.accommodationIds()));
+        tourPackage.setEligibleVehicles(resolveVehicles(request == null ? null : request.vehicleIds()));
+
+        initializeCollections(tourPackage);
+        return repository.save(tourPackage);
+    }
+
+    private List<TourGuide> resolveGuides(List<Long> ids) {
+        List<Long> safeIds = ids == null ? List.of() : ids.stream().filter(java.util.Objects::nonNull).distinct().toList();
+        List<TourGuide> resources = tourGuideRepository.findAllById(safeIds);
+        if (resources.size() != safeIds.size()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "One or more selected tour guides were not found");
+        }
+        return resources;
+    }
+
+    private List<Accommodation> resolveAccommodations(List<Long> ids) {
+        List<Long> safeIds = ids == null ? List.of() : ids.stream().filter(java.util.Objects::nonNull).distinct().toList();
+        List<Accommodation> resources = accommodationRepository.findAllById(safeIds);
+        if (resources.size() != safeIds.size()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "One or more selected accommodations were not found");
+        }
+        return resources;
+    }
+
+    private List<Vehicle> resolveVehicles(List<Long> ids) {
+        List<Long> safeIds = ids == null ? List.of() : ids.stream().filter(java.util.Objects::nonNull).distinct().toList();
+        List<Vehicle> resources = vehicleRepository.findAllById(safeIds);
+        if (resources.size() != safeIds.size()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "One or more selected vehicles were not found");
+        }
+        return resources;
     }
 
     @Transactional(readOnly = true)
