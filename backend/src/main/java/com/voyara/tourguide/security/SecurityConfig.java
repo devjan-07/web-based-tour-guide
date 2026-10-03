@@ -133,7 +133,6 @@ public class SecurityConfig {
                                                 authentication.get() != null
                                                         && authentication.get().isAuthenticated()
                                                         && authentication.get().getAuthorities().stream().anyMatch(authority ->
-                                                        authority.getAuthority().equals("ROLE_ADMIN") || authority.get().getAuthorities().stream().anyMatch(authority ->
                                                         authority.getAuthority().equals("ROLE_ADMIN") || authority.getAuthority().equals("ROLE_TRAVEL_STAFF")))
                                         : new org.springframework.security.authorization.AuthorizationDecision(true))
                         .requestMatchers(HttpMethod.DELETE, MANAGEMENT_ENDPOINTS).access((authentication, context) ->
@@ -141,7 +140,8 @@ public class SecurityConfig {
                                         ? new org.springframework.security.authorization.AuthorizationDecision(
                                                 authentication.get() != null
                                                         && authentication.get().isAuthenticated()
-                                                        && authentication.get().getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN")))
+                                                        && authentication.get().getAuthorities().stream().anyMatch(authority ->
+                                                        authority.getAuthority().equals("ROLE_ADMIN")))
                                         : new org.springframework.security.authorization.AuthorizationDecision(true))
                         .anyRequest().authenticated()
                 )
