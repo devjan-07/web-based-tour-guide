@@ -1,7 +1,6 @@
 package com.voyara.tourguide.bookings;
 
 import com.voyara.tourguide.accommodations.Accommodation;
-import com.voyara.tourguide.accommodations.AccommodationRepository;
 import com.voyara.tourguide.packages.TourPackage;
 import com.voyara.tourguide.tourguides.TourGuide;
 import com.voyara.tourguide.vehiclerental.Vehicle;
@@ -10,21 +9,18 @@ import java.util.Locale;
 import java.util.Objects;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class PackageResourceAllocationService {
     private final BookingRepository bookingRepository;
-    private final AccommodationRepository accommodationRepository;
 
-    public PackageResourceAllocationService(
-            BookingRepository bookingRepository,
-            AccommodationRepository accommodationRepository
-    ) {
+    public PackageResourceAllocationService(BookingRepository bookingRepository) {
         this.bookingRepository = bookingRepository;
-        this.accommodationRepository = accommodationRepository;
     }
 
+    @Transactional
     public void allocate(TourPackage tourPackage, Booking booking, String updatingId) {
         String included = tourPackage.getIncluded() == null
                 ? ""
