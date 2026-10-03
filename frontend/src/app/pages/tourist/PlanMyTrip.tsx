@@ -22,6 +22,17 @@ const experiences = [
   ["Food", "🍜"], ["Adventure", "🥾"], ["Wellness", "🍃"], ["Family", "👨‍👩‍👧"],
 ] as const;
 
+const experienceAliases: Record<string, string[]> = {
+  Nature: ["nature", "eco", "scenic"],
+  Beach: ["beach", "coastal", "coast"],
+  Culture: ["culture", "cultural", "heritage", "history"],
+  Wildlife: ["wildlife", "safari"],
+  Food: ["food", "culinary"],
+  Adventure: ["adventure", "hiking", "trekking"],
+  Wellness: ["wellness", "spa", "relaxation"],
+  Family: ["family"],
+};
+
 function today() { return new Date().toISOString().slice(0, 10); }
 function addDays(value: string, days: number) {
   const date = new Date(value);
@@ -84,7 +95,12 @@ export default function PlanMyTrip() {
       .filter((pkg) => pkg.maxGroup <= 0 || pkg.maxGroup >= travellers)
       .filter((pkg) => pkg.destinations?.some((name) => name.toLowerCase().includes(destinationName) || destinationName.includes(name.toLowerCase())))
       .filter((pkg) => !dailyBudget || Number(pkg.price || 0) <= dailyBudget * duration * Math.max(1, travellers))
-      .filter((pkg) => !experience || pkg.category.toLowerCase().includes(experience.toLowerCase()))
+      .filter((pkg) => {
+        if (!experience) return true;
+        const category = pkg.category?.toLowerCase() || "";
+        const aliases = experienceAliases[experience] || [experience.toLowerCase()];
+        return aliases.some((alias) => category.includes(alias));
+      })
       .sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0) || Number(a.price || 0) - Number(b.price || 0))
       .slice(0, 4);
   }, [dailyBudget, duration, experience, packages, selectedDestination, travellers]);
