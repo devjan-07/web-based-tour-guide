@@ -62,7 +62,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return !managementAuthRequired && isManagementEndpoint(request.getRequestURI());
+        String uri = request.getRequestURI();
+        boolean publicTourGuideRecommendation = "GET".equalsIgnoreCase(request.getMethod())
+                && uri.equals("/api/tour-guides/recommendations");
+        return publicTourGuideRecommendation || (!managementAuthRequired && isManagementEndpoint(uri));
     }
 
     private boolean isManagementEndpoint(String uri) {
