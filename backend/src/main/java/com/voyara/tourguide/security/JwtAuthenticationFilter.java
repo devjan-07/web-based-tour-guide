@@ -62,10 +62,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
+        if (!"GET".equalsIgnoreCase(request.getMethod())) {
+            return false;
+        }
+
         String uri = request.getRequestURI();
-        boolean publicTourGuideRecommendation = "GET".equalsIgnoreCase(request.getMethod())
-                && uri.equals("/api/tour-guides/recommendations");
-        return publicTourGuideRecommendation || (!managementAuthRequired && isManagementEndpoint(uri));
+        return uri.equals("/api/tour-guides/recommendations")
+                || isPublicCatalogEndpoint(uri);
+    }
+
+    private boolean isPublicCatalogEndpoint(String uri) {
+        return uri.equals("/api/destinations") || uri.startsWith("/api/destinations/")
+                || uri.equals("/api/packages") || uri.startsWith("/api/packages/")
+                || uri.equals("/api/accommodations") || uri.startsWith("/api/accommodations/")
+                || uri.equals("/api/tour-guides") || uri.startsWith("/api/tour-guides/")
+                || uri.equals("/api/vehicles") || uri.startsWith("/api/vehicles/")
+                || uri.equals("/api/routes") || uri.startsWith("/api/routes/")
+                || uri.equals("/api/reviews") || uri.startsWith("/api/reviews/");
     }
 
     private boolean isManagementEndpoint(String uri) {
