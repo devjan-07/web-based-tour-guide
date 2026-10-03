@@ -204,6 +204,15 @@ public class TourPackageService {
         if (tourPackage.getDestinations() != null) {
             tourPackage.getDestinations().size();
         }
+        if (tourPackage.getEligibleGuides() != null) {
+            tourPackage.getEligibleGuides().size();
+        }
+        if (tourPackage.getEligibleAccommodations() != null) {
+            tourPackage.getEligibleAccommodations().size();
+        }
+        if (tourPackage.getEligibleVehicles() != null) {
+            tourPackage.getEligibleVehicles().size();
+        }
     }
 
     private void clearUnsupportedRatings(TourPackage tourPackage) {
