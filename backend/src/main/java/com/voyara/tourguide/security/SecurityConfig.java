@@ -18,8 +18,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.core.annotation.Order;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -68,32 +66,7 @@ public class SecurityConfig {
         this.allowedOrigins = allowedOrigins;
     }
 
-    /**
-     * Public catalogue chain.
-     *
-     * Catalogue reads must never depend on a user's JWT. Keeping these GETs in
-     * their own first-priority chain prevents an invalid/stale Authorization
-     * header or another authentication filter from turning a public catalogue
-     * request into a 401. Management writes remain protected by the main chain.
-     */
     @Bean
-    @Order(1)
-    public SecurityFilterChain publicCatalogueFilterChain(HttpSecurity http) throws Exception {
-        RequestMatcher publicCatalogueGet = request ->
-                "GET".equalsIgnoreCase(request.getMethod()) && isPublicCatalogEndpoint(request.getRequestURI());
-
-        http
-                .securityMatcher(publicCatalogueGet)
-                .cors(Customizer.withDefaults())
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
-
-        return http.build();
-    }
-
-    @Bean
-    @Order(2)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         if (!securityEnabled) {
             http
@@ -130,9 +103,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/auth/me").authenticated()
                         .requestMatchers("/api/stakeholder/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/tour-guides/recommendations").permitAll()
-                        // Keep the package catalogue explicitly public. Package discovery is required
-                        // before a tourist chooses to authenticate or book.
-                        .requestMatchers(HttpMethod.GET, "/api/packages", "/api/packages/**").permitAll()
                         .requestMatchers(HttpMethod.GET, PUBLIC_CATALOG_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/bookings", "/api/bookings/**").hasAnyRole("ADMIN", "TRAVEL_STAFF")
                         .requestMatchers(HttpMethod.POST, "/api/ai-chat").permitAll()
@@ -174,16 +144,6 @@ public class SecurityConfig {
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
-    }
-
-    private boolean isPublicCatalogEndpoint(String uri) {
-        return uri.equals("/api/destinations") || uri.startsWith("/api/destinations/")
-                || uri.equals("/api/packages") || uri.startsWith("/api/packages/")
-                || uri.equals("/api/accommodations") || uri.startsWith("/api/accommodations/")
-                || uri.equals("/api/tour-guides") || uri.startsWith("/api/tour-guides/")
-                || uri.equals("/api/vehicles") || uri.startsWith("/api/vehicles/")
-                || uri.equals("/api/routes") || uri.startsWith("/api/routes/")
-                || uri.equals("/api/reviews") || uri.startsWith("/api/reviews/");
     }
 
     @Bean
