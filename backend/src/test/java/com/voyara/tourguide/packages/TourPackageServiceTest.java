@@ -6,9 +6,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.voyara.tourguide.accommodations.AccommodationRepository;
 import com.voyara.tourguide.bookings.BookingRepository;
 import com.voyara.tourguide.destinations.DestinationRepository;
 import com.voyara.tourguide.routes.RouteRepository;
+import com.voyara.tourguide.tourguides.TourGuideRepository;
+import com.voyara.tourguide.vehiclerental.VehicleRepository;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -25,12 +28,22 @@ class TourPackageServiceTest {
     @Mock BookingRepository bookingRepository;
     @Mock DestinationRepository destinationRepository;
     @Mock RouteRepository routeRepository;
+    @Mock TourGuideRepository tourGuideRepository;
+    @Mock AccommodationRepository accommodationRepository;
+    @Mock VehicleRepository vehicleRepository;
 
     private TourPackageService service;
 
     @BeforeEach
     void setUp() {
-        service = new TourPackageService(repository, bookingRepository, destinationRepository, routeRepository);
+        service = new TourPackageService(
+                repository,
+                bookingRepository,
+                destinationRepository,
+                routeRepository,
+                tourGuideRepository,
+                accommodationRepository,
+                vehicleRepository);
     }
 
     @Test
