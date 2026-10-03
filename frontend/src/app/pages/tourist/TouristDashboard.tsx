@@ -78,10 +78,11 @@ function bookingRows(booking: Booking) {
       ["Passengers", String(booking.guests || 1)],
     ];
   }
+  const isPackageIncluded = Boolean(booking.packageId);
   return [
-    ["Guide", booking.guide || "Pending"],
-    ["Stay", accommodationName(booking.accommodation) || "Pending"],
-    ["Vehicle", booking.vehicle || "Pending"],
+    ["Guide", booking.guide || (isPackageIncluded && booking.guideSelectionType === "VOYARA" ? "Included · pending assignment" : "Pending")],
+    ["Stay", accommodationName(booking.accommodation) || (isPackageIncluded && booking.accommodationSelectionType === "VOYARA" ? "Included · pending assignment" : "Pending")],
+    ["Vehicle", booking.vehicle || (isPackageIncluded && booking.vehicleSelectionType === "VOYARA" ? "Included · pending assignment" : "Pending")],
     ["Guests", String(booking.guests || 1)],
   ];
 }
@@ -233,7 +234,13 @@ export default function TouristDashboard() {
                 <div className="mt-4 h-2 overflow-hidden rounded-full bg-gray-100">
                   <div className="h-full rounded-full" style={{ width: `${readiness.completionPercent}%`, background: "#FF385C" }} />
                 </div>
-                <p className="mt-3 text-sm text-gray-600">{readiness.nextAction}</p>
+                {summary.nextBooking?.packageId ? (
+                  <p className="mt-3 text-sm text-gray-600">
+                    Your package already includes the guide, accommodation and transport. The remaining readiness reflects Voyara's provider assignment, not services you need to select again.
+                  </p>
+                ) : (
+                  <p className="mt-3 text-sm text-gray-600">{readiness.nextAction}</p>
+                )}
                 <Link to={`/tourist/bookings/${readiness.bookingId}`} className="mt-4 inline-flex items-center gap-2 text-sm font-semibold" style={{ color: "#FF385C" }}>
                   Open trip details <ArrowRight className="h-4 w-4" />
                 </Link>
