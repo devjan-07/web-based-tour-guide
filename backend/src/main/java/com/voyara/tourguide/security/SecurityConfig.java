@@ -102,6 +102,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/auth/resend-verification-code").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/auth/me").authenticated()
                         .requestMatchers("/api/stakeholder/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/tour-guides/recommendations").permitAll()
                         .requestMatchers(HttpMethod.GET, PUBLIC_CATALOG_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/bookings", "/api/bookings/**").hasAnyRole("ADMIN", "TRAVEL_STAFF")
                         .requestMatchers(HttpMethod.POST, "/api/ai-chat").permitAll()
