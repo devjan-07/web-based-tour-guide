@@ -94,70 +94,10 @@ export default function PlanMyTrip() {
     setMatching(true);
     setError("");
     try {
-      const guidePromise = guidesApi.recommendations({
-        language: guideLanguage,
-        location: selectedDestination.name,
-      }).catch(async (err) => {
-        // The recommendation endpoint should be public. If an older/running
-        // backend still protects it, fall back to the same public guide catalogue
-        // so the trip planner remains usable while the backend is restarted/synced.
-        if (!(err instanceof Error) || !/401|authentication/i.test(err.message)) throw err;
-
-        const availableGuides = (await guidesApi.list()).filter(
-          (guide) => guide.status === "Available"
-        );
-
-        const requestedLanguage = guideLanguage.trim().toLowerCase();
-        const requestedLocation = selectedDestination.name.trim().toLowerCase();
-
-        return availableGuides
-          .map((guide: Guide): GuideRecommendation => {
-            let score = 40;
-            const reasons: string[] = [];
-
-            if (requestedLanguage && guide.languages?.some(
-              (language) => language.toLowerCase().includes(requestedLanguage)
-            )) {
-              score += 25;
-              reasons.push("Language match");
-            }
-
-            if (requestedLocation && (
-              guide.location?.toLowerCase().includes(requestedLocation) ||
-              guide.country?.toLowerCase().includes(requestedLocation)
-            )) {
-              score += 10;
-              reasons.push("Location match");
-            }
-
-            if (Number(guide.rating || 0) >= 4.5) {
-              score += 5;
-              reasons.push("Highly rated");
-            }
-
-            if (Number(guide.experience || 0) >= 5) {
-              score += 5;
-              reasons.push("Experienced guide");
-            }
-
-            if (!reasons.length) reasons.push("Available for your trip");
-
-            return {
-              guide,
-              suitabilityScore: Math.min(score, 100),
-              reasons,
-            };
-          })
-          .sort(
-            (a, b) =>
-              b.suitabilityScore - a.suitabilityScore ||
-              Number(b.guide.rating || 0) - Number(a.guide.rating || 0)
-          )
-          .slice(0, 5);
-      });
-
+      // Guide recommendations are built from the public guide catalogue so the
+      // trip planner does not depend on the protected recommendation endpoint.
       const [guideItems, stayItems, vehicleItems] = await Promise.all([
-        guidePromise,
+        guidesApi.list(),
         accommodationRecommendationsApi.list({
           destinationId: selectedDestination.id,
           destination: selectedDestination.name,
@@ -174,7 +114,55 @@ export default function PlanMyTrip() {
         }),
       ]);
 
-      setGuides(guideItems.slice(0, 3));
+      const requestedLanguage = guideLanguage.trim().toLowerCase();
+      const requestedLocation = selectedDestination.name.trim().toLowerCase();
+
+      const guideRecommendations: GuideRecommendation[] = guideItems
+        .filter((guide) => guide.status === "Available")
+        .map((guide): GuideRecommendation => {
+          let score = 40;
+          const reasons: string[] = [];
+
+          if (requestedLanguage && guide.languages?.some(
+            (language) => language.toLowerCase().includes(requestedLanguage)
+          )) {
+            score += 25;
+            reasons.push("Language match");
+          }
+
+          if (requestedLocation && (
+            guide.location?.toLowerCase().includes(requestedLocation) ||
+            guide.country?.toLowerCase().includes(requestedLocation)
+          )) {
+            score += 10;
+            reasons.push("Location match");
+          }
+
+          if (Number(guide.rating || 0) >= 4.5) {
+            score += 5;
+            reasons.push("Highly rated");
+          }
+
+          if (Number(guide.experience || 0) >= 5) {
+            score += 5;
+            reasons.push("Experienced guide");
+          }
+
+          if (!reasons.length) reasons.push("Available for your trip");
+
+          return {
+            guide,
+            suitabilityScore: Math.min(score, 100),
+            reasons,
+          };
+        })
+        .sort(
+          (a, b) =>
+            b.suitabilityScore - a.suitabilityScore ||
+            Number(b.guide.rating || 0) - Number(a.guide.rating || 0)
+        );
+
+      setGuides(guideRecommendations.slice(0, 3));
       setStays(stayItems.slice(0, 3));
       setVehicles(vehicleItems.slice(0, 3));
       setMatched(true);
