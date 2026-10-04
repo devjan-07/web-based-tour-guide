@@ -266,6 +266,62 @@ public class BookingService {
     }
 
     @Transactional(readOnly = true)
+    public CustomTripPreview previewCustomTrip(TouristBookingRequest request) {
+        Booking booking = toBooking(request);
+        booking.setBookingType("CUSTOM");
+        booking.setStatus("Pending");
+        booking.setPayment("Pending");
+        requireText(booking.getDestination(), "Destination is required");
+        if (booking.getCheckIn() == null || booking.getCheckOut() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Check-in and check-out dates are required");
+        }
+        if (!booking.getCheckOut().isAfter(booking.getCheckIn())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Check-out date must be after check-in date");
+        }
+        if (booking.getGuests() < 1) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Guest count must be at least 1");
+        }
+        if (booking.getRooms() == null || booking.getRooms() < 1) {
+            booking.setRooms(1);
+        }
+
+        if (booking.getGuideId() != null) {
+            booking.setGuideSelectionType("VOYARA");
+        }
+        if (booking.getAccommodationId() != null) {
+            booking.setAccommodationSelectionType("VOYARA");
+        }
+        if (booking.getVehicleId() != null) {
+            booking.setVehicleSelectionType("VOYARA");
+        }
+
+        validateAndPriceBooking(booking, null, false);
+
+        TourGuide guide = selectedGuide(booking);
+        Accommodation accommodation = selectedAccommodation(booking);
+        Vehicle vehicle = selectedVehicle(booking);
+
+        return new CustomTripPreview(
+                "CUSTOM",
+                booking.getDestination(),
+                guide == null ? null : guide.getId(),
+                guide == null ? null : guide.getName(),
+                guide == null ? null : guide.getPricePerDay(),
+                accommodation == null ? null : accommodation.getId(),
+                accommodation == null ? null : accommodation.getName(),
+                accommodation == null ? null : accommodation.getPrice(),
+                vehicle == null ? null : vehicle.getId(),
+                vehicle == null ? null : vehicle.getName(),
+                vehicle == null ? null : vehicle.getPricePerDay(),
+                booking.getGuests(),
+                booking.getRooms(),
+                booking.getCheckIn().toString(),
+                booking.getCheckOut().toString(),
+                booking.getTotal()
+        );
+    }
+
+    @Transactional(readOnly = true)
     public TripReadiness getTripReadiness(String email, String id) {
         Booking booking = findTouristBooking(email, id);
         return buildTripReadiness(booking);
