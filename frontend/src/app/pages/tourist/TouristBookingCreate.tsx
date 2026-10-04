@@ -337,7 +337,7 @@ export default function TouristBookingCreate() {
           {loading ? (
             <div className="rounded-[2rem] bg-white p-12 text-center text-sm font-semibold text-gray-500 shadow-sm ring-1 ring-gray-200">Preparing your booking...</div>
           ) : (
-            {bookingType === "CUSTOM" ? (
+            bookingType === "CUSTOM" ? (
               <form onSubmit={handleSubmit} className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_360px]">
               <div className="space-y-7">
                 {error && <div className="rounded-2xl border border-rose-100 bg-rose-50 px-5 py-4 text-sm font-bold text-rose-700">{error}</div>}
