@@ -72,7 +72,6 @@ export default function TouristBookingCreate() {
   const [vehiclesLoading, setVehiclesLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [bookingStep, setBookingStep] = useState(1);
 
   useEffect(() => {
     if (!packageId) return;
@@ -338,7 +337,80 @@ export default function TouristBookingCreate() {
           {loading ? (
             <div className="rounded-[2rem] bg-white p-12 text-center text-sm font-semibold text-gray-500 shadow-sm ring-1 ring-gray-200">Preparing your booking...</div>
           ) : (
-            <form onSubmit={handleSubmit} className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_360px]">
+            {bookingType === "CUSTOM" ? (
+              <form onSubmit={handleSubmit} className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_360px]">
+              <div className="space-y-7">
+                {error && <div className="rounded-2xl border border-rose-100 bg-rose-50 px-5 py-4 text-sm font-bold text-rose-700">{error}</div>}
+
+                <section className="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-gray-200 md:p-8">
+                  <div className="flex items-start justify-between gap-5">
+                    <div>
+                      <p className="text-xs font-black uppercase tracking-[0.2em] text-rose-500">01 · Your trip</p>
+                      <h2 className="mt-2 text-3xl font-black text-[#10213b]">Your custom journey</h2>
+                      <p className="mt-2 text-sm leading-6 text-gray-500">You already selected your guide, stay and transport. This step is for confirming the trip details before booking.</p>
+                    </div>
+                    <span className="hidden rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-black text-emerald-700 sm:inline-flex">Selections saved</span>
+                  </div>
+                  <div className="mt-7 grid gap-4 sm:grid-cols-2">
+                    <Field icon={MapPin} label="Destination"><input value={destination} readOnly className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none" /></Field>
+                    <Field icon={Package} label="Journey type"><input value="Custom trip" readOnly className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none" /></Field>
+                    <Field icon={CalendarDays} label="Check-in"><input type="date" value={checkIn} onChange={(e) => { setCheckIn(e.target.value); if (new Date(checkOut) <= new Date(e.target.value)) setCheckOut(addDays(e.target.value, 1)); }} className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none" /></Field>
+                    <Field icon={CalendarDays} label="Check-out"><input type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none" /></Field>
+                    <Field icon={Users} label="Travellers"><input type="number" min="1" value={guests} onChange={(e) => setGuests(Math.max(1, Number(e.target.value)))} className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none" /></Field>
+                    <Field icon={Languages} label="Guide language"><select value={languagePreference} onChange={(e) => setLanguagePreference(e.target.value)} className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none">{TOUR_GUIDE_LANGUAGES.map((language) => <option key={language}>{language}</option>)}</select></Field>
+                  </div>
+                </section>
+
+                <section className="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-gray-200 md:p-8">
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-rose-500">02 · Selected services</p>
+                  <h2 className="mt-2 text-3xl font-black text-[#10213b]">Your choices</h2>
+                  <p className="mt-2 text-sm leading-6 text-gray-500">These are the services you selected while building your trip. Voyara will validate their availability again when you create the reservation.</p>
+                  <div className="mt-6 grid gap-4 md:grid-cols-3">
+                    <SelectedServiceCard title="Guide" value={selectedGuide ? guideLabel(selectedGuide) : "Not selected"} detail={selectedGuide ? `LKR ${Number(selectedGuide.pricePerDay || 0).toLocaleString()} / day` : "Staff assignment"} />
+                    <SelectedServiceCard title="Stay" value={selectedAccommodation ? accommodationLabel(selectedAccommodation) : "Not selected"} detail={selectedAccommodation ? `LKR ${Number(selectedAccommodation.price || 0).toLocaleString()} / night` : "Staff assignment"} />
+                    <SelectedServiceCard title="Transport" value={selectedVehicle ? vehicleLabel(selectedVehicle) : "Own vehicle"} detail={selectedVehicle ? `LKR ${Number(selectedVehicle.pricePerDay || 0).toLocaleString()} / day` : "No vehicle selected"} />
+                  </div>
+                  <Link to={`/tourist/custom-trip?destination=${encodeURIComponent(destination)}&checkIn=${encodeURIComponent(checkIn)}&checkOut=${encodeURIComponent(checkOut)}&guests=${guests}&guideId=${selectedGuideId || ""}&accommodationId=${selectedAccommodationId || ""}&vehicleId=${selectedVehicleId || ""}&language=${encodeURIComponent(languagePreference)}&driverRequired=${driverRequired}&luggage=${luggageCount}`} className="mt-5 inline-flex text-sm font-black text-rose-500 hover:text-rose-600">Edit my selections</Link>
+                </section>
+
+                <section className="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-gray-200 md:p-8">
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-rose-500">03 · Final details</p>
+                  <h2 className="mt-2 text-3xl font-black text-[#10213b]">Anything else we should know?</h2>
+                  <p className="mt-2 text-sm leading-6 text-gray-500">Add the practical details Voyara needs to complete your reservation.</p>
+                  {selectedVehicle && <div className="mt-6 grid gap-4 md:grid-cols-2">
+                    <Field icon={MapPin} label="Pickup location"><input value={pickupLocation} onChange={(e) => setPickupLocation(e.target.value)} className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none" /></Field>
+                    <Field icon={CalendarDays} label="Pickup time"><input type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none" /></Field>
+                    <Field icon={MapPin} label="Return location"><input value={returnLocation} onChange={(e) => setReturnLocation(e.target.value)} className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none" /></Field>
+                    <Field icon={CalendarDays} label="Return time"><input type="time" value={returnTime} onChange={(e) => setReturnTime(e.target.value)} className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none" /></Field>
+                    <Field icon={Car} label="Driver"><select value={driverRequired ? "Yes" : "No"} onChange={(e) => setDriverRequired(e.target.value === "Yes")} className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none"><option>Yes</option><option>No</option></select></Field>
+                    <Field icon={Package} label="Luggage"><input type="number" min="0" value={luggageCount} onChange={(e) => setLuggageCount(Math.max(0, Number(e.target.value)))} className="w-full bg-transparent text-sm font-bold text-gray-800 outline-none" /></Field>
+                  </div>}
+                  <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={5} className="mt-5 w-full resize-none rounded-2xl bg-gray-50 p-4 text-sm font-medium text-gray-700 outline-none ring-1 ring-gray-200 focus:ring-2 focus:ring-rose-200" placeholder="Arrival details, dietary needs, special requests..." />
+                </section>
+              </div>
+
+              <aside className="h-fit lg:sticky lg:top-24">
+                <div className="overflow-hidden rounded-[2rem] bg-[#0b1f3a] text-white shadow-xl">
+                  <div className="p-6"><p className="text-xs font-black uppercase tracking-[0.2em] text-rose-300">Final confirmation</p><h2 className="mt-2 text-2xl font-black">{destination || "Sri Lanka"} Custom Trip</h2></div>
+                  <div className="space-y-4 border-y border-white/10 p-6 text-sm">
+                    <SummaryLine label="Dates" value={checkIn + " → " + checkOut} />
+                    <SummaryLine label="Travellers" value={String(guests)} />
+                    <SummaryLine label="Guide" value={selectedGuide ? guideLabel(selectedGuide) : "Staff assignment"} />
+                    <SummaryLine label="Stay" value={selectedAccommodation ? accommodationLabel(selectedAccommodation) : "Staff assignment"} />
+                    <SummaryLine label="Vehicle" value={selectedVehicle ? vehicleLabel(selectedVehicle) : OWN_VEHICLE_LABEL} />
+                    {selectedVehicle && <SummaryLine label="Driver" value={driverRequired ? "Required" : "Not required"} />}
+                  </div>
+                  <div className="bg-white p-6 text-[#10213b]">
+                    <p className="text-[10px] font-black uppercase tracking-wider text-gray-400">Estimated total</p>
+                    <p className="mt-1 text-3xl font-black">LKR {total.toLocaleString()}</p>
+                    <p className="mt-2 text-xs leading-5 text-gray-500">The backend will perform the final availability and pricing checks when you confirm.</p>
+                    <button type="submit" disabled={submitting} className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-[#ff385c] px-5 py-4 text-sm font-black text-white transition hover:bg-[#e91f47] disabled:opacity-60">{submitting ? "Creating booking..." : "Confirm & create booking"} <CheckCircle className="h-4 w-4" /></button>
+                  </div>
+                </div>
+              </aside>
+            </form>
+            ) : (
+              <form onSubmit={handleSubmit} className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_360px]">
               <div className="space-y-7">
                 {error && <div className="rounded-2xl border border-rose-100 bg-rose-50 px-5 py-4 text-sm font-bold text-rose-700">{error}</div>}
 
@@ -439,6 +511,7 @@ export default function TouristBookingCreate() {
                 </div>
               </aside>
             </form>
+            )}
           )}
         </div>
       </main>
@@ -459,6 +532,15 @@ function SectionHeading({ step, title, subtitle }: { step: string; title: string
 function SummaryLine({ label, value }: { label: string; value: string }) {
   return <div className="flex items-start justify-between gap-4"><span className="text-white/50">{label}</span><span className="text-right font-bold">{value}</span></div>;
 }
+
+function SelectedServiceCard({ title, value, detail }: { title: string; value: string; detail: string }) {
+  return <div className="rounded-2xl bg-[#f7f8fa] p-5">
+    <p className="text-[10px] font-black uppercase tracking-wider text-gray-400">{title}</p>
+    <p className="mt-2 truncate text-sm font-black text-[#10213b]">{value}</p>
+    <p className="mt-2 text-xs font-bold text-gray-500">{detail}</p>
+  </div>;
+}
+
 
 function vehicleLabel(vehicle: Vehicle) {
   return [vehicle.name, vehicle.brand, vehicle.model].filter(Boolean).join(" · ");
