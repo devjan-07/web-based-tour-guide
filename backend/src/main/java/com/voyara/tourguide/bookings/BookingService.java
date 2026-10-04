@@ -615,9 +615,6 @@ public class BookingService {
         }
 
         Vehicle vehicle = selectedVehicle(candidate);
-        }
-
-        Vehicle vehicle
         if (vehicle != null) {
             validateActive("Vehicle", vehicle.getStatus(), "Available");
             if (candidate.getGuests() > vehicle.getCapacity()) {
