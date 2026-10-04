@@ -31,6 +31,8 @@ public class BookingStrategyFactory {
                 strategies.put("PACKAGE", strategy);
             } else if (strategy instanceof AccommodationBookingStrategy) {
                 strategies.put("ACCOMMODATION", strategy);
+            } else if (strategy instanceof VehicleBookingStrategy) {
+                strategies.put("VEHICLE", strategy);
             }
         }
     }
@@ -53,8 +55,8 @@ public class BookingStrategyFactory {
 
     /**
      * Temporary no-op strategy for booking types that have not yet been
-     * extracted into concrete strategies. This lets the existing booking
-     * workflow continue unchanged while patterns are introduced incrementally.
+     * extracted into concrete strategies. This keeps unsupported strategy
+     * selections unchanged while patterns are introduced incrementally.
      */
     private static final class NoOpBookingStrategy implements BookingStrategy {
 
