@@ -1,4 +1,4 @@
-import { Outlet, NavLink, useNavigate } from "react-router";
+import { Outlet, NavLink, useLocation, useNavigate } from "react-router";
 import { useState } from "react";
 import { LayoutDashboard, BedDouble, UserCheck, CalendarCheck, Package, MapPin, Car, Settings, User, Globe, Menu, X, LogOut, Sun, Moon, ChevronsLeft, Users, ChevronDown, ChevronRight, ShieldCheck, BriefcaseBusiness } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
@@ -39,6 +39,7 @@ export function DashboardLayout() {
   const { logout, user } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
@@ -50,6 +51,15 @@ export function DashboardLayout() {
   const isAdmin = user?.roles.includes("ADMIN");
   const isHotelPartner = user?.roles.includes("HOTEL_PARTNER");
   const isTransportProvider = user?.roles.includes("TRANSPORT_PROVIDER");
+  const pageTitle = location.pathname === "/dashboard"
+    ? "Dashboard"
+    : navGroups.flatMap((group) => group.items).find((item) => location.pathname === item.to || location.pathname.startsWith(item.to + "/"))?.label
+      || (location.pathname.includes("stakeholder/accommodations") ? "My Properties"
+      : location.pathname.includes("stakeholder/bookings") ? "Property Bookings"
+      : location.pathname.includes("stakeholder/vehicles") ? "My Vehicles"
+      : location.pathname.includes("stakeholder/vehicle-bookings") ? "Vehicle Bookings"
+      : location.pathname.includes("profile") ? "My Profile"
+      : "Voyara");
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-slate-950 overflow-hidden">
@@ -210,7 +220,12 @@ export function DashboardLayout() {
           <button onClick={() => setSidebarOpen(true)} className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800">
             <Menu className="w-5 h-5 text-gray-600 dark:text-slate-400" />
           </button>
-          <div className="flex-1" />
+          <div className="flex min-w-0 flex-1 items-center">
+            <div className="hidden min-w-0 sm:block">
+              <p className="truncate text-sm font-bold text-gray-900 dark:text-white">{pageTitle}</p>
+              <p className="text-[11px] text-gray-400 dark:text-slate-500">{isAdmin ? "Voyara administration" : "Provider workspace"}</p>
+            </div>
+          </div>
           <div className="flex items-center gap-2">
             <button
               onClick={toggleTheme}
@@ -228,7 +243,7 @@ export function DashboardLayout() {
             </div>
           </div>
         </header>
-        <main className="flex-1 overflow-y-auto p-5 md:p-7">
+        <main className="flex-1 overflow-y-auto bg-gray-50/70 p-4 md:p-6 lg:p-7 dark:bg-slate-950">
           <Outlet />
         </main>
       </div>
