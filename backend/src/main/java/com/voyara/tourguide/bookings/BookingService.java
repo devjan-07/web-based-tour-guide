@@ -592,23 +592,26 @@ public class BookingService {
 
         if (!accommodationBooking) {
             Accommodation accommodation = selectedAccommodation(candidate);
-
-            validateActive("Accommodation", accommodation.getStatus(), "Active");
-            if (strictCustomerBooking && "ACCOMMODATION".equalsIgnoreCase(candidate.getBookingType())) {
-                requireText(candidate.getRoomType(), "Room type is required");
-            }
-            int requestedRooms = bookingRooms(candidate);
-            if (requestedRooms > accommodation.getRooms()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Requested rooms exceed available rooms at this accommodation");
-            }
-            int bookedRooms = bookedAccommodationRooms(candidate, updatingId);
-            if (bookedRooms + requestedRooms > accommodation.getRooms()) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "The selected accommodation does not have enough rooms for these dates");
-            }
-            candidate.setAccommodation(accommodation.getName());
-            if (!packageBooking || accommodationExplicitlySelected) {
-                total = total.add(nonNull(accommodation.getPrice()).multiply(BigDecimal.valueOf(days)).multiply(BigDecimal.valueOf(requestedRooms)));
-                pricedFromResources = true;
+            if (accommodation != null) {
+                validateActive("Accommodation", accommodation.getStatus(), "Active");
+                int requestedRooms = bookingRooms(candidate);
+                if (requestedRooms > accommodation.getRooms()) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Requested rooms exceed available rooms at this accommodation");
+                }
+                int bookedRooms = bookedAccommodationRooms(candidate, updatingId);
+                if (bookedRooms + requestedRooms > accommodation.getRooms()) {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "The selected accommodation does not have enough rooms for these dates");
+                }
+                candidate.setAccommodation(accommodation.getName());
+                if (!packageBooking) {
+                    total = total.add(nonNull(accommodation.getPrice())
+                            .multiply(BigDecimal.valueOf(days))
+                            .multiply(BigDecimal.valueOf(requestedRooms)));
+                    pricedFromResources = true;
+                }
+            } else if (strictCustomerBooking && "ACCOMMODATION".equalsIgnoreCase(candidate.getBookingType())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "An accommodation booking requires a valid accommodation");
             }
         } else if (strictCustomerBooking && "ACCOMMODATION".equalsIgnoreCase(candidate.getBookingType())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "An accommodation booking requires a valid accommodation");
