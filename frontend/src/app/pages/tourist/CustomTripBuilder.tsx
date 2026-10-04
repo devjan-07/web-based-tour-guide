@@ -27,6 +27,17 @@ function primaryDestinationName(value: string) {
   return value.split(",")[0].trim();
 }
 
+function guideSuitabilityScore(guide: Guide, language: string, destination: string) {
+  const location = primaryDestinationName(destination).toLowerCase();
+  const requestedLanguage = language.toLowerCase();
+  let score = 40;
+  if (guide.languages?.some((item) => item.toLowerCase().includes(requestedLanguage))) score += 25;
+  if (guide.location?.toLowerCase().includes(location) || guide.country?.toLowerCase().includes(location)) score += 10;
+  if (Number(guide.rating || 0) >= 4.5) score += 10;
+  if (Number(guide.experience || 0) >= 5) score += 10;
+  return Math.min(score, 100);
+}
+
 export default function CustomTripBuilder() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
@@ -76,14 +87,10 @@ export default function CustomTripBuilder() {
 
         const rankedGuides = guideItems
           .filter((guide) => guide.status === "Available")
-          .map((guide) => {
-            let score = 40;
-            if (guide.languages?.some((item) => item.toLowerCase().includes(requestedLanguage))) score += 25;
-            if (guide.location?.toLowerCase().includes(location) || guide.country?.toLowerCase().includes(location)) score += 10;
-            if (Number(guide.rating || 0) >= 4.5) score += 10;
-            if (Number(guide.experience || 0) >= 5) score += 10;
-            return { guide, score: Math.min(score, 100) };
-          })
+          .map((guide) => ({
+            guide,
+            score: guideSuitabilityScore(guide, language, destination),
+          }))
           .sort((a, b) => b.score - a.score || Number(b.guide.rating || 0) - Number(a.guide.rating || 0))
           .slice(0, 5)
           .map((item) => item.guide);
@@ -177,7 +184,7 @@ export default function CustomTripBuilder() {
           ) : (
             <>
               <ResourceSection title="Choose your guide" icon={Languages} description={"Guides matched to " + language + " and " + destination + "."}>
-                {guides.map((guide) => <ResourceCard key={guide.id} selected={guide.id === guideId} onSelect={() => { setGuideId(guide.id); setPreview(null); }} image={guide.profilePhoto} title={guide.name} subtitle={guide.location + " · " + guide.experience + " years experience"} price={"LKR " + Number(guide.pricePerDay || 0).toLocaleString() + " / day"} rating={guide.rating} meta={guide.languages?.slice(0, 2).join(" · ")} />)}
+                {guides.map((guide) => <ResourceCard key={guide.id} selected={guide.id === guideId} onSelect={() => { setGuideId(guide.id); setPreview(null); }} image={guide.profilePhoto} title={guide.name} subtitle={guide.location + " · " + guide.experience + " years experience"} price={"LKR " + Number(guide.pricePerDay || 0).toLocaleString() + " / day"} rating={guide.rating} meta={guideSuitabilityScore(guide, language, destination) + "% fit"} />)}
               </ResourceSection>
 
               <ResourceSection title="Choose your stay" icon={BedDouble} description="Available stays matched to your destination and group size.">
