@@ -7,12 +7,11 @@ import {
   accommodationRecommendationsApi,
   guidesApi,
   packagesApi,
+  packageResourceAllocationApi,
   touristBookingsApi,
-  vehicleRecommendationsApi,
-  type AccommodationRecommendation,
-  type GuideRecommendation,
+  type PackageResourceAllocationPreview,
+  type PackageResourceOption,
   type TourPackage,
-  type VehicleRecommendation,
 } from "../../lib/api";
 
 function today() { return new Date().toISOString().slice(0, 10); }
@@ -34,12 +33,10 @@ export default function PackageCustomization() {
   const [driverRequired, setDriverRequired] = useState(params.get("driver") !== "false");
   const [pickupTime, setPickupTime] = useState("09:00");
   const [returnTime, setReturnTime] = useState("18:00");
-  const [guide, setGuide] = useState<GuideRecommendation | null>(null);
-  const [stay, setStay] = useState<AccommodationRecommendation | null>(null);
-  const [vehicle, setVehicle] = useState<VehicleRecommendation | null>(null);
-  const [guideOptions, setGuideOptions] = useState<GuideRecommendation[]>([]);
-  const [stayOptions, setStayOptions] = useState<AccommodationRecommendation[]>([]);
-  const [vehicleOptions, setVehicleOptions] = useState<VehicleRecommendation[]>([]);
+  const [guide, setGuide] = useState<PackageResourceOption | null>(null);
+  const [stay, setStay] = useState<PackageResourceOption | null>(null);
+  const [vehicle, setVehicle] = useState<PackageResourceOption | null>(null);
+  const [allocation, setAllocation] = useState<PackageResourceAllocationPreview | null>(null);
   const [loading, setLoading] = useState(true);
   const [matching, setMatching] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -63,23 +60,31 @@ export default function PackageCustomization() {
   const hasIncludedTransport = includesAny(pkg?.included || "", ["transport", "transfer", "private van", "car", "vehicle", "jeep"]);
 
   useEffect(() => {
-    if (!pkg) return;
-    const destination = pkg.destinations?.[0] || "";
+    if (!pkg || !checkOut || new Date(checkOut) <= new Date(checkIn)) return;
+
     setMatching(true);
-    Promise.all([
-      guidesApi.recommendations({ language, location: destination }),
-      accommodationRecommendationsApi.list({ destination, travellers: guests }),
-      vehicleRecommendationsApi.list({ passengers: guests, luggage, driverRequired, location: destination }),
-    ]).then(([guides, stays, vehicles]) => {
-      setGuideOptions(guides.slice(0, 3));
-      setStayOptions(stays.slice(0, 3));
-      setVehicleOptions(vehicles.slice(0, 3));
-    }).catch(() => {
-      setGuideOptions([]);
-      setStayOptions([]);
-      setVehicleOptions([]);
+    setError("");
+
+    packageResourceAllocationApi.preview({
+      packageId: pkg.id,
+      languagePreference: language,
+      guideSelectionType: guide ? "VOYARA" : hasIncludedGuide ? "VOYARA" : "OWN",
+      guideId: guide?.id ?? null,
+      accommodationSelectionType: stay ? "VOYARA" : hasIncludedAccommodation ? "VOYARA" : "OWN",
+      accommodationId: stay?.id ?? null,
+      vehicleSelectionType: vehicle ? "VOYARA" : hasIncludedTransport ? "VOYARA" : "OWN",
+      vehicleId: vehicle?.id ?? null,
+      checkIn,
+      checkOut,
+      guests,
+      rooms: 1,
+    }).then((result) => {
+      setAllocation(result);
+    }).catch((e) => {
+      setAllocation(null);
+      setError(e instanceof Error ? e.message : "No suitable resources are available for these dates.");
     }).finally(() => setMatching(false));
-  }, [pkg, guests, language, luggage, driverRequired]);
+  }, [pkg, guests, language, checkIn, checkOut, guide?.id, stay?.id, vehicle?.id]);
 
   const tripDays = daysBetween(checkIn, checkOut);
   const estimatedTotal = useMemo(() => {
@@ -87,9 +92,9 @@ export default function PackageCustomization() {
     const base = Number(pkg.price || 0) * Math.max(1, guests);
     // Included services are already covered by the package price. An amount is
     // added only when the tourist explicitly selects a replacement option.
-    const guideCost = guide ? Number(guide.guide.pricePerDay || 0) * tripDays : 0;
-    const stayCost = stay ? Number(stay.accommodation.price || 0) * tripDays : 0;
-    const vehicleCost = vehicle ? Number(vehicle.vehicle.pricePerDay || 0) * tripDays : 0;
+    const guideCost = guide ? Number(guide.pricePerDay || 0) * tripDays : 0;
+    const stayCost = stay ? Number(stay.pricePerNight || 0) * tripDays : 0;
+    const vehicleCost = vehicle ? Number(vehicle.pricePerDay || 0) * tripDays : 0;
     return base + guideCost + stayCost + vehicleCost;
   }, [pkg, guests, guide, stay, vehicle, tripDays]);
 
@@ -112,13 +117,13 @@ export default function PackageCustomization() {
         languagePreference: language,
         destination: pkg.destinations?.join(", ") || "",
         guideSelectionType: guide ? "VOYARA" : hasIncludedGuide ? "VOYARA" : "OWN",
-        guideId: guide?.guide.id ?? null,
+        guideId: guide?.id ?? null,
         accommodationSelectionType: stay ? "VOYARA" : hasIncludedAccommodation ? "VOYARA" : "OWN",
-        accommodationId: stay?.accommodation.id ?? null,
+        accommodationId: stay?.id ?? null,
         rooms: 1,
         roomType: "Double",
         vehicleSelectionType: vehicle ? "VOYARA" : hasIncludedTransport ? "VOYARA" : "OWN",
-        vehicleId: vehicle?.vehicle.id ?? null,
+        vehicleId: vehicle?.id ?? null,
         pickupLocation: pkg.destinations?.[0] || "",
         pickupTime,
         returnLocation: pkg.destinations?.[0] || "",
@@ -128,7 +133,7 @@ export default function PackageCustomization() {
         checkIn,
         checkOut,
         guests,
-        notes: "Package: " + pkg.name + ". Included services: " + includedSummary + ". Replacement guide: " + (guide?.guide.name || (hasIncludedGuide ? "Keep package guide" : "None")) + ". Replacement stay: " + (stay?.accommodation.name || (hasIncludedAccommodation ? "Keep package accommodation" : "None")) + ". Replacement vehicle: " + (vehicle?.vehicle.name || (hasIncludedTransport ? "Keep package transport" : "None")) + ".",
+        notes: "Package: " + pkg.name + ". Included services: " + includedSummary + ". Assigned guide: " + (allocation?.guide?.name || "None") + ". Assigned stay: " + (allocation?.accommodation?.name || "None") + ". Assigned vehicle: " + (allocation?.vehicle?.name || "None") + ". Replacement guide: " + (guide?.name || "None") + ". Replacement stay: " + (stay?.name || "None") + ". Replacement vehicle: " + (vehicle?.name || "None") + ".",
       });
       navigate("/tourist/bookings/" + booking.id);
     } catch (e) {
@@ -190,16 +195,16 @@ export default function PackageCustomization() {
             <section className="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-gray-200 md:p-8">
               <div><p className="text-xs font-black uppercase tracking-[0.2em] text-rose-500">03 · Personalise</p><h2 className="mt-2 text-3xl font-black text-[#10213b]">Change something only if you want to</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-gray-500">Your package is the source of truth. Included services stay included automatically; the cards below are optional replacements, not items you must add again.</p></div>
 
-              <ChoiceSection title="Local guide" icon={Languages} included={hasIncludedGuide} selected={guide?.guide.name} loading={matching} open={openOption === "guide"} onToggle={() => setOpenOption(openOption === "guide" ? null : "guide")} onClear={() => setGuide(null)}>
-                {guideOptions.map((item) => <GuideCard key={item.guide.id} item={item} selected={guide?.guide.id === item.guide.id} onSelect={() => setGuide(item)} />)}
+              <ChoiceSection title="Local guide" icon={Languages} included={hasIncludedGuide} assigned={allocation?.guide?.name} selected={guide?.name} loading={matching} open={openOption === "guide"} onToggle={() => setOpenOption(openOption === "guide" ? null : "guide")} onClear={() => setGuide(null)}>
+                {allocation?.guideOptions.map((item) => <GuideCard key={item.id} item={item} selected={guide?.id === item.id} onSelect={() => setGuide(item)} />)}
               </ChoiceSection>
 
-              <ChoiceSection title="Where you stay" icon={BedDouble} included={hasIncludedAccommodation} selected={stay?.accommodation.name} loading={matching} open={openOption === "stay"} onToggle={() => setOpenOption(openOption === "stay" ? null : "stay")} onClear={() => setStay(null)}>
-                {stayOptions.map((item) => <StayCard key={item.accommodation.id} item={item} selected={stay?.accommodation.id === item.accommodation.id} onSelect={() => setStay(item)} />)}
+              <ChoiceSection title="Where you stay" icon={BedDouble} included={hasIncludedAccommodation} assigned={allocation?.accommodation?.name} selected={stay?.name} loading={matching} open={openOption === "stay"} onToggle={() => setOpenOption(openOption === "stay" ? null : "stay")} onClear={() => setStay(null)}>
+                {allocation?.accommodationOptions.map((item) => <StayCard key={item.id} item={item} selected={stay?.id === item.id} onSelect={() => setStay(item)} />)}
               </ChoiceSection>
 
-              <ChoiceSection title="Transport" icon={Car} included={hasIncludedTransport} selected={vehicle?.vehicle.name} loading={matching} open={openOption === "vehicle"} onToggle={() => setOpenOption(openOption === "vehicle" ? null : "vehicle")} onClear={() => setVehicle(null)}>
-                {vehicleOptions.map((item) => <VehicleCard key={item.vehicle.id} item={item} selected={vehicle?.vehicle.id === item.vehicle.id} onSelect={() => setVehicle(item)} />)}
+              <ChoiceSection title="Transport" icon={Car} included={hasIncludedTransport} assigned={allocation?.vehicle?.name} selected={vehicle?.name} loading={matching} open={openOption === "vehicle"} onToggle={() => setOpenOption(openOption === "vehicle" ? null : "vehicle")} onClear={() => setVehicle(null)}>
+                {allocation?.vehicleOptions.map((item) => <VehicleCard key={item.id} item={item} selected={vehicle?.id === item.id} onSelect={() => setVehicle(item)} />)}
               </ChoiceSection>
             </section>
           </div>
@@ -213,9 +218,9 @@ export default function PackageCustomization() {
               </div>
               <div className="space-y-3 border-y border-white/10 p-6 text-sm">
                 <Summary label="Dates" value={checkIn + " → " + checkOut} />
-                <Summary label="Guide" value={guide ? guide.guide.name : hasIncludedGuide ? "Included in package" : "No guide selected"} />
-                <Summary label="Stay" value={stay ? stay.accommodation.name : hasIncludedAccommodation ? "Included in package" : "No stay selected"} />
-                <Summary label="Transport" value={vehicle ? vehicle.vehicle.name : hasIncludedTransport ? "Included services" : "Not selected"} />
+                <Summary label="Guide" value={guide?.name || allocation?.guide?.name || (hasIncludedGuide ? "Checking assignment..." : "No guide selected")} />
+                <Summary label="Stay" value={stay?.name || allocation?.accommodation?.name || (hasIncludedAccommodation ? "Checking assignment..." : "No stay selected")} />
+                <Summary label="Transport" value={vehicle?.name || allocation?.vehicle?.name || (hasIncludedTransport ? "Checking assignment..." : "Not selected")} />
                 <Summary label="Language" value={language} />
               </div>
               <div className="bg-white p-6 text-[#10213b]">
@@ -249,34 +254,31 @@ function Summary({ label, value }: { label: string; value: string }) {
   return <div className="flex items-start justify-between gap-4"><span className="text-white/50">{label}</span><span className="text-right font-bold">{value}</span></div>;
 }
 
-function ChoiceSection({ title, icon: Icon, included, selected, loading, open, onToggle, onClear, children }: { title: string; icon: typeof BedDouble; included: boolean; selected?: string; loading: boolean; open: boolean; onToggle: () => void; onClear: () => void; children: React.ReactNode }) {
+function ChoiceSection({ title, icon: Icon, included, assigned, selected, loading, open, onToggle, onClear, children }: { title: string; icon: typeof BedDouble; included: boolean; assigned?: string; selected?: string; loading: boolean; open: boolean; onToggle: () => void; onClear: () => void; children: React.ReactNode }) {
   return <div className="mt-4 overflow-hidden rounded-2xl border border-gray-200">
     <button type="button" onClick={onToggle} className="flex w-full items-center justify-between gap-4 bg-white p-5 text-left hover:bg-gray-50">
-      <div className="flex items-center gap-3"><span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gray-50 text-gray-600"><Icon className="h-5 w-5" /></span><div><p className="font-black text-[#10213b]">{title}</p><p className="mt-1 text-xs text-gray-500">{selected ? "Alternative: " + selected : included ? "Included with this package" : "Choose an optional service"}</p></div></div>
+      <div className="flex items-center gap-3"><span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gray-50 text-gray-600"><Icon className="h-5 w-5" /></span><div><p className="font-black text-[#10213b]">{title}</p><p className="mt-1 text-xs text-gray-500">{selected ? "Alternative: " + selected : assigned ? "Assigned for your dates: " + assigned : included ? "Included with this package" : "Choose an optional service"}</p></div></div>
       <div className="flex items-center gap-2">{selected && <button type="button" onClick={(event) => { event.stopPropagation(); onClear(); }} className="rounded-full px-3 py-1.5 text-xs font-black text-gray-500 hover:bg-gray-100">Reset</button>}<span className={"rounded-full px-3 py-1.5 text-xs font-black " + (included ? "bg-emerald-50 text-emerald-700" : "bg-gray-100 text-gray-600")}>{included ? "Included" : "Optional"}</span><ArrowRight className={"h-4 w-4 text-gray-400 transition " + (open ? "rotate-90" : "")} /></div>
     </button>
-    {open && <div className="border-t border-gray-100 bg-[#fafafa] p-4">{loading ? <p className="p-4 text-sm text-gray-400">Finding suitable options...</p> : <div className="grid gap-3 md:grid-cols-2">{children}</div>}</div>}
+    {open && <div className="border-t border-gray-100 bg-[#fafafa] p-4">{loading ? <p className="p-4 text-sm text-gray-400">Checking live availability...</p> : <div className="grid gap-3 md:grid-cols-2">{children}</div>}</div>}
   </div>;
 }
 
-function GuideCard({ item, selected, onSelect }: { item: GuideRecommendation; selected: boolean; onSelect: () => void }) {
-  const guide = item.guide;
+function GuideCard({ item, selected, onSelect }: { item: PackageResourceOption; selected: boolean; onSelect: () => void }) {
   return <button type="button" onClick={onSelect} className={"overflow-hidden rounded-2xl border bg-white text-left transition hover:-translate-y-0.5 hover:shadow-md " + (selected ? "border-rose-400 ring-2 ring-rose-100" : "border-gray-200")}>
-    <div className="flex items-center gap-3 p-4"><div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-100 text-sm font-black text-gray-500">{guide.profilePhoto ? <img src={guide.profilePhoto} alt={guide.name} className="h-full w-full object-cover" /> : guide.initials}</div><div className="min-w-0 flex-1"><p className="truncate font-black text-[#10213b]">{guide.name}</p><p className="text-xs text-gray-500">{guide.location} · {guide.experience} years</p></div>{selected && <Check className="h-5 w-5 text-rose-500" />}</div>
-    <div className="border-t border-gray-100 px-4 py-3"><div className="flex justify-between text-xs"><span className="font-bold text-gray-500">★ {Number(guide.rating || 0).toFixed(1)}</span><span className="font-black text-gray-800">LKR {Number(guide.pricePerDay || 0).toLocaleString()}/day</span></div><div className="mt-2 flex flex-wrap gap-1">{item.reasons.slice(0, 2).map((reason) => <span key={reason} className="rounded-full bg-gray-50 px-2 py-1 text-[10px] font-bold text-gray-500">{reason}</span>)}</div></div>
+    <div className="flex items-center gap-3 p-4"><div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-100 text-sm font-black text-gray-500">{item.image ? <img src={item.image} alt={item.name} className="h-full w-full object-cover" /> : item.name.slice(0, 2).toUpperCase()}</div><div className="min-w-0 flex-1"><p className="truncate font-black text-[#10213b]">{item.name}</p><p className="text-xs text-gray-500">{item.location} · {item.experience ?? 0} years</p></div>{selected && <Check className="h-5 w-5 text-rose-500" />}</div>
+    <div className="border-t border-gray-100 px-4 py-3"><div className="flex justify-between text-xs"><span className="font-bold text-gray-500">★ {Number(item.rating || 0).toFixed(1)}</span><span className="font-black text-gray-800">LKR {Number(item.pricePerDay || 0).toLocaleString()}/day</span></div><div className="mt-2 flex flex-wrap gap-1">{(item.specialties || []).slice(0, 2).map((specialty) => <span key={specialty} className="rounded-full bg-gray-50 px-2 py-1 text-[10px] font-bold text-gray-500">{specialty}</span>)}</div></div>
   </button>;
 }
 
-function StayCard({ item, selected, onSelect }: { item: AccommodationRecommendation; selected: boolean; onSelect: () => void }) {
-  const stay = item.accommodation;
+function StayCard({ item, selected, onSelect }: { item: PackageResourceOption; selected: boolean; onSelect: () => void }) {
   return <button type="button" onClick={onSelect} className={"overflow-hidden rounded-2xl border bg-white text-left transition hover:-translate-y-0.5 hover:shadow-md " + (selected ? "border-rose-400 ring-2 ring-rose-100" : "border-gray-200")}>
-    <div className="h-28 overflow-hidden bg-gray-100"><img src={stay.image} alt={stay.name} className="h-full w-full object-cover" /></div><div className="p-4"><div className="flex items-start justify-between gap-2"><div><p className="font-black text-[#10213b]">{stay.name}</p><p className="mt-1 text-xs text-gray-500">{stay.type} · {stay.location}</p></div>{selected && <Check className="h-5 w-5 text-rose-500" />}</div><div className="mt-3 flex items-center justify-between text-xs"><span className="font-bold text-gray-500">★ {Number(stay.rating || 0).toFixed(1)}</span><span className="font-black text-gray-800">LKR {Number(stay.price).toLocaleString()}/night</span></div></div>
+    <div className="h-28 overflow-hidden bg-gray-100"><img src={item.image} alt={item.name} className="h-full w-full object-cover" /></div><div className="p-4"><div className="flex items-start justify-between gap-2"><div><p className="font-black text-[#10213b]">{item.name}</p><p className="mt-1 text-xs text-gray-500">{item.type} · {item.location}</p></div>{selected && <Check className="h-5 w-5 text-rose-500" />}</div><div className="mt-3 flex items-center justify-between text-xs"><span className="font-bold text-gray-500">★ {Number(item.rating || 0).toFixed(1)}</span><span className="font-black text-gray-800">LKR {Number(item.pricePerNight || 0).toLocaleString()}/night</span></div></div>
   </button>;
 }
 
-function VehicleCard({ item, selected, onSelect }: { item: VehicleRecommendation; selected: boolean; onSelect: () => void }) {
-  const vehicle = item.vehicle;
+function VehicleCard({ item, selected, onSelect }: { item: PackageResourceOption; selected: boolean; onSelect: () => void }) {
   return <button type="button" onClick={onSelect} className={"overflow-hidden rounded-2xl border bg-white text-left transition hover:-translate-y-0.5 hover:shadow-md " + (selected ? "border-rose-400 ring-2 ring-rose-100" : "border-gray-200")}>
-    <div className="h-28 overflow-hidden bg-gray-100"><img src={vehicle.image} alt={vehicle.name} className="h-full w-full object-cover" /></div><div className="p-4"><div className="flex items-start justify-between gap-2"><div><p className="font-black text-[#10213b]">{vehicle.name}</p><p className="mt-1 text-xs text-gray-500">{vehicle.type} · {vehicle.capacity} seats</p></div>{selected && <Check className="h-5 w-5 text-rose-500" />}</div><div className="mt-3 flex items-center justify-between text-xs"><span className="font-bold text-gray-500">{vehicle.transmission} · {vehicle.fuel}</span><span className="font-black text-gray-800">LKR {Number(vehicle.pricePerDay).toLocaleString()}/day</span></div></div>
+    <div className="h-28 overflow-hidden bg-gray-100"><img src={item.image} alt={item.name} className="h-full w-full object-cover" /></div><div className="p-4"><div className="flex items-start justify-between gap-2"><div><p className="font-black text-[#10213b]">{item.name}</p><p className="mt-1 text-xs text-gray-500">{item.type} · {item.capacity ?? 0} seats</p></div>{selected && <Check className="h-5 w-5 text-rose-500" />}</div><div className="mt-3 flex items-center justify-between text-xs"><span className="font-bold text-gray-500">{item.transmission} · {item.fuel}</span><span className="font-black text-gray-800">LKR {Number(item.pricePerDay || 0).toLocaleString()}/day</span></div></div>
   </button>;
 }
