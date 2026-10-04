@@ -5,6 +5,7 @@ import com.voyara.tourguide.packages.TourPackage;
 import com.voyara.tourguide.tourguides.TourGuide;
 import com.voyara.tourguide.vehiclerental.Vehicle;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import org.springframework.http.HttpStatus;
@@ -35,6 +36,156 @@ public class PackageResourceAllocationService {
         if (requiresVehicle(included)) {
             allocateVehicle(tourPackage, booking, updatingId);
         }
+    }
+
+    /**
+     * Calculates the same date-aware assignment that the booking flow will use,
+     * but does not persist a booking or reserve a resource. The final booking
+     * flow must call allocate() again so availability is re-checked at commit time.
+     */
+    @Transactional(readOnly = true)
+    public PackageResourceAllocationPreview preview(TourPackage tourPackage, Booking booking, String updatingId) {
+        allocate(tourPackage, booking, updatingId);
+
+        List<PackageResourceAllocationPreview.ResourceOption> guideOptions =
+                tourPackage.getEligibleGuides().stream()
+                        .filter(guide -> "Available".equalsIgnoreCase(guide.getStatus()))
+                        .filter(guide -> isGuideAvailable(guide, booking, updatingId))
+                        .sorted(Comparator.comparingInt((TourGuide guide) -> guideScore(guide, tourPackage, booking)).reversed()
+                                .thenComparing(TourGuide::getId))
+                        .map(this::guideOption)
+                        .toList();
+
+        List<PackageResourceAllocationPreview.ResourceOption> accommodationOptions =
+                tourPackage.getEligibleAccommodations().stream()
+                        .filter(accommodation -> "Active".equalsIgnoreCase(accommodation.getStatus()))
+                        .filter(accommodation -> isAccommodationAvailable(accommodation, booking, updatingId))
+                        .sorted(Comparator.comparingInt((Accommodation accommodation) ->
+                                        accommodationScore(accommodation, tourPackage)).reversed()
+                                .thenComparing(Accommodation::getId))
+                        .map(this::accommodationOption)
+                        .toList();
+
+        List<PackageResourceAllocationPreview.ResourceOption> vehicleOptions =
+                tourPackage.getEligibleVehicles().stream()
+                        .filter(vehicle -> "Available".equalsIgnoreCase(vehicle.getStatus()))
+                        .filter(vehicle -> booking.getGuests() <= vehicle.getCapacity())
+                        .filter(vehicle -> isVehicleAvailable(vehicle, booking, updatingId))
+                        .sorted(Comparator.comparingInt((Vehicle vehicle) ->
+                                        vehicleScore(vehicle, tourPackage, booking)).reversed()
+                                .thenComparing(Vehicle::getId))
+                        .map(this::vehicleOption)
+                        .toList();
+
+        return new PackageResourceAllocationPreview(
+                tourPackage.getId(),
+                tourPackage.getName(),
+                findGuideOption(tourPackage, booking.getGuideId()),
+                findAccommodationOption(tourPackage, booking.getAccommodationId()),
+                findVehicleOption(tourPackage, booking.getVehicleId()),
+                guideOptions,
+                accommodationOptions,
+                vehicleOptions
+        );
+    }
+
+    private PackageResourceAllocationPreview.ResourceOption findGuideOption(TourPackage tourPackage, Long id) {
+        if (id == null) {
+            return null;
+        }
+        return tourPackage.getEligibleGuides().stream()
+                .filter(item -> Objects.equals(item.getId(), id))
+                .findFirst()
+                .map(this::guideOption)
+                .orElse(null);
+    }
+
+    private PackageResourceAllocationPreview.ResourceOption findAccommodationOption(TourPackage tourPackage, Long id) {
+        if (id == null) {
+            return null;
+        }
+        return tourPackage.getEligibleAccommodations().stream()
+                .filter(item -> Objects.equals(item.getId(), id))
+                .findFirst()
+                .map(this::accommodationOption)
+                .orElse(null);
+    }
+
+    private PackageResourceAllocationPreview.ResourceOption findVehicleOption(TourPackage tourPackage, Long id) {
+        if (id == null) {
+            return null;
+        }
+        return tourPackage.getEligibleVehicles().stream()
+                .filter(item -> Objects.equals(item.getId(), id))
+                .findFirst()
+                .map(this::vehicleOption)
+                .orElse(null);
+    }
+
+    private PackageResourceAllocationPreview.ResourceOption guideOption(TourGuide guide) {
+        return new PackageResourceAllocationPreview.ResourceOption(
+                guide.getId(),
+                guide.getName(),
+                guide.getLocation(),
+                guide.getProfilePhoto(),
+                "Guide",
+                guide.getRating(),
+                guide.getReviews(),
+                guide.getPricePerDay(),
+                null,
+                null,
+                guide.getExperience(),
+                guide.getSpecialties(),
+                guide.getLanguages(),
+                null,
+                null,
+                null,
+                null
+        );
+    }
+
+    private PackageResourceAllocationPreview.ResourceOption accommodationOption(Accommodation accommodation) {
+        return new PackageResourceAllocationPreview.ResourceOption(
+                accommodation.getId(),
+                accommodation.getName(),
+                accommodation.getLocation(),
+                accommodation.getImage(),
+                accommodation.getType(),
+                accommodation.getRating(),
+                accommodation.getReviews(),
+                null,
+                accommodation.getPrice(),
+                null,
+                null,
+                null,
+                null,
+                accommodation.getAmenities(),
+                null,
+                null,
+                null
+        );
+    }
+
+    private PackageResourceAllocationPreview.ResourceOption vehicleOption(Vehicle vehicle) {
+        return new PackageResourceAllocationPreview.ResourceOption(
+                vehicle.getId(),
+                vehicle.getName(),
+                vehicle.getLocation(),
+                vehicle.getImage(),
+                vehicle.getType(),
+                vehicle.getRating(),
+                vehicle.getReviews(),
+                vehicle.getPricePerDay(),
+                null,
+                vehicle.getCapacity(),
+                null,
+                null,
+                null,
+                null,
+                vehicle.getTransmission(),
+                vehicle.getFuel(),
+                vehicle.getFeatures()
+        );
     }
 
     private void allocateGuide(TourPackage tourPackage, Booking booking, String updatingId) {
