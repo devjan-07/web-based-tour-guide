@@ -40,7 +40,6 @@ public class BookingService {
     private final ReviewRatingService reviewRatingService;
     private final NotificationService notificationService;
     private final PackageResourceAllocationService packageResourceAllocationService;
-    private final BookingStrategyFactory bookingStrategyFactory;
 
     public BookingService(
             BookingRepository repository,
@@ -53,8 +52,7 @@ public class BookingService {
             ReviewRepository reviewRepository,
             ReviewRatingService reviewRatingService,
             NotificationService notificationService,
-            PackageResourceAllocationService packageResourceAllocationService,
-            BookingStrategyFactory bookingStrategyFactory
+            PackageResourceAllocationService packageResourceAllocationService
     ) {
         this.repository = repository;
         this.userRepository = userRepository;
@@ -67,7 +65,6 @@ public class BookingService {
         this.reviewRatingService = reviewRatingService;
         this.notificationService = notificationService;
         this.packageResourceAllocationService = packageResourceAllocationService;
-        this.bookingStrategyFactory = bookingStrategyFactory;
     }
 
     public List<Booking> findAll() {
@@ -557,25 +554,32 @@ public class BookingService {
         BigDecimal total = BigDecimal.ZERO;
         boolean pricedFromResources = false;
 
-        boolean packageBooking = "PACKAGE".equalsIgnoreCase(candidate.getBookingType());
-        boolean accommodationBooking = "ACCOMMODATION".equalsIgnoreCase(candidate.getBookingType());
+        TourPackage tourPackage = selectedPackage(candidate);
+        boolean packageBooking = tourPackage != null && "PACKAGE".equalsIgnoreCase(candidate.getBookingType());
         boolean guideExplicitlySelected = candidate.getGuideId() != null;
+        boolean accommodationExplicitlySelected = candidate.getAccommodationId() != null;
         boolean vehicleExplicitlySelected = candidate.getVehicleId() != null;
 
-        /*
-         * Strategy Pattern integration:
-         * BookingService delegates PACKAGE-specific validation, preparation,
-         * allocation and base pricing to the selected BookingStrategy.
-         *
-         * The Factory decides which concrete strategy is appropriate. Common
-         * guide/accommodation/vehicle pricing and conflict validation remain
-         * in this service.
-         */
-        BigDecimal strategyTotal = bookingStrategyFactory
-                .getStrategy(candidate.getBookingType())
-                .apply(candidate, updatingId, strictCustomerBooking);
-        total = total.add(strategyTotal);
-        pricedFromResources = pricedFromResources || strategyTotal.signum() > 0;
+        if (tourPackage != null) {
+            validateActive("Package", tourPackage.getStatus(), "Active");
+            if (tourPackage.getMaxGroup() > 0 && candidate.getGuests() > tourPackage.getMaxGroup()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Guest count exceeds the selected package maximum group size");
+            }
+            candidate.setPkg(tourPackage.getName());
+            if (candidate.getDestination() == null || candidate.getDestination().isBlank()) {
+                candidate.setDestination(String.join(", ", tourPackage.getDestinations()));
+            }
+
+            if (packageBooking) {
+                packageResourceAllocationService.allocate(tourPackage, candidate, updatingId);
+            }
+
+            total = total.add(nonNull(tourPackage.getPrice()).multiply(BigDecimal.valueOf(candidate.getGuests())));
+            pricedFromResources = true;
+        } else if (strictCustomerBooking && "PACKAGE".equalsIgnoreCase(candidate.getBookingType())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A package booking requires a valid package");
+        }
         if (strictCustomerBooking && "CUSTOM".equalsIgnoreCase(candidate.getBookingType())) {
             requireText(candidate.getDestination(), "Destination is required");
         }
@@ -590,37 +594,30 @@ public class BookingService {
             }
         }
 
-        if (!accommodationBooking) {
-            Accommodation accommodation = selectedAccommodation(candidate);
-            if (accommodation != null) {
-                validateActive("Accommodation", accommodation.getStatus(), "Active");
-                int requestedRooms = bookingRooms(candidate);
-                if (requestedRooms > accommodation.getRooms()) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Requested rooms exceed available rooms at this accommodation");
-                }
-                int bookedRooms = bookedAccommodationRooms(candidate, updatingId);
-                if (bookedRooms + requestedRooms > accommodation.getRooms()) {
-                    throw new ResponseStatusException(HttpStatus.CONFLICT, "The selected accommodation does not have enough rooms for these dates");
-                }
-                candidate.setAccommodation(accommodation.getName());
-                if (!packageBooking) {
-                    total = total.add(nonNull(accommodation.getPrice())
-                            .multiply(BigDecimal.valueOf(days))
-                            .multiply(BigDecimal.valueOf(requestedRooms)));
-                    pricedFromResources = true;
-                }
-            } else if (strictCustomerBooking && "ACCOMMODATION".equalsIgnoreCase(candidate.getBookingType())) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "An accommodation booking requires a valid accommodation");
+        Accommodation accommodation = selectedAccommodation(candidate);
+        if (accommodation != null) {
+            validateActive("Accommodation", accommodation.getStatus(), "Active");
+            if (strictCustomerBooking && "ACCOMMODATION".equalsIgnoreCase(candidate.getBookingType())) {
+                requireText(candidate.getRoomType(), "Room type is required");
+            }
+            int requestedRooms = bookingRooms(candidate);
+            if (requestedRooms > accommodation.getRooms()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Requested rooms exceed available rooms at this accommodation");
+            }
+            int bookedRooms = bookedAccommodationRooms(candidate, updatingId);
+            if (bookedRooms + requestedRooms > accommodation.getRooms()) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "The selected accommodation does not have enough rooms for these dates");
+            }
+            candidate.setAccommodation(accommodation.getName());
+            if (!packageBooking || accommodationExplicitlySelected) {
+                total = total.add(nonNull(accommodation.getPrice()).multiply(BigDecimal.valueOf(days)).multiply(BigDecimal.valueOf(requestedRooms)));
+                pricedFromResources = true;
             }
         } else if (strictCustomerBooking && "ACCOMMODATION".equalsIgnoreCase(candidate.getBookingType())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "An accommodation booking requires a valid accommodation");
         }
 
         Vehicle vehicle = selectedVehicle(candidate);
-        }
-
-        Vehicle vehicle
         if (vehicle != null) {
             validateActive("Vehicle", vehicle.getStatus(), "Available");
             if (candidate.getGuests() > vehicle.getCapacity()) {
