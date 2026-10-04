@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Clock, Users, Heart, MapPin, Star } from "lucide-react";
+import { ImageWithFallback } from "./figma/ImageWithFallback";
 
 interface TourCardProps {
   id: number;
@@ -17,17 +18,15 @@ interface TourCardProps {
 
 export function TourCard({ id, image, title, location, price, duration, maxGroup, badge, category, rating = 0, onView }: TourCardProps) {
   const [liked, setLiked] = useState(false);
-  const [imgError, setImgError] = useState(false);
 
   return (
     <div onClick={() => onView?.(id)} className="bg-white rounded-2xl overflow-hidden flex flex-col md:flex-row hover:shadow-xl transition-all duration-300 cursor-pointer group" style={{ border: "1px solid #e5e7eb" }}>
       <div className="relative md:w-64 shrink-0" style={{ minHeight: 200 }}>
-        <img
-          src={imgError ? "https://images.unsplash.com/photo-1586500036706-41963de24d8b?w=600" : image}
+        <ImageWithFallback
+          src={image}
           alt={title}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           style={{ minHeight: 200 }}
-          onError={() => setImgError(true)}
         />
         {badge && <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-bold text-white" style={{ background: "linear-gradient(135deg, #00AA6C, #008A56)" }}>{badge}</span>}
         <button onClick={(e) => { e.stopPropagation(); setLiked(!liked); }} className="absolute top-3 right-3 p-2 rounded-full bg-white/90 hover:bg-white transition-colors shadow" aria-label={liked ? "Remove from favourites" : "Save tour"}>
