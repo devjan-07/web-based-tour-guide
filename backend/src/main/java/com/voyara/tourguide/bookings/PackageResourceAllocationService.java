@@ -135,8 +135,8 @@ public class PackageResourceAllocationService {
                 null,
                 null,
                 guide.getExperience(),
-                guide.getSpecialties(),
-                guide.getLanguages(),
+                copyList(guide.getSpecialties()),
+                copyList(guide.getLanguages()),
                 null,
                 null,
                 null,
@@ -159,7 +159,7 @@ public class PackageResourceAllocationService {
                 null,
                 null,
                 null,
-                accommodation.getAmenities(),
+                copyList(accommodation.getAmenities()),
                 null,
                 null,
                 null
@@ -184,8 +184,12 @@ public class PackageResourceAllocationService {
                 null,
                 vehicle.getTransmission(),
                 vehicle.getFuel(),
-                vehicle.getFeatures()
+                copyList(vehicle.getFeatures())
         );
+    }
+
+    private <T> List<T> copyList(List<T> values) {
+        return values == null ? List.of() : List.copyOf(values);
     }
 
     private void allocateGuide(TourPackage tourPackage, Booking booking, String updatingId) {
