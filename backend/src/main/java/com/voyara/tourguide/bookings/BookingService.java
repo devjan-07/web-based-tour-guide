@@ -40,6 +40,7 @@ public class BookingService {
     private final ReviewRatingService reviewRatingService;
     private final NotificationService notificationService;
     private final PackageResourceAllocationService packageResourceAllocationService;
+    private final BookingStrategyFactory bookingStrategyFactory;
 
     public BookingService(
             BookingRepository repository,
@@ -52,7 +53,8 @@ public class BookingService {
             ReviewRepository reviewRepository,
             ReviewRatingService reviewRatingService,
             NotificationService notificationService,
-            PackageResourceAllocationService packageResourceAllocationService
+            PackageResourceAllocationService packageResourceAllocationService,
+            BookingStrategyFactory bookingStrategyFactory
     ) {
         this.repository = repository;
         this.userRepository = userRepository;
@@ -65,6 +67,7 @@ public class BookingService {
         this.reviewRatingService = reviewRatingService;
         this.notificationService = notificationService;
         this.packageResourceAllocationService = packageResourceAllocationService;
+        this.bookingStrategyFactory = bookingStrategyFactory;
     }
 
     public List<Booking> findAll() {
@@ -554,32 +557,25 @@ public class BookingService {
         BigDecimal total = BigDecimal.ZERO;
         boolean pricedFromResources = false;
 
-        TourPackage tourPackage = selectedPackage(candidate);
-        boolean packageBooking = tourPackage != null && "PACKAGE".equalsIgnoreCase(candidate.getBookingType());
+        boolean packageBooking = "PACKAGE".equalsIgnoreCase(candidate.getBookingType());
         boolean guideExplicitlySelected = candidate.getGuideId() != null;
         boolean accommodationExplicitlySelected = candidate.getAccommodationId() != null;
         boolean vehicleExplicitlySelected = candidate.getVehicleId() != null;
 
-        if (tourPackage != null) {
-            validateActive("Package", tourPackage.getStatus(), "Active");
-            if (tourPackage.getMaxGroup() > 0 && candidate.getGuests() > tourPackage.getMaxGroup()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "Guest count exceeds the selected package maximum group size");
-            }
-            candidate.setPkg(tourPackage.getName());
-            if (candidate.getDestination() == null || candidate.getDestination().isBlank()) {
-                candidate.setDestination(String.join(", ", tourPackage.getDestinations()));
-            }
-
-            if (packageBooking) {
-                packageResourceAllocationService.allocate(tourPackage, candidate, updatingId);
-            }
-
-            total = total.add(nonNull(tourPackage.getPrice()).multiply(BigDecimal.valueOf(candidate.getGuests())));
-            pricedFromResources = true;
-        } else if (strictCustomerBooking && "PACKAGE".equalsIgnoreCase(candidate.getBookingType())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A package booking requires a valid package");
-        }
+        /*
+         * Strategy Pattern integration:
+         * BookingService delegates PACKAGE-specific validation, preparation,
+         * allocation and base pricing to the selected BookingStrategy.
+         *
+         * The Factory decides which concrete strategy is appropriate. Common
+         * guide/accommodation/vehicle pricing and conflict validation remain
+         * in this service.
+         */
+        BigDecimal strategyTotal = bookingStrategyFactory
+                .getStrategy(candidate.getBookingType())
+                .apply(candidate, updatingId, strictCustomerBooking);
+        total = total.add(strategyTotal);
+        pricedFromResources = pricedFromResources || strategyTotal.signum() > 0;
         if (strictCustomerBooking && "CUSTOM".equalsIgnoreCase(candidate.getBookingType())) {
             requireText(candidate.getDestination(), "Destination is required");
         }
