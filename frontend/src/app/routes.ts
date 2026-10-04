@@ -18,6 +18,7 @@ import TouristVehicleBooking from "./pages/tourist/TouristVehicleBooking";
 import PlanMyTrip from "./pages/tourist/PlanMyTrip";
 import ComparePackages from "./pages/tourist/ComparePackages";
 import PackageCustomization from "./pages/tourist/PackageCustomization";
+import CustomTripBuilder from "./pages/tourist/CustomTripBuilder";
 import { DashboardLayout } from "./pages/dashboard/DashboardLayout";
 import { DashboardHome } from "./pages/dashboard/DashboardHome";
 import { AccommodationManagement } from "./pages/dashboard/AccommodationManagement";
@@ -47,6 +48,7 @@ export const router = createBrowserRouter([
   { path: "/destinations/:id", Component: DestinationDetailPage },
   { path: "/packages/:id", Component: PackageDetailPage },
   { path: "/tourist/plan", Component: PlanMyTrip },
+  { path: "/tourist/custom-trip", Component: CustomTripBuilder },
   { path: "/unauthorized", Component: UnauthorizedPage },
   {
     Component: ProtectedRoute,
