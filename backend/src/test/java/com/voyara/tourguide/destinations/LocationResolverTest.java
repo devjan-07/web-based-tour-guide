@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.http.HttpClient;
@@ -18,6 +19,34 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class LocationResolverTest {
     @Mock HttpClient httpClient;
     @Mock HttpResponse<String> httpResponse;
+
+
+    @Test
+    void canonicalizesTourismLandmarkNamesBeforeGeocoding() throws Exception {
+        when(httpResponse.statusCode()).thenReturn(200);
+        when(httpResponse.body()).thenReturn("""
+                {"results":[{"name":"Sigiriya","latitude":7.9570,"longitude":80.7603}]}
+                """);
+        when(httpClient.<String>send(any(), any())).thenReturn(httpResponse);
+
+        LocationResolver resolver = new LocationResolver(
+                httpClient, new ObjectMapper(), "http://localhost/geocode");
+
+        Destination destination = new Destination();
+        destination.setName("Sigiriya Rock Fortress");
+        destination.setCountry("Sri Lanka");
+
+        GeoCoordinates coordinates = resolver.resolve(destination);
+
+        assertEquals(7.9570, coordinates.latitude(), 0.0001);
+        assertEquals(80.7603, coordinates.longitude(), 0.0001);
+        assertEquals("Sigiriya", coordinates.locationName());
+
+        verify(httpClient).send(
+                org.mockito.ArgumentMatchers.argThat(request ->
+                        request.uri().toString().contains("name=Sigiriya%2C+Sri+Lanka")),
+                any());
+    }
 
     @Test
     void cachesResolvedCoordinatesDuringApplicationRuntime() throws Exception {
