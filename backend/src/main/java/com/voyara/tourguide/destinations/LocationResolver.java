@@ -80,7 +80,7 @@ public class LocationResolver {
     }
 
     private JsonNode geocode(Destination destination) throws IOException, InterruptedException {
-        String query = destination.getName();
+        String query = canonicalLocationName(destination.getName());
         if (destination.getCountry() != null && !destination.getCountry().isBlank()) {
             query += ", " + destination.getCountry();
         }
@@ -121,6 +121,17 @@ public class LocationResolver {
         }
 
         return response.body();
+    }
+
+    private String canonicalLocationName(String destinationName) {
+        return switch (destinationName.trim().toLowerCase()) {
+            case "sigiriya rock fortress" -> "Sigiriya";
+            case "ella highlands" -> "Ella";
+            case "mirissa beach" -> "Mirissa";
+            case "galle fort" -> "Galle";
+            case "yala national park" -> "Yala";
+            default -> destinationName.trim();
+        };
     }
 
     private String cacheKey(Destination destination) {
