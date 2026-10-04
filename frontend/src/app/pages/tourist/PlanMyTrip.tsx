@@ -69,6 +69,7 @@ export default function PlanMyTrip() {
   const [matching, setMatching] = useState(false);
   const [matched, setMatched] = useState(false);
   const [error, setError] = useState("");
+  const [recommendationWarnings, setRecommendationWarnings] = useState<string[]>([]);
 
   useEffect(() => {
     Promise.all([destinationsApi.list(), packagesApi.list()])
@@ -126,7 +127,7 @@ export default function PlanMyTrip() {
     try {
       // Guide recommendations are built from the public guide catalogue so the
       // trip planner does not depend on the protected recommendation endpoint.
-      const [guideItems, stayItems, vehicleItems] = await Promise.all([
+      const results = await Promise.allSettled([
         guidesApi.list(),
         accommodationRecommendationsApi.list({
           destinationId: selectedDestination.id,
@@ -143,6 +144,20 @@ export default function PlanMyTrip() {
           maxDailyBudget: dailyBudget || undefined,
         }),
       ]);
+
+      const warnings: string[] = [];
+      const guideItems = results[0].status === "fulfilled" ? results[0].value : [];
+      const stayItems = results[1].status === "fulfilled" ? results[1].value : [];
+      const vehicleItems = results[2].status === "fulfilled" ? results[2].value : [];
+
+      if (results[0].status === "rejected") warnings.push("Guide recommendations are temporarily unavailable.");
+      if (results[1].status === "rejected") warnings.push("Accommodation recommendations are temporarily unavailable.");
+      if (results[2].status === "rejected") warnings.push("Transport recommendations are temporarily unavailable.");
+
+      setRecommendationWarnings(warnings);
+      setError(warnings.length === 3
+        ? "Supporting recommendations are temporarily unavailable. You can still choose a package or build your own trip."
+        : "");
 
       const requestedLanguage = guideLanguage.trim().toLowerCase();
       const requestedLocation = selectedDestination.name.trim().toLowerCase();
@@ -197,6 +212,7 @@ export default function PlanMyTrip() {
       setVehicles(vehicleItems.slice(0, 3));
       setMatched(true);
     } catch (err) {
+      setRecommendationWarnings([]);
       setError(err instanceof Error ? err.message : "Could not build recommendations.");
     } finally {
       setMatching(false);
@@ -241,6 +257,15 @@ export default function PlanMyTrip() {
 
       <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
         {error && <div className="mb-6 rounded-2xl border border-rose-100 bg-rose-50 px-5 py-4 text-sm font-bold text-rose-700">{error}</div>}
+        {recommendationWarnings.length > 0 && recommendationWarnings.length < 3 && (
+          <div className="mb-6 rounded-2xl border border-amber-100 bg-amber-50 px-5 py-4 text-sm font-semibold text-amber-800">
+            <p className="font-black">Some supporting recommendations could not be loaded.</p>
+            <ul className="mt-1 list-disc space-y-1 pl-5">
+              {recommendationWarnings.map((warning) => <li key={warning}>{warning}</li>)}
+            </ul>
+            <p className="mt-2 text-xs font-medium text-amber-700">The available recommendations and package choices remain usable.</p>
+          </div>
+        )}
 
         <section className="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-gray-200 md:p-8">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -362,9 +387,9 @@ export default function PlanMyTrip() {
               <p className="mt-2 max-w-2xl text-sm leading-6 text-white/65">These are separate local resources matched to your choices. They are not automatically added to a package.</p>
             </div>
             <div className="mt-6 grid gap-6 lg:grid-cols-3">
-              <ServicePanel title="Local guides" icon={Languages} count={guides.length} empty="No guide matches right now.">{guides.map(({ guide, suitabilityScore, reasons }) => <ServiceCard key={guide.id} image={guide.profilePhoto} title={guide.name} subtitle={guide.location + " · " + guide.experience + " years"} price={guide.pricePerDay ? "LKR " + Number(guide.pricePerDay).toLocaleString() + " / day" : "Price on request"} score={suitabilityScore} reasons={reasons} />)}</ServicePanel>
-              <ServicePanel title="Places to stay" icon={BedDouble} count={stays.length} empty="No suitable stays found.">{stays.map(({ accommodation, suitabilityScore, reasons }) => <ServiceCard key={accommodation.id} image={accommodation.image} title={accommodation.name} subtitle={accommodation.type + " · " + accommodation.location} price={"LKR " + Number(accommodation.price).toLocaleString() + " / night"} score={suitabilityScore} reasons={reasons} />)}</ServicePanel>
-              <ServicePanel title="Transport" icon={Car} count={vehicles.length} empty="No suitable vehicles found.">{vehicles.map(({ vehicle, suitabilityScore, reasons }) => <ServiceCard key={vehicle.id} image={vehicle.image} title={vehicle.name} subtitle={vehicle.type + " · " + vehicle.capacity + " seats"} price={"LKR " + Number(vehicle.pricePerDay).toLocaleString() + " / day"} score={suitabilityScore} reasons={reasons} />)}</ServicePanel>
+              <ServicePanel title="Local guides" icon={Languages} count={guides.length} empty={recommendationWarnings.includes("Guide recommendations are temporarily unavailable.") ? "Guide recommendations are temporarily unavailable." : "No guide matches right now."}>{guides.map(({ guide, suitabilityScore, reasons }) => <ServiceCard key={guide.id} image={guide.profilePhoto} title={guide.name} subtitle={guide.location + " · " + guide.experience + " years"} price={guide.pricePerDay ? "LKR " + Number(guide.pricePerDay).toLocaleString() + " / day" : "Price on request"} score={suitabilityScore} reasons={reasons} />)}</ServicePanel>
+              <ServicePanel title="Places to stay" icon={BedDouble} count={stays.length} empty={recommendationWarnings.includes("Accommodation recommendations are temporarily unavailable.") ? "Accommodation recommendations are temporarily unavailable." : "No suitable stays found."}>{stays.map(({ accommodation, suitabilityScore, reasons }) => <ServiceCard key={accommodation.id} image={accommodation.image} title={accommodation.name} subtitle={accommodation.type + " · " + accommodation.location} price={"LKR " + Number(accommodation.price).toLocaleString() + " / night"} score={suitabilityScore} reasons={reasons} />)}</ServicePanel>
+              <ServicePanel title="Transport" icon={Car} count={vehicles.length} empty={recommendationWarnings.includes("Transport recommendations are temporarily unavailable.") ? "Transport recommendations are temporarily unavailable." : "No suitable vehicles found."}>{vehicles.map(({ vehicle, suitabilityScore, reasons }) => <ServiceCard key={vehicle.id} image={vehicle.image} title={vehicle.name} subtitle={vehicle.type + " · " + vehicle.capacity + " seats"} price={"LKR " + Number(vehicle.pricePerDay).toLocaleString() + " / day"} score={suitabilityScore} reasons={reasons} />)}</ServicePanel>
             </div>
           </section>
           </>
