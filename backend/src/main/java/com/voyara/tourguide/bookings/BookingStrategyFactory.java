@@ -1,6 +1,5 @@
 package com.voyara.tourguide.bookings;
 
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Component;
@@ -30,6 +29,8 @@ public class BookingStrategyFactory {
         for (BookingStrategy strategy : strategyList) {
             if (strategy instanceof PackageBookingStrategy) {
                 strategies.put("PACKAGE", strategy);
+            } else if (strategy instanceof AccommodationBookingStrategy) {
+                strategies.put("ACCOMMODATION", strategy);
             }
         }
     }
