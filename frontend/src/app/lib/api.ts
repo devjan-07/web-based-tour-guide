@@ -67,6 +67,40 @@ export interface TourPackage {
   image: string;
   included: string;
   description: string;
+  eligibleGuides?: Guide[];
+  eligibleAccommodations?: Accommodation[];
+  eligibleVehicles?: Vehicle[];
+}
+
+export interface PackageResourceOption {
+  id: number;
+  name: string;
+  location?: string;
+  image?: string;
+  type?: string;
+  rating: number;
+  reviews: number;
+  pricePerDay?: number | null;
+  pricePerNight?: number | null;
+  capacity?: number | null;
+  experience?: number | null;
+  specialties?: string[] | null;
+  languages?: string[] | null;
+  amenities?: string[] | null;
+  transmission?: string | null;
+  fuel?: string | null;
+  features?: string[] | null;
+}
+
+export interface PackageResourceAllocationPreview {
+  packageId: number;
+  packageName: string;
+  guide: PackageResourceOption | null;
+  accommodation: PackageResourceOption | null;
+  vehicle: PackageResourceOption | null;
+  guideOptions: PackageResourceOption[];
+  accommodationOptions: PackageResourceOption[];
+  vehicleOptions: PackageResourceOption[];
 }
 
 export interface Booking {
@@ -316,6 +350,26 @@ export interface TripReadiness {
 
 export const tripReadinessApi = {
   get: (id: string) => request<TripReadiness>(`/tourist/bookings/${id}/readiness`),
+};
+
+export const packageResourceAllocationApi = {
+  preview: (payload: {
+    packageId: number;
+    languagePreference?: string;
+    guideSelectionType?: "VOYARA" | "OWN";
+    guideId?: number | null;
+    accommodationSelectionType?: "VOYARA" | "OWN";
+    accommodationId?: number | null;
+    vehicleSelectionType?: "VOYARA" | "OWN";
+    vehicleId?: number | null;
+    checkIn: string;
+    checkOut: string;
+    guests: number;
+    rooms?: number;
+  }) => request<PackageResourceAllocationPreview>("/tourist/bookings/package-preview", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  }),
 };
 
 export const touristBookingsApi = {
