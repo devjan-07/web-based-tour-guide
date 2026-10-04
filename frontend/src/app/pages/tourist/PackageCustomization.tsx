@@ -194,15 +194,15 @@ export default function PackageCustomization() {
               <div><p className="text-xs font-black uppercase tracking-[0.2em] text-rose-500">03 · Personalise</p><h2 className="mt-2 text-3xl font-black text-[#10213b]">Change something only if you want to</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-gray-500">Your package is the source of truth. Included services stay included automatically; the cards below are optional replacements, not items you must add again.</p></div>
 
               <ChoiceSection title="Local guide" icon={Languages} included={hasIncludedGuide} assigned={allocation?.guide?.name} selected={guide?.name} loading={matching} open={openOption === "guide"} onToggle={() => setOpenOption(openOption === "guide" ? null : "guide")} onClear={() => setGuide(null)}>
-                {allocation?.guideOptions.map((item) => <GuideCard key={item.id} item={item} selected={guide?.id === item.id} onSelect={() => setGuide(item)} />)}
+                {allocation?.guideOptions.map((item) => <GuideCard key={item.id} item={item} selected={guide?.id === item.id} onSelect={() => setGuide(item.id === allocation?.guide?.id ? null : item)} />)}
               </ChoiceSection>
 
               <ChoiceSection title="Where you stay" icon={BedDouble} included={hasIncludedAccommodation} assigned={allocation?.accommodation?.name} selected={stay?.name} loading={matching} open={openOption === "stay"} onToggle={() => setOpenOption(openOption === "stay" ? null : "stay")} onClear={() => setStay(null)}>
-                {allocation?.accommodationOptions.map((item) => <StayCard key={item.id} item={item} selected={stay?.id === item.id} onSelect={() => setStay(item)} />)}
+                {allocation?.accommodationOptions.map((item) => <StayCard key={item.id} item={item} selected={stay?.id === item.id} onSelect={() => setStay(item.id === allocation?.accommodation?.id ? null : item)} />)}
               </ChoiceSection>
 
               <ChoiceSection title="Transport" icon={Car} included={hasIncludedTransport} assigned={allocation?.vehicle?.name} selected={vehicle?.name} loading={matching} open={openOption === "vehicle"} onToggle={() => setOpenOption(openOption === "vehicle" ? null : "vehicle")} onClear={() => setVehicle(null)}>
-                {allocation?.vehicleOptions.map((item) => <VehicleCard key={item.id} item={item} selected={vehicle?.id === item.id} onSelect={() => setVehicle(item)} />)}
+                {allocation?.vehicleOptions.map((item) => <VehicleCard key={item.id} item={item} selected={vehicle?.id === item.id} onSelect={() => setVehicle(item.id === allocation?.vehicle?.id ? null : item)} />)}
               </ChoiceSection>
             </section>
           </div>
