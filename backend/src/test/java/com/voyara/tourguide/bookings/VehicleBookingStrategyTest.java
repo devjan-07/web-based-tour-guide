@@ -30,7 +30,7 @@ class VehicleBookingStrategyTest {
 
         assertEquals(new BigDecimal("200.00"), total);
         assertEquals(vehicle, booking.getVehicleResource());
-        assertEquals("Toyota · Corolla", booking.getVehicle());
+        assertEquals("Premium Sedan · Toyota · Corolla", booking.getVehicle());
         assertEquals("Colombo", booking.getDestination());
     }
 
@@ -66,7 +66,7 @@ class VehicleBookingStrategyTest {
     private Vehicle vehicle(Long id, int capacity, BigDecimal pricePerDay) {
         Vehicle vehicle = new Vehicle();
         vehicle.setId(id);
-        vehicle.setName("Toyota");
+        vehicle.setName("Premium Sedan");
         vehicle.setBrand("Toyota");
         vehicle.setModel("Corolla");
         vehicle.setCapacity(capacity);
