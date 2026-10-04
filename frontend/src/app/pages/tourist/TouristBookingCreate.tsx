@@ -512,7 +512,6 @@ export default function TouristBookingCreate() {
               </aside>
             </form>
             ))}
-          )}
         </div>
       </main>
       <Footer />
