@@ -268,12 +268,12 @@ export function DashboardHome() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {dashboard.stats.map((s) => {
           const Icon = s.icon;
-          const max = Math.max(...s.trend);
+          const max = Math.max(1, ...s.trend);
           return (
-            <div key={s.label} className="group relative bg-white dark:bg-slate-800 rounded-2xl p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 border border-gray-200 dark:border-slate-700 overflow-hidden">
+            <div key={s.label} className="group relative min-w-0 bg-white dark:bg-slate-800 rounded-2xl p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 border border-gray-200 dark:border-slate-700 overflow-hidden">
               <span className="absolute inset-x-0 top-0 h-1 opacity-80" style={{ background: s.color }} />
               <div className="flex items-center justify-between mb-4">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: s.bg }}>
@@ -283,7 +283,7 @@ export function DashboardHome() {
                   <TrendingUp className="w-3 h-3" />{s.change}
                 </div>
               </div>
-              <p className="text-gray-900 dark:text-white" style={{ fontSize: "1.6rem", fontWeight: 800, lineHeight: 1 }}>{s.value}</p>
+              <p className="truncate text-gray-900 dark:text-white" title={s.value} style={{ fontSize: "1.6rem", fontWeight: 800, lineHeight: 1 }}>{s.value}</p>
               <div className="flex items-end justify-between mt-2 gap-2">
                 <p className="text-gray-400 dark:text-slate-500 text-xs">{s.label}{s.note && <span className="hidden sm:inline"> · {s.note}</span>}</p>
                 <div className="flex items-end gap-0.5 h-6 shrink-0">
