@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { Link } from "react-router";
 import { ArrowRight, BedDouble, Car, Compass, MapPin, Search, Star, Users, SlidersHorizontal } from "lucide-react";
 import { Navbar } from "../components/Navbar";
@@ -111,7 +112,7 @@ function SectionHeading({ title, text }: { title: string; text: string }) {
 function DestinationGrid({ items }: { items: Destination[] }) {
   return <><SectionHeading title="Places worth the journey" text="Find your next base, day trip or long-weekend escape." />
     {items.length ? <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">{items.map(item => <Link key={item.id} to={`/destinations/${item.id}`} className="group overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-gray-200 transition hover:-translate-y-1 hover:shadow-xl">
-      <div className="relative h-56"><img src={item.image} alt={item.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" /><div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent" /><div className="absolute bottom-3 left-4 text-white"><p className="font-extrabold">{item.name}</p><p className="text-xs text-white/80">{item.country}</p></div></div>
+      <div className="relative h-56"><ImageWithFallback src={item.image} alt={item.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" /><div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent" /><div className="absolute bottom-3 left-4 text-white"><p className="font-extrabold">{item.name}</p><p className="text-xs text-white/80">{item.country}</p></div></div>
       <div className="p-4"><div className="flex flex-wrap gap-1.5">{(item.categories || []).slice(0,3).map(c => <span key={c} className="rounded-full bg-gray-100 px-2.5 py-1 text-[11px] font-semibold text-gray-600">{c}</span>)}</div><div className="mt-3 flex items-center justify-between text-xs text-gray-500"><span>{item.bestSeason || "Year-round"}</span><span className="inline-flex items-center gap-1 font-bold text-gray-700"><Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />{Number(item.rating || 0).toFixed(1)}</span></div></div>
     </Link>)}</div> : <EmptyState />}</>;
 }
