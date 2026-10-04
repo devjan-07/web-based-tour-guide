@@ -87,6 +87,20 @@ export default function PlanMyTrip() {
     [destinations, destinationId]
   );
   const duration = tripDays(startDate, endDate);
+  const customTripPath = useMemo(() => {
+    const query = new URLSearchParams({
+      destinationId: selectedDestination ? String(selectedDestination.id) : "",
+      destination: selectedDestination?.name || "",
+      checkIn: startDate,
+      checkOut: endDate,
+      guests: String(travellers),
+      language: guideLanguage,
+      driverRequired: String(driverRequired),
+      luggage: String(luggage),
+    });
+    return "/tourist/custom-trip?" + query.toString();
+  }, [driverRequired, endDate, guideLanguage, luggage, selectedDestination, startDate, travellers]);
+
 
   const matchingPackages = useMemo(() => {
     if (!selectedDestination) return [];
@@ -302,8 +316,9 @@ export default function PlanMyTrip() {
             <div className="mt-6 rounded-[2rem] border border-dashed border-gray-300 bg-white p-10 text-center">
               <Compass className="mx-auto h-8 w-8 text-gray-300" />
               <p className="mt-4 font-black text-[#10213b]">No package matches these choices yet.</p>
-              <p className="mt-2 text-sm text-gray-500">Try another destination, experience or budget. You can also browse every package.</p>
-              <Link to="/explore?tab=tours" className="mt-5 inline-flex rounded-full bg-[#10213b] px-5 py-3 text-sm font-black text-white">Browse all packages</Link>
+              <p className="mt-2 text-sm text-gray-500">Build a journey around your own guide, stay and transport instead.</p>
+              <Link to={customTripPath} className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#ff385c] px-5 py-3 text-sm font-black text-white">Build My Own Trip <ArrowRight className="h-4 w-4" /></Link>
+              <Link to="/explore?tab=tours" className="ml-2 mt-5 inline-flex rounded-full border border-gray-200 bg-white px-5 py-3 text-sm font-black text-gray-700">Browse packages</Link>
             </div>
           ) : (
             <div className="mt-6 grid gap-6 md:grid-cols-2">
@@ -328,7 +343,19 @@ export default function PlanMyTrip() {
         </section>
 
         {matched && (
-          <section className="mt-14">
+          <>
+            <section className="mt-10 rounded-[2rem] bg-gradient-to-r from-[#10213b] to-[#183d68] p-6 text-white md:p-8">
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-rose-300">Prefer something completely your own?</p>
+                  <h2 className="mt-2 text-3xl font-black">Build a trip around your choices.</h2>
+                  <p className="mt-2 max-w-2xl text-sm leading-6 text-white/70">These recommendations are based on your destination, dates, group size and preferences — not on a package. Choose your own guide, stay and transport.</p>
+                </div>
+                <Link to={customTripPath} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-[#ff385c] px-6 py-3.5 text-sm font-black text-white">Build My Own Trip <ArrowRight className="h-4 w-4" /></Link>
+              </div>
+            </section>
+
+            <section className="mt-14">
             <div className="rounded-[2rem] bg-[#0b1f3a] p-6 text-white md:p-8">
               <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-300">Supporting services</p>
               <h2 className="mt-2 text-3xl font-black">Complete the journey when you need to.</h2>
@@ -340,6 +367,7 @@ export default function PlanMyTrip() {
               <ServicePanel title="Transport" icon={Car} count={vehicles.length} empty="No suitable vehicles found.">{vehicles.map(({ vehicle, suitabilityScore, reasons }) => <ServiceCard key={vehicle.id} image={vehicle.image} title={vehicle.name} subtitle={vehicle.type + " · " + vehicle.capacity + " seats"} price={"LKR " + Number(vehicle.pricePerDay).toLocaleString() + " / day"} score={suitabilityScore} reasons={reasons} />)}</ServicePanel>
             </div>
           </section>
+          </>
         )}
 
         <section className="mt-14 overflow-hidden rounded-[2rem] bg-[#f5eee7]">
