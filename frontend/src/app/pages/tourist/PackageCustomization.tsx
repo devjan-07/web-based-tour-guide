@@ -216,9 +216,9 @@ export default function PackageCustomization() {
               </div>
               <div className="space-y-3 border-y border-white/10 p-6 text-sm">
                 <Summary label="Dates" value={checkIn + " → " + checkOut} />
-                <Summary label="Guide" value={guide?.name || allocation?.guide?.name || (hasIncludedGuide ? "Checking assignment..." : "No guide selected")} />
-                <Summary label="Stay" value={stay?.name || allocation?.accommodation?.name || (hasIncludedAccommodation ? "Checking assignment..." : "No stay selected")} />
-                <Summary label="Transport" value={vehicle?.name || allocation?.vehicle?.name || (hasIncludedTransport ? "Checking assignment..." : "Not selected")} />
+                <Summary label="Guide" value={guide?.name || allocation?.guide?.name || (hasIncludedGuide ? "Checking match..." : "No guide selected")} />
+                <Summary label="Stay" value={stay?.name || allocation?.accommodation?.name || (hasIncludedAccommodation ? "Checking match..." : "No stay selected")} />
+                <Summary label="Transport" value={vehicle?.name || allocation?.vehicle?.name || (hasIncludedTransport ? "Checking match..." : "Not selected")} />
                 <Summary label="Language" value={language} />
               </div>
               <div className="bg-white p-6 text-[#10213b]">
@@ -255,7 +255,7 @@ function Summary({ label, value }: { label: string; value: string }) {
 function ChoiceSection({ title, icon: Icon, included, assigned, selected, loading, open, onToggle, onClear, children }: { title: string; icon: typeof BedDouble; included: boolean; assigned?: string; selected?: string; loading: boolean; open: boolean; onToggle: () => void; onClear: () => void; children: React.ReactNode }) {
   return <div className="mt-4 overflow-hidden rounded-2xl border border-gray-200">
     <button type="button" onClick={onToggle} className="flex w-full items-center justify-between gap-4 bg-white p-5 text-left hover:bg-gray-50">
-      <div className="flex items-center gap-3"><span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gray-50 text-gray-600"><Icon className="h-5 w-5" /></span><div><p className="font-black text-[#10213b]">{title}</p><p className="mt-1 text-xs text-gray-500">{selected ? "Alternative: " + selected : assigned ? "Assigned for your dates: " + assigned : included ? "Included with this package" : "Choose an optional service"}</p></div></div>
+      <div className="flex items-center gap-3"><span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gray-50 text-gray-600"><Icon className="h-5 w-5" /></span><div><p className="font-black text-[#10213b]">{title}</p><p className="mt-1 text-xs text-gray-500">{selected ? "Alternative: " + selected : assigned ? "Matched for your dates: " + assigned : included ? "Included with this package" : "Choose an optional service"}</p></div></div>
       <div className="flex items-center gap-2">{selected && <button type="button" onClick={(event) => { event.stopPropagation(); onClear(); }} className="rounded-full px-3 py-1.5 text-xs font-black text-gray-500 hover:bg-gray-100">Reset</button>}<span className={"rounded-full px-3 py-1.5 text-xs font-black " + (included ? "bg-emerald-50 text-emerald-700" : "bg-gray-100 text-gray-600")}>{included ? "Included" : "Optional"}</span><ArrowRight className={"h-4 w-4 text-gray-400 transition " + (open ? "rotate-90" : "")} /></div>
     </button>
     {open && <div className="border-t border-gray-100 bg-[#fafafa] p-4">{loading ? <p className="p-4 text-sm text-gray-400">Checking live availability...</p> : <div className="grid gap-3 md:grid-cols-2">{children}</div>}</div>}
