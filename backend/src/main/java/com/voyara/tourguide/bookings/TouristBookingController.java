@@ -60,6 +60,14 @@ public class TouristBookingController {
         return bookingService.previewPackageAllocation(request);
     }
 
+    @PostMapping("/custom-preview")
+    public CustomTripPreview customPreview(
+            @Valid @RequestBody TouristBookingRequest request,
+            Principal principal
+    ) {
+        return bookingService.previewCustomTrip(request);
+    }
+
     @PostMapping
     public Booking create(@Valid @RequestBody TouristBookingRequest request, Principal principal) {
         if (!securityEnabled && !hasPrincipal(principal)) {
