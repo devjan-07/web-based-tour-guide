@@ -84,6 +84,32 @@ class PackageResourceAllocationServiceTest {
     }
 
     @Test
+    void previewsDateAwareAssignmentsWithoutPersistingBooking() {
+        TourPackage tourPackage = packageWithAllIncludedServices();
+        Booking booking = booking("English", 2, 1);
+
+        TourGuide guide = guide(10L, "Nethmi Fernando", "Ella");
+        Accommodation accommodation = accommodation(20L, "Ella Tea Valley Villa", "Ella", 12);
+        Vehicle vehicle = vehicle(30L, "Mitsubishi Montero SUV", 6, "Ella");
+
+        tourPackage.setEligibleGuides(List.of(guide));
+        tourPackage.setEligibleAccommodations(List.of(accommodation));
+        tourPackage.setEligibleVehicles(List.of(vehicle));
+
+        PackageResourceAllocationPreview preview = service.preview(tourPackage, booking, null);
+
+        assertEquals(10L, preview.guide().id());
+        assertEquals("Nethmi Fernando", preview.guide().name());
+        assertEquals(20L, preview.accommodation().id());
+        assertEquals("Ella Tea Valley Villa", preview.accommodation().name());
+        assertEquals(30L, preview.vehicle().id());
+        assertEquals("Mitsubishi Montero SUV", preview.vehicle().name());
+        assertEquals(1, preview.guideOptions().size());
+        assertEquals(1, preview.accommodationOptions().size());
+        assertEquals(1, preview.vehicleOptions().size());
+    }
+
+    @Test
     void rejectsWhenNoEligibleVehicleCanCarryTheGroup() {
         TourPackage tourPackage = packageWithAllIncludedServices();
         Booking booking = booking("English", 8, 1);
