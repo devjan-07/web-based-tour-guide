@@ -23,6 +23,13 @@ function addDays(value: string, days: number) {
   return date.toISOString().slice(0, 10);
 }
 
+function tripDays(start: string, end: string) {
+  const from = new Date(start);
+  const to = new Date(end);
+  if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) return 1;
+  return Math.max(1, Math.ceil((to.getTime() - from.getTime()) / 86400000));
+}
+
 function primaryDestinationName(value: string) {
   return value.split(",")[0].trim();
 }
@@ -116,6 +123,16 @@ export default function CustomTripBuilder() {
   const selectedStay = useMemo(() => stays.find((item) => item.accommodation.id === stayId)?.accommodation || null, [stays, stayId]);
   const selectedVehicle = useMemo(() => vehicles.find((item) => item.vehicle.id === vehicleId)?.vehicle || null, [vehicles, vehicleId]);
 
+  const estimatedTotal = useMemo(() => {
+    if (!selectedGuide || !selectedStay || !selectedVehicle) return 0;
+    const days = tripDays(checkIn, checkOut);
+    return (
+      Number(selectedGuide.pricePerDay || 0) * days +
+      Number(selectedStay.price || 0) * days +
+      Number(selectedVehicle.pricePerDay || 0) * days
+    );
+  }, [checkIn, checkOut, selectedGuide, selectedStay, selectedVehicle]);
+
   async function reviewTrip() {
     setReviewing(true);
     setError("");
@@ -197,15 +214,18 @@ export default function CustomTripBuilder() {
 
               <section className="mt-8 rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-gray-200 md:p-8">
                 <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-                  <div><p className="text-xs font-black uppercase tracking-[0.2em] text-rose-500">Review your choices</p><h2 className="mt-2 text-3xl font-black text-[#10213b]">Your custom journey</h2><p className="mt-2 text-sm text-gray-500">Voyara will re-check availability before the reservation is created.</p></div>
-                  <button type="button" onClick={reviewTrip} disabled={reviewing} className="inline-flex items-center justify-center gap-2 rounded-full bg-[#ff385c] px-6 py-3.5 text-sm font-black text-white disabled:opacity-50">{reviewing ? "Checking availability..." : "Review my trip"} <ArrowRight className="h-4 w-4" /></button>
+                  <div><p className="text-xs font-black uppercase tracking-[0.2em] text-rose-500">Review your choices</p><h2 className="mt-2 text-3xl font-black text-[#10213b]">Your custom journey</h2><p className="mt-2 text-sm text-gray-500">Your estimate updates as you change your guide, stay or transport. Voyara checks final availability before booking.</p></div>
+                  <div className="text-left md:text-right">
+                    <p className="text-[10px] font-black uppercase tracking-wider text-gray-400">Estimated total</p>
+                    <p className="mt-1 text-3xl font-black text-[#10213b]">{estimatedTotal ? "LKR " + estimatedTotal.toLocaleString() : "Select your options"}</p>
+                  </div>
                 </div>
                 <div className="mt-6 grid gap-3 md:grid-cols-3">
                   <Summary title="Guide" value={selectedGuide?.name || "Not selected"} />
                   <Summary title="Stay" value={selectedStay?.name || "Not selected"} />
                   <Summary title="Transport" value={selectedVehicle?.name || "Not selected"} />
                 </div>
-                {preview && <div className="mt-6 rounded-2xl bg-[#f7f8fa] p-5"><div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-xs font-black uppercase tracking-wider text-emerald-600">Availability confirmed</p><p className="mt-1 text-sm text-gray-600">The selected resources pass the current date, capacity and conflict checks.</p></div><p className="text-3xl font-black text-[#10213b]">LKR {Number(preview.total || 0).toLocaleString()}</p></div><button type="button" onClick={continueToBooking} className="mt-5 w-full rounded-xl bg-[#10213b] px-5 py-3.5 text-sm font-black text-white">Continue to booking</button></div>}
+                {preview ? <div className="mt-6 rounded-2xl bg-[#f7f8fa] p-5"><div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-xs font-black uppercase tracking-wider text-emerald-600">Availability confirmed</p><p className="mt-1 text-sm text-gray-600">The selected resources pass the current date, capacity and conflict checks.</p></div><p className="text-3xl font-black text-[#10213b]">LKR {Number(preview.total || 0).toLocaleString()}</p></div><button type="button" onClick={continueToBooking} className="mt-5 w-full rounded-xl bg-[#10213b] px-5 py-3.5 text-sm font-black text-white">Continue to booking</button></div> : <button type="button" onClick={reviewTrip} disabled={reviewing || !selectedGuide || !selectedStay || !selectedVehicle} className="mt-6 w-full rounded-xl bg-[#ff385c] px-5 py-3.5 text-sm font-black text-white disabled:opacity-50">{reviewing ? "Checking availability..." : "Check availability & continue"} <ArrowRight className="ml-1 inline h-4 w-4" /></button>}
               </section>
             </>
           )}
