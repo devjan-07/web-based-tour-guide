@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Heart } from "lucide-react";
+import { ImageWithFallback } from "./figma/ImageWithFallback";
 
 interface DestinationCardProps {
   id: number;
@@ -15,16 +16,14 @@ export function DestinationCard({
   id, image, title, location, badge, tags = [], onView,
 }: DestinationCardProps) {
   const [liked, setLiked] = useState(false);
-  const [imgError, setImgError] = useState(false);
 
   return (
     <div className="group cursor-pointer" onClick={() => onView?.(id, title)}>
       <div className="relative rounded-2xl overflow-hidden mb-3" style={{ aspectRatio: "4/3" }}>
-        <img
-          src={imgError ? "https://images.unsplash.com/photo-1586500036706-41963de24d8b?w=600" : image}
+        <ImageWithFallback
+          src={image}
           alt={title}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          onError={() => setImgError(true)}
         />
         {/* Gradient overlay */}
         <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 50%)" }} />
