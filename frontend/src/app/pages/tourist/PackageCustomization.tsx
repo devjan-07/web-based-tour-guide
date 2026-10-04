@@ -4,8 +4,6 @@ import { ArrowLeft, ArrowRight, BedDouble, Car, Check, Clock3, Languages, MapPin
 import { Navbar } from "../../components/Navbar";
 import { Footer } from "../../components/Footer";
 import {
-  accommodationRecommendationsApi,
-  guidesApi,
   packagesApi,
   packageResourceAllocationApi,
   touristBookingsApi,
