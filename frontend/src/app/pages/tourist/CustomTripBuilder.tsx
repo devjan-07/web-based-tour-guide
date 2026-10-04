@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { ImageWithFallback } from "../../components/figma/ImageWithFallback";
 import { Link, useNavigate, useSearchParams } from "react-router";
 import { ArrowLeft, ArrowRight, BedDouble, Car, Check, Languages, MapPin, Star, Users } from "lucide-react";
 import { Navbar } from "../../components/Navbar";
@@ -242,7 +243,7 @@ function ResourceSection({ title, icon: Icon, description, children }: { title: 
 
 function ResourceCard({ selected, onSelect, image, title, subtitle, price, rating, meta }: { selected: boolean; onSelect: () => void; image?: string; title: string; subtitle: string; price: string; rating: number; meta: string }) {
   return <button type="button" onClick={onSelect} className={"overflow-hidden rounded-2xl border text-left transition hover:-translate-y-0.5 hover:shadow-lg " + (selected ? "border-rose-400 ring-2 ring-rose-200" : "border-gray-200")}>
-    <div className="relative h-40 bg-gray-100">{image && <img src={image} alt="" className="h-full w-full object-cover" />} {selected && <span className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-[#ff385c] text-white"><Check className="h-5 w-5" /></span>}</div>
+    <div className="relative h-40 bg-gray-100">{image && <ImageWithFallback src={image} alt="" className="h-full w-full object-cover" />} {selected && <span className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-[#ff385c] text-white"><Check className="h-5 w-5" /></span>}</div>
     <div className="p-4"><div className="flex items-start justify-between gap-3"><h3 className="font-black text-[#10213b]">{title}</h3><span className="shrink-0 inline-flex items-center gap-1 text-xs font-black text-gray-500"><Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />{Number(rating || 0).toFixed(1)}</span></div><p className="mt-1 text-xs text-gray-500">{subtitle}</p><p className="mt-3 text-sm font-black text-[#10213b]">{price}</p><p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-gray-400">{meta}</p></div>
   </button>;
 }
