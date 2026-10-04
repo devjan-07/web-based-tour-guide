@@ -210,6 +210,62 @@ public class BookingService {
     }
 
     @Transactional(readOnly = true)
+    public PackageResourceAllocationPreview previewPackageAllocation(TouristBookingRequest request) {
+        Booking booking = toBooking(request);
+        booking.setBookingType("PACKAGE");
+        booking.setStatus("Pending");
+        booking.setPayment("Pending");
+
+        if (booking.getCheckIn() == null || booking.getCheckOut() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Check-in and check-out dates are required");
+        }
+        if (!booking.getCheckOut().isAfter(booking.getCheckIn())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Check-out date must be after check-in date");
+        }
+
+        TourPackage tourPackage = selectedPackage(booking);
+        if (tourPackage == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A package is required for resource preview");
+        }
+        validateActive("Package", tourPackage.getStatus(), "Active");
+        if (tourPackage.getMaxGroup() > 0 && booking.getGuests() > tourPackage.getMaxGroup()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Guest count exceeds the selected package maximum group size");
+        }
+
+        String included = tourPackage.getIncluded() == null ? "" : tourPackage.getIncluded().toLowerCase();
+        if (booking.getGuideSelectionType() == null || booking.getGuideSelectionType().isBlank()) {
+            booking.setGuideSelectionType(included.contains("guide") || included.contains("naturalist") ? "VOYARA" : "OWN");
+        }
+        if (booking.getAccommodationSelectionType() == null || booking.getAccommodationSelectionType().isBlank()) {
+            booking.setAccommodationSelectionType(
+                    included.contains("hotel")
+                            || included.contains("accommodation")
+                            || included.contains("lodge")
+                            || included.contains("stay")
+                            || included.contains("villa")
+                            || included.contains("bungalow")
+                            || included.contains("inn") ? "VOYARA" : "OWN");
+        }
+        if (booking.getVehicleSelectionType() == null || booking.getVehicleSelectionType().isBlank()) {
+            booking.setVehicleSelectionType(
+                    included.contains("transport")
+                            || included.contains("transfer")
+                            || included.contains("private van")
+                            || included.contains("safari jeep") ? "VOYARA" : "OWN");
+        }
+
+        if (booking.getGuests() < 1) {
+            booking.setGuests(1);
+        }
+        if (booking.getRooms() == null || booking.getRooms() < 1) {
+            booking.setRooms(1);
+        }
+
+        return packageResourceAllocationService.preview(tourPackage, booking, null);
+    }
+
+    @Transactional(readOnly = true)
     public TripReadiness getTripReadiness(String email, String id) {
         Booking booking = findTouristBooking(email, id);
         return buildTripReadiness(booking);
