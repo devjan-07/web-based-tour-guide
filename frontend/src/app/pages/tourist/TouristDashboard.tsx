@@ -220,37 +220,54 @@ export default function TouristDashboard() {
           ))}
         </section>
 
-        {(readiness || notifications.length > 0) && (
+        {(readiness || summary.nextBooking || bookings.length > 0) && (
           <section className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-4 mb-6">
-            {readiness && (
-              <div className="rounded-3xl border border-gray-200 bg-white p-5">
+            {readiness ? (
+              <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">Trip command center</p>
                     <h2 className="mt-1 text-lg font-bold text-gray-900">Trip readiness</h2>
                   </div>
-                  <span className="text-lg font-extrabold text-gray-900">{readiness.completionPercent}%</span>
+                  <span className="rounded-full bg-rose-50 px-3 py-1 text-sm font-extrabold text-rose-600">{readiness.completionPercent}% ready</span>
                 </div>
                 <div className="mt-4 h-2 overflow-hidden rounded-full bg-gray-100">
-                  <div className="h-full rounded-full" style={{ width: `${readiness.completionPercent}%`, background: "#FF385C" }} />
+                  <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(100, Math.max(0, readiness.completionPercent))}%`, background: "#FF385C" }} />
                 </div>
                 {summary.nextBooking?.packageId ? (
-                  <p className="mt-3 text-sm text-gray-600">
-                    Your package already includes the guide, accommodation and transport. The remaining readiness reflects Voyara's provider assignment, not services you need to select again.
+                  <p className="mt-3 text-sm leading-6 text-gray-600">
+                    Your package already includes the guide, accommodation and transport. Remaining readiness reflects Voyara's provider assignment rather than services you need to select again.
                   </p>
                 ) : (
-                  <p className="mt-3 text-sm text-gray-600">{readiness.nextAction}</p>
+                  <p className="mt-3 text-sm leading-6 text-gray-600">{readiness.nextAction}</p>
                 )}
-                <Link to={`/tourist/bookings/${readiness.bookingId}`} className="mt-4 inline-flex items-center gap-2 text-sm font-semibold" style={{ color: "#FF385C" }}>
+                <Link to={`/tourist/bookings/${readiness.bookingId}`} className="mt-4 inline-flex items-center gap-2 rounded-xl bg-gray-50 px-3 py-2 text-sm font-semibold text-rose-600 hover:bg-rose-50">
                   Open trip details <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
+            ) : (
+              <div className="rounded-3xl border border-dashed border-gray-200 bg-white p-5 shadow-sm">
+                <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">Trip command center</p>
+                <h2 className="mt-1 text-lg font-bold text-gray-900">No upcoming trip yet</h2>
+                <p className="mt-2 text-sm leading-6 text-gray-500">Start planning a journey and Voyara will show its readiness here once a booking is available.</p>
+                <Link to="/tourist/plan" className="mt-4 inline-flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-bold text-white hover:bg-gray-800">
+                  Build my trip <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
             )}
-            {notifications.length > 0 && (
-              <div className="rounded-3xl border border-gray-200 bg-white p-5">
-                <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">Action center</p>
-                <h2 className="mt-1 text-lg font-bold text-gray-900">Needs your attention</h2>
-                <div className="mt-3 space-y-2">
+            <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">Action center</p>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h2 className="mt-1 text-lg font-bold text-gray-900">{notifications.length > 0 ? "Needs your attention" : "You are all caught up"}</h2>
+                  <p className="mt-1 text-sm text-gray-500">{notifications.length > 0 ? "Recent updates that may need a response." : "There are no unread updates waiting for you."}</p>
+                </div>
+                <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${notifications.length > 0 ? "bg-amber-50 text-amber-700" : "bg-emerald-50 text-emerald-700"}`}>
+                  {notifications.length > 0 ? `${notifications.length} new` : "Clear"}
+                </span>
+              </div>
+              {notifications.length > 0 ? (
+                <div className="mt-4 space-y-2">
                   {notifications.map((notification) => (
                     <div key={notification.id} className="rounded-xl bg-gray-50 p-3">
                       <p className="text-sm font-semibold text-gray-800">{notification.title}</p>
@@ -258,8 +275,12 @@ export default function TouristDashboard() {
                     </div>
                   ))}
                 </div>
-              </div>
-            )}
+              ) : (
+                <Link to="/" className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-rose-600 hover:text-rose-700">
+                  Explore new ideas <ArrowRight className="h-4 w-4" />
+                </Link>
+              )}
+            </div>
           </section>
         )}
 
