@@ -616,37 +616,26 @@ public class BookingService {
 
         Vehicle vehicle = selectedVehicle(candidate);
         if (vehicle != null) {
-            validateActive("Vehicle", vehicle.getStatus(), "Available");
-            if (candidate.getGuests() > vehicle.getCapacity()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Passenger count exceeds the selected vehicle capacity");
-            }
+            /*
+             * VEHICLE bookings are priced by VehicleBookingStrategy.
+             * For PACKAGE/CUSTOM bookings, vehicle pricing remains part of the
+             * common resource-pricing workflow when a vehicle is explicitly selected.
+             */
             candidate.setVehicle(label(vehicle.getName(), vehicle.getBrand(), vehicle.getModel()));
-            if ("VEHICLE".equalsIgnoreCase(candidate.getBookingType())) {
-                candidate.setDestination(candidate.getPickupLocation());
-            }
-            if (!packageBooking || vehicleExplicitlySelected) {
+            if (!"VEHICLE".equalsIgnoreCase(candidate.getBookingType())
+                    && (!packageBooking || vehicleExplicitlySelected)) {
                 total = total.add(nonNull(vehicle.getPricePerDay()).multiply(BigDecimal.valueOf(days)));
                 pricedFromResources = true;
             }
-        } else if (strictCustomerBooking && "VEHICLE".equalsIgnoreCase(candidate.getBookingType())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A vehicle booking requires a valid vehicle");
-        }
-        if (strictCustomerBooking && vehicle != null && (candidate.getPickupLocation() == null || candidate.getPickupLocation().isBlank())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pickup location is required");
-        }
-        if (strictCustomerBooking && vehicle != null) {
-            requireText(candidate.getPickupTime(), "Pickup time is required");
-            requireText(candidate.getReturnLocation(), "Return location is required");
-            requireText(candidate.getReturnTime(), "Return time is required");
-        }
 
-        if (strictCustomerBooking && "VEHICLE".equalsIgnoreCase(candidate.getBookingType()) && (candidate.getPickupLocation() == null || candidate.getPickupLocation().isBlank())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pickup location is required");
-        }
-        if (strictCustomerBooking && "VEHICLE".equalsIgnoreCase(candidate.getBookingType())) {
-            requireText(candidate.getPickupTime(), "Pickup time is required");
-            requireText(candidate.getReturnLocation(), "Return location is required");
-            requireText(candidate.getReturnTime(), "Return time is required");
+            // These requirements also apply when a guide/package/custom booking
+            // explicitly includes a vehicle resource.
+            if (strictCustomerBooking) {
+                requireText(candidate.getPickupLocation(), "Pickup location is required");
+                requireText(candidate.getPickupTime(), "Pickup time is required");
+                requireText(candidate.getReturnLocation(), "Return location is required");
+                requireText(candidate.getReturnTime(), "Return time is required");
+            }
         }
 
         List<Booking> existingBookings = repository.findAll();
