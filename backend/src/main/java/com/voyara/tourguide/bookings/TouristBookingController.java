@@ -52,6 +52,14 @@ public class TouristBookingController {
         return bookingService.getTripReadiness(currentEmail(principal), id);
     }
 
+    @PostMapping("/package-preview")
+    public PackageResourceAllocationPreview packagePreview(
+            @Valid @RequestBody TouristBookingRequest request,
+            Principal principal
+    ) {
+        return bookingService.previewPackageAllocation(request);
+    }
+
     @PostMapping
     public Booking create(@Valid @RequestBody TouristBookingRequest request, Principal principal) {
         if (!securityEnabled && !hasPrincipal(principal)) {
