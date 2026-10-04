@@ -56,13 +56,16 @@ export default function CustomTripBuilder() {
   const language = params.get("language") || "English";
   const driverRequired = params.get("driverRequired") !== "false";
   const luggage = Math.max(0, Number(params.get("luggage") || 0));
+  const initialGuideId = Number(params.get("guideId") || 0) || null;
+  const initialStayId = Number(params.get("accommodationId") || 0) || null;
+  const initialVehicleId = Number(params.get("vehicleId") || 0) || null;
 
   const [guides, setGuides] = useState<Guide[]>([]);
   const [stays, setStays] = useState<AccommodationRecommendation[]>([]);
   const [vehicles, setVehicles] = useState<VehicleRecommendation[]>([]);
-  const [guideId, setGuideId] = useState<number | null>(null);
-  const [stayId, setStayId] = useState<number | null>(null);
-  const [vehicleId, setVehicleId] = useState<number | null>(null);
+  const [guideId, setGuideId] = useState<number | null>(initialGuideId);
+  const [stayId, setStayId] = useState<number | null>(initialStayId);
+  const [vehicleId, setVehicleId] = useState<number | null>(initialVehicleId);
   const [loading, setLoading] = useState(true);
   const [reviewing, setReviewing] = useState(false);
   const [error, setError] = useState("");
@@ -89,9 +92,6 @@ export default function CustomTripBuilder() {
     ])
       .then(([guideItems, stayItems, vehicleItems]) => {
         if (cancelled) return;
-        const location = primaryDestinationName(destination).toLowerCase();
-        const requestedLanguage = language.toLowerCase();
-
         const rankedGuides = guideItems
           .filter((guide) => guide.status === "Available")
           .map((guide) => ({
@@ -105,9 +105,9 @@ export default function CustomTripBuilder() {
         setGuides(rankedGuides);
         setStays(stayItems.slice(0, 5));
         setVehicles(vehicleItems.slice(0, 5));
-        setGuideId(rankedGuides[0]?.id ?? null);
-        setStayId(stayItems[0]?.accommodation.id ?? null);
-        setVehicleId(vehicleItems[0]?.vehicle.id ?? null);
+        setGuideId((current) => current && rankedGuides.some((item) => item.id === current) ? current : rankedGuides[0]?.id ?? null);
+        setStayId((current) => current && stayItems.some((item) => item.accommodation.id === current) ? current : stayItems[0]?.accommodation.id ?? null);
+        setVehicleId((current) => current && vehicleItems.some((item) => item.vehicle.id === current) ? current : vehicleItems[0]?.vehicle.id ?? null);
       })
       .catch((err) => {
         if (!cancelled) setError(err instanceof Error ? err.message : "Could not load custom trip options.");
