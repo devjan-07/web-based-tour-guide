@@ -372,6 +372,47 @@ export const packageResourceAllocationApi = {
   }),
 };
 
+export interface CustomTripPreview {
+  bookingType: "CUSTOM";
+  destination: string;
+  guideId?: number | null;
+  guide?: string | null;
+  guidePricePerDay?: number | null;
+  accommodationId?: number | null;
+  accommodation?: string | null;
+  accommodationPricePerNight?: number | null;
+  vehicleId?: number | null;
+  vehicle?: string | null;
+  vehiclePricePerDay?: number | null;
+  guests: number;
+  rooms: number;
+  checkIn: string;
+  checkOut: string;
+  total: number;
+}
+
+export const customTripApi = {
+  preview: (payload: {
+    destination: string;
+    guideId?: number | null;
+    accommodationId?: number | null;
+    vehicleId?: number | null;
+    guideSelectionType?: "VOYARA" | "OWN";
+    accommodationSelectionType?: "VOYARA" | "OWN";
+    vehicleSelectionType?: "VOYARA" | "OWN";
+    checkIn: string;
+    checkOut: string;
+    guests: number;
+    rooms?: number;
+    languagePreference?: string;
+    driverRequired?: boolean;
+    luggageCount?: number;
+  }) => request<CustomTripPreview>("/tourist/bookings/custom-preview", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  }),
+};
+
 export const touristBookingsApi = {
   list: () => request<Booking[]>("/tourist/bookings"),
   detail: (id: string) => request<Booking>(`/tourist/bookings/${id}`),
