@@ -190,12 +190,15 @@ export default function TouristBookingCreate() {
   }, [accommodations, destination]);
 
   useEffect(() => {
-    if (!nearbyGuides.length) {
-      setSelectedGuideId(null);
-      return;
+    if (!guidesLoading) {
+      setSelectedGuideId((current) => {
+        if (current && nearbyGuides.some((guide) => guide.id === current)) {
+          return current;
+        }
+        return nearbyGuides[0]?.id ?? null;
+      });
     }
-    setSelectedGuideId((current) => current && nearbyGuides.some((guide) => guide.id === current) ? current : nearbyGuides[0].id);
-  }, [nearbyGuides]);
+  }, [guidesLoading, nearbyGuides]);
 
   useEffect(() => {
     if (!nearbyAccommodations.length) {
