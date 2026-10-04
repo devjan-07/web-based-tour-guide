@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { ImageWithFallback } from "../../components/figma/ImageWithFallback";
 import type { ComponentType, ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { ArrowLeft, BedDouble, CalendarDays, CheckCircle, CreditCard, MapPin, Star, Users } from "lucide-react";
@@ -110,7 +111,7 @@ export default function TouristAccommodationBooking() {
           <form onSubmit={submit} className="grid grid-cols-1 gap-5 lg:grid-cols-3">
             <section className="lg:col-span-2 overflow-hidden rounded-3xl border border-gray-200 bg-white">
               <div className="relative h-72">
-                <img src={accommodation.image} alt={accommodation.name} className="h-full w-full object-cover" />
+                <ImageWithFallback src={accommodation.image} alt={accommodation.name} className="h-full w-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/65 to-transparent" />
                 <div className="absolute bottom-0 p-6 text-white">
                   <p className="mb-2 text-xs font-bold uppercase tracking-widest text-white/70">Accommodation booking</p>
