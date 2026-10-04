@@ -75,6 +75,17 @@ export function Navbar() {
             >
               Compare
             </Link>
+            {isTourist && (
+              <Link
+                to="/tourist/dashboard"
+                aria-current={isActive("/tourist/dashboard") ? "page" : undefined}
+                className={`rounded-full px-4 py-2.5 text-sm font-semibold transition ${
+                  isActive("/tourist/dashboard") ? "bg-gray-100 text-gray-950" : "text-gray-600 hover:bg-gray-50 hover:text-gray-950"
+                }`}
+              >
+                My trips
+              </Link>
+            )}
             <Link
               to={planHref}
               className="ml-2 inline-flex items-center rounded-full bg-gray-950 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-gray-800"
