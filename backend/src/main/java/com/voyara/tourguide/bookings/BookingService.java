@@ -558,8 +558,8 @@ public class BookingService {
         boolean pricedFromResources = false;
 
         boolean packageBooking = "PACKAGE".equalsIgnoreCase(candidate.getBookingType());
+        boolean accommodationBooking = "ACCOMMODATION".equalsIgnoreCase(candidate.getBookingType());
         boolean guideExplicitlySelected = candidate.getGuideId() != null;
-        boolean accommodationExplicitlySelected = candidate.getAccommodationId() != null;
         boolean vehicleExplicitlySelected = candidate.getVehicleId() != null;
 
         /*
@@ -590,8 +590,9 @@ public class BookingService {
             }
         }
 
-        Accommodation accommodation = selectedAccommodation(candidate);
-        if (accommodation != null) {
+        if (!accommodationBooking) {
+            Accommodation accommodation = selectedAccommodation(candidate);
+
             validateActive("Accommodation", accommodation.getStatus(), "Active");
             if (strictCustomerBooking && "ACCOMMODATION".equalsIgnoreCase(candidate.getBookingType())) {
                 requireText(candidate.getRoomType(), "Room type is required");
@@ -614,6 +615,9 @@ public class BookingService {
         }
 
         Vehicle vehicle = selectedVehicle(candidate);
+        }
+
+        Vehicle vehicle
         if (vehicle != null) {
             validateActive("Vehicle", vehicle.getStatus(), "Available");
             if (candidate.getGuests() > vehicle.getCapacity()) {
