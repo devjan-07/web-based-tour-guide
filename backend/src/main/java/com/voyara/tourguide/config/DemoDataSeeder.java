@@ -158,13 +158,29 @@ public class DemoDataSeeder implements CommandLineRunner {
         // Refresh the package map after seeding so newly-created demo packages are always available.
         List<TourPackage> seededPackages = tourPackageRepository.findAll();
         Map<String, TourPackage> packages = seededPackages.stream()
-                .collect(Collectors.toMap(TourPackage::getName, Function.identity(), (first, second) -> first));
+                .collect(Collectors.toMap(
+                        pkg -> seedKey(pkg.getName()),
+                        Function.identity(),
+                        (first, second) -> first
+                ));
         Map<String, TourGuide> guides = tourGuideRepository.findAll().stream()
-                .collect(Collectors.toMap(TourGuide::getName, Function.identity(), (first, second) -> first));
+                .collect(Collectors.toMap(
+                        guide -> seedKey(guide.getName()),
+                        Function.identity(),
+                        (first, second) -> first
+                ));
         Map<String, Accommodation> accommodations = accommodationRepository.findAll().stream()
-                .collect(Collectors.toMap(Accommodation::getName, Function.identity(), (first, second) -> first));
+                .collect(Collectors.toMap(
+                        accommodation -> seedKey(accommodation.getName()),
+                        Function.identity(),
+                        (first, second) -> first
+                ));
         Map<String, Vehicle> vehicles = vehicleRepository.findAll().stream()
-                .collect(Collectors.toMap(Vehicle::getName, Function.identity(), (first, second) -> first));
+                .collect(Collectors.toMap(
+                        vehicle -> seedKey(vehicle.getName()),
+                        Function.identity(),
+                        (first, second) -> first
+                ));
 
         assignPackageResources(packages, guides, accommodations, vehicles,
                 "Sri Lanka Cultural Triangle",
@@ -252,7 +268,7 @@ public class DemoDataSeeder implements CommandLineRunner {
     }
 
     private <T> T required(Map<String, T> values, String key, String type) {
-        T value = values.get(key);
+        T value = values.get(seedKey(key));
         if (value == null) {
             throw new IllegalStateException(
                     "Demo data is missing " + type + ": " + key
@@ -289,6 +305,9 @@ public class DemoDataSeeder implements CommandLineRunner {
                     if (existing == null) {
                         return seed;
                     }
+                    // Canonicalize the name so later normalized lookups and API responses
+                    // use the current seeded value even when the database contains legacy casing/spacing.
+                    existing.setName(seed.getName());
                     existing.setPrice(seed.getPrice());
                     existing.setImage(seed.getImage());
                     existing.setIncluded(seed.getIncluded());
