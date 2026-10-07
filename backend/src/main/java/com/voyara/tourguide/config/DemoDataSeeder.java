@@ -155,7 +155,9 @@ public class DemoDataSeeder implements CommandLineRunner {
     }
 
     private void seedPackageResources() {
-        Map<String, TourPackage> packages = tourPackageRepository.findAll().stream()
+        // Refresh the package map after seeding so newly-created demo packages are always available.
+        List<TourPackage> seededPackages = tourPackageRepository.findAll();
+        Map<String, TourPackage> packages = seededPackages.stream()
                 .collect(Collectors.toMap(TourPackage::getName, Function.identity(), (first, second) -> first));
         Map<String, TourGuide> guides = tourGuideRepository.findAll().stream()
                 .collect(Collectors.toMap(TourGuide::getName, Function.identity(), (first, second) -> first));
@@ -252,7 +254,9 @@ public class DemoDataSeeder implements CommandLineRunner {
     private <T> T required(Map<String, T> values, String key, String type) {
         T value = values.get(key);
         if (value == null) {
-            throw new IllegalStateException("Demo data is missing " + type + ": " + key);
+            throw new IllegalStateException(
+                    "Demo data is missing " + type + ": " + key
+                            + ". Check that the corresponding demo seeding method runs before package resources are assigned.");
         }
         return value;
     }
