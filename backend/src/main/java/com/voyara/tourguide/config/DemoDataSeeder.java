@@ -275,13 +275,33 @@ public class DemoDataSeeder implements CommandLineRunner {
                 tourPackage("Sri Lanka Family Highlights", "Family", List.of("Kandy", "Sigiriya Rock Fortress", "Mirissa Beach"), 7, "228000.00", 14, "Easy", 4.8, 256, 73, "Guide, family hotels, breakfast, private van, attraction tickets")
         );
 
-        syncSeeded(tourPackages, tourPackageRepository.findAll(), TourPackage::getName,
-                (existing, seed) -> {
+        List<TourPackage> existingPackages = tourPackageRepository.findAll();
+        Map<String, TourPackage> existingByName = existingPackages.stream()
+                .collect(Collectors.toMap(
+                        pkg -> seedKey(pkg.getName()),
+                        Function.identity(),
+                        (first, second) -> first
+                ));
+
+        List<TourPackage> packagesToSave = tourPackages.stream()
+                .map(seed -> {
+                    TourPackage existing = existingByName.get(seedKey(seed.getName()));
+                    if (existing == null) {
+                        return seed;
+                    }
                     existing.setPrice(seed.getPrice());
                     existing.setImage(seed.getImage());
                     existing.setIncluded(seed.getIncluded());
                     existing.setDescription(seed.getDescription());
-                }, tourPackageRepository::saveAll);
+                    return existing;
+                })
+                .toList();
+
+        if (!packagesToSave.isEmpty()) {
+            // Flush explicitly so seedPackageResources() can reliably read the rows
+            // immediately after package seeding, even with an existing database.
+            tourPackageRepository.saveAllAndFlush(packagesToSave);
+        }
     }
 
     private void seedAccommodations(List<Destination> destinations) {
